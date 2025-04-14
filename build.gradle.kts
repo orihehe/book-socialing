@@ -10,3 +10,9 @@ allprojects {
         mavenCentral()
     }
 }
+
+tasks.register<Copy>("installGitHooks") {
+	from("hooks")
+	into(".git/hooks")
+	fileMode = 0b111101101
+}
