@@ -1,0 +1,142 @@
+name: Deploy to AWS with CodeDeploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Build with Gradle
+        run: ./gradlew build -x test
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Generate deployment timestamp
+        id: timestamp
+        run: echo "::set-output name=timestamp::$(date +'%Y%m%d%H%M%S')"
+
+      - name: Upload JAR to S3
+        run: |
+          aws s3 cp build/libs/*.jar s3://${{ secrets.S3_BUCKET }}/artifacts/${{ github.sha }}-${{ steps.timestamp.outputs.timestamp }}.jar
+
+      - name: Create appspec.yml
+        run: |
+          cat > appspec.yml << 'EOF'
+          version: 0.0
+          os: linux
+          files:
+            - source: /
+              destination: /home/ec2-user/app
+          hooks:
+            BeforeInstall:
+              - location: scripts/before_install.sh
+                timeout: 300
+                runas: ec2-user
+            AfterInstall:
+              - location: scripts/after_install.sh
+                timeout: 300
+                runas: ec2-user
+            ApplicationStart:
+              - location: scripts/start_application.sh
+                timeout: 300
+                runas: ec2-user
+            ValidateService:
+              - location: scripts/validate_service.sh
+                timeout: 300
+                runas: ec2-user
+          EOF
+
+      - name: Create deployment scripts directory
+        run: mkdir -p scripts
+
+      - name: Create before_install.sh
+        run: |
+          cat > scripts/before_install.sh << 'EOF'
+          #!/bin/bash
+          mkdir -p /home/ec2-user/app
+          EOF
+          chmod +x scripts/before_install.sh
+
+      - name: Create after_install.sh
+        run: |
+          cat > scripts/after_install.sh << 'EOF'
+          #!/bin/bash
+          cd /home/ec2-user/app
+          # Download the JAR file from S3
+          aws s3 cp s3://${S3_BUCKET}/artifacts/${DEPLOYMENT_GROUP_ID}.jar ./application.jar
+          EOF
+          chmod +x scripts/after_install.sh
+
+      - name: Create start_application.sh
+        run: |
+          cat > scripts/start_application.sh << 'EOF'
+          #!/bin/bash
+          cd /home/ec2-user/app
+          
+          # Stop any existing application
+          if pgrep -f "java -jar application.jar" > /dev/null; then
+            pkill -f "java -jar application.jar"
+            sleep 5
+          fi
+          
+          # Start the application
+          nohup java -jar application.jar > application.log 2>&1 &
+          
+          # Wait for application to start
+          sleep 10
+          EOF
+          chmod +x scripts/start_application.sh
+
+      - name: Create validate_service.sh
+        run: |
+          cat > scripts/validate_service.sh << 'EOF'
+          #!/bin/bash
+          
+          # Allow time for the application to fully initialize
+          sleep 15
+          
+          # Simple check to verify the application is running
+          if ! pgrep -f "java -jar application.jar" > /dev/null; then
+            echo "Application process is not running"
+            exit 1
+          fi
+          
+          # Let ELB handle the actual health checks
+          # CodeDeploy will rely on ELB health check status for traffic shifting
+          echo "Application process is running, letting ELB handle health checks"
+          exit 0
+          EOF
+          chmod +x scripts/validate_service.sh
+
+      - name: Create deployment bundle
+        run: |
+          zip -r deployment.zip appspec.yml scripts/
+          aws s3 cp deployment.zip s3://${{ secrets.S3_BUCKET }}/deployments/${{ github.sha }}-${{ steps.timestamp.outputs.timestamp }}.zip
+
+      - name: Create CodeDeploy Deployment
+        run: |
+          aws deploy create-deployment \
+            --application-name ${{ secrets.CODEDEPLOY_APPLICATION_NAME }} \
+            --deployment-group-name ${{ secrets.CODEDEPLOY_DEPLOYMENT_GROUP }} \
+            --deployment-config-name CodeDeployDefault.BlueGreen \
+            --s3-location bucket=${{ secrets.S3_BUCKET }},bundleType=zip,key=deployments/${{ github.sha }}-${{ steps.timestamp.outputs.timestamp }}.zip \
+            --file-exists-behavior OVERWRITE
