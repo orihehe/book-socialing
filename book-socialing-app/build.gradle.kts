@@ -39,3 +39,9 @@ kotlin {
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
+
+tasks.apply {
+	jar {
+		enabled = false
+	}
+}
