@@ -33,7 +33,7 @@ mobaxterm 설치
 - 개인키 경로 설정 (~/.ssh/id_rsa)
 5. save 및 실행
 
-
+---
 
 ## 🛠️ FE Tech Stack
 
@@ -52,6 +52,10 @@ mobaxterm 설치
 ### 📋 폼 & 유효성 검사
 - **[react-hook-form](https://react-hook-form.com/)** - 선언형 폼 상태 관리
 - **[zod](https://zod.dev/)** - 타입 기반 스키마 유효성 검증
+
+### 📖 문서화
+- **[Storybook](https://storybook.js.org/)** – UI 컴포넌트 개발 및 상태별 문서화 도구  
+  → `pnpm storybook`으로 실행 후 [http://localhost:6006](http://localhost:6006) 에서 확인 가능
 
 ---
 
