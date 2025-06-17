@@ -1,8 +1,13 @@
-import './App.css'
+// App.tsx
+import { Routes, Route } from 'react-router-dom'
+import NoteView from './pages/note'
 
 function App() {
   return (
-    <p className="text-2xl">HELLO</p>
+    <Routes>
+      <Route path="/" element={<NoteView />} />
+      {/* <Route path="/about" element={<AboutPage />} /> */}
+    </Routes>
   )
 }
 
