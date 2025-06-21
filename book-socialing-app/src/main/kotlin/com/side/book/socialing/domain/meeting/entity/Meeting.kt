@@ -17,29 +17,40 @@ class Meeting(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
+
     @Column(name = "name", length = 100, nullable = false)
     var name: String,
+
     @Column(name = "description", length = 1000)
     var description: String? = null,
+
     @Column(name = "round")
     var round: Int,
+
     @Column(name = "book_name", length = 200)
     var bookName: String? = null,
+
     @Column(name = "book_author", length = 100)
     var bookAuthor: String? = null,
+
     @Column(name = "book_link", length = 200)
     var bookLink: String? = null,
+
     @Column(name = "meet_date")
     var meetDate: LocalDateTime,
+
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     var createdAt: LocalDateTime? = null,
+
     @CreatedBy
     @Column(name = "created_by", updatable = false)
     var createdBy: String? = null,
+
     @LastModifiedDate
     @Column(name = "modified_at", nullable = false)
     var modifiedAt: LocalDateTime? = null,
+
     @LastModifiedBy
     @Column(name = "modified_by")
     var modifiedBy: String? = null,
