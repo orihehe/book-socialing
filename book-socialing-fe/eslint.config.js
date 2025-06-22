@@ -7,6 +7,7 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import tseslint from 'typescript-eslint'
 import prettier from 'eslint-plugin-prettier'
 import eslintConfigPrettier from 'eslint-config-prettier'
+import eslintPluginImport from 'eslint-plugin-import'
 
 export default tseslint.config({ ignores: ['dist'] }, {
   extends: [
@@ -22,7 +23,8 @@ export default tseslint.config({ ignores: ['dist'] }, {
   plugins: {
     'react-hooks': reactHooks,
     'react-refresh': reactRefresh,
-    'prettier': prettier
+    'prettier': prettier,
+    'import': eslintPluginImport
   },
   rules: {
     ...reactHooks.configs.recommended.rules,
@@ -30,6 +32,31 @@ export default tseslint.config({ ignores: ['dist'] }, {
       'warn',
       { allowConstantExport: true },
     ],
-    'prettier/prettier': 'error'
+    'prettier/prettier': 'error',
+    'import/order': [
+      'error',
+      {
+        groups: [
+          'builtin',
+          'external',
+          'internal',
+          ['parent', 'sibling', 'index'],
+          'object',
+          'type',
+        ],
+        pathGroups: [
+          {
+            pattern: '@/**',
+            group: 'internal',
+          },
+        ],
+        pathGroupsExcludedImportTypes: ['builtin'],
+        'newlines-between': 'always',
+        alphabetize: {
+          order: 'asc',
+          caseInsensitive: true,
+        },
+      },
+    ],
   },
 }, storybook.configs["flat/recommended"]);
