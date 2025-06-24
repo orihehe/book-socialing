@@ -19,7 +19,7 @@ export function BaseCard({ children, className, title }: BaseCardProps) {
       )}
     >
       {title && (
-        <CardHeader>
+        <CardHeader className="pt-4">
           <CardTitle className="text-base font-semibold">{title}</CardTitle>
         </CardHeader>
       )}
