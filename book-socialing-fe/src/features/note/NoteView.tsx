@@ -1,3 +1,7 @@
+import { CircleUserRound, Search } from 'lucide-react'
+
+import { PageHeader } from '@/components/layout/PageHeader'
+import { Button } from '@/components/ui/button'
 import type { Note } from '@/types/note'
 
 import { CurrentNotes } from './components/CurrentNotes'
@@ -35,10 +39,22 @@ const dummyCurrentNotes: Note[] = [
 
 export default function NoteView() {
   return (
-    <div className="flex flex-col p-2 mx-auto">
-      <CurrentNotes currentNotes={dummyCurrentNotes} />
+    <>
+      <PageHeader title="SAISAI">
+        <div className="flex items-center">
+          <Button variant="ghost" size="icon">
+            <Search />
+          </Button>
+          <Button variant="ghost" className="-ml-1">
+            <CircleUserRound />
+          </Button>
+        </div>
+      </PageHeader>
+      <div className="flex flex-col p-2 mx-auto">
+        <CurrentNotes currentNotes={dummyCurrentNotes} />
 
-      <MyNotes myNotes={dummyCurrentNotes} />
-    </div>
+        <MyNotes myNotes={dummyCurrentNotes} />
+      </div>
+    </>
   )
 }

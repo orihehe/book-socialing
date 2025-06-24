@@ -14,16 +14,15 @@ export function BaseButton({ children, className, type, ...buttonProps }: BaseBu
   return (
     <Button
       className={cn(
-        cn(
-          type === 'primary'
-            ? 'bg-main text-white rounded-full border-none'
-            : 'bg-[#F7F8F9] text-main rounded-full border-none',
-          className
-        )
+        type === 'primary'
+          ? 'bg-main text-white rounded-full border-none'
+          : 'bg-[#F7F8F9] text-main rounded-full border-none',
+        'h-7 px-2 text-sm rounded-full bg-gray-100 text-main',
+        className
       )}
-      {...{ ...buttonProps }}
+      {...buttonProps}
     >
-      {children}
+      <span className="font-bold">{children}</span>
     </Button>
   )
 }

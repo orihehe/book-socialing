@@ -60,9 +60,9 @@ export function CurrentNotes({ currentNotes }: Props) {
                   aria-controls="carousel-item"
                   aria-label={`Slide ${index + 1}`}
                   className={cn(
-                    'w-2.5 h-2.5 rounded-full transition-all duration-200 cursor-pointer border border-gray-300',
+                    'w-5 h-2 rounded-full transition-all duration-200 cursor-pointer',
                     index === current - 1
-                      ? 'bg-main border-main scale-110 shadow'
+                      ? 'bg-main scale-110 shadow'
                       : 'bg-gray-200 hover:bg-gray-300'
                   )}
                   style={{
