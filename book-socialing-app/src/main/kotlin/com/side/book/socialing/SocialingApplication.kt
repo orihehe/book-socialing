@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class SocialingApplication
 
 fun main(args: Array<String>) {
-	runApplication<SocialingApplication>(*args)
+    runApplication<SocialingApplication>(*args)
 }
