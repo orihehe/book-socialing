@@ -36,6 +36,8 @@ dependencies {
     testImplementation("io.mockk:mockk:1.13.10")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation(kotlin("test"))
+
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
 }
 
 kotlin {
