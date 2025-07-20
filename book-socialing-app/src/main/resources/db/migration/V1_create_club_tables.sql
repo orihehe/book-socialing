@@ -1,3 +1,4 @@
+-- deprecated (2025.07.20)
 -- Drop if exists
 DROP TABLE IF EXISTS meeting_participant;
 DROP TABLE IF EXISTS meeting;

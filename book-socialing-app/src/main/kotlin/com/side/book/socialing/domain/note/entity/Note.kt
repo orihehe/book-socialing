@@ -1,6 +1,5 @@
-package com.side.book.socialing.domain.meeting.entity
+package com.side.book.socialing.domain.note.entity
 
-import com.side.book.socialing.domain.meeting.command.CreateMeetingCommand
 import jakarta.persistence.*
 import jakarta.persistence.Entity
 import org.springframework.data.annotation.CreatedBy
@@ -12,20 +11,20 @@ import java.time.LocalDateTime
 
 @Entity
 @EntityListeners(AuditingEntityListener::class)
-@Table(name = "meeting")
-class Meeting(
+@Table(name = "note")
+class Note(
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
 
-    @Column(name = "name", length = 100, nullable = false)
-    var name: String,
+// TODO: club 구현 후
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "club_id", nullable = false)
+//    var club: Club,
 
     @Column(name = "description", length = 1000)
     var description: String? = null,
-
-    @Column(name = "round")
-    var round: Int,
 
     @Column(name = "book_name", length = 200)
     var bookName: String? = null,
@@ -33,11 +32,11 @@ class Meeting(
     @Column(name = "book_author", length = 100)
     var bookAuthor: String? = null,
 
-    @Column(name = "book_link", length = 200)
-    var bookLink: String? = null,
+    @Column(name = "start_date")
+    var startDate: LocalDateTime,
 
-    @Column(name = "meet_date")
-    var meetDate: LocalDateTime,
+    @Column(name = "end_date")
+    var endDate: LocalDateTime,
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -54,20 +53,12 @@ class Meeting(
     @LastModifiedBy
     @Column(name = "modified_by")
     var modifiedBy: String? = null,
+
+    // Join Fetch를 위해 설정된 부분
+    @OneToMany(mappedBy = "note")
+    var participants: MutableList<NoteParticipant> = mutableListOf(),
+
+    @OneToMany(mappedBy = "note")
+    var files: MutableList<NoteFile> = mutableListOf()
 ) {
-    companion object {
-        fun create(cmd: CreateMeetingCommand): Meeting {
-            return Meeting(
-                name = cmd.name,
-                description = cmd.description,
-                bookName = cmd.bookName,
-                bookAuthor = cmd.bookAuthor,
-                bookLink = cmd.bookLink,
-                meetDate = cmd.meetDate,
-                round = cmd.round,
-                createdBy = cmd.createdBy,
-                modifiedBy = cmd.createdBy,
-            )
-        }
-    }
 }

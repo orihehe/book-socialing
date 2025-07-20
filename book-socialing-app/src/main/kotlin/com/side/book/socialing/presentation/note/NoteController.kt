@@ -1,25 +1,29 @@
 package com.side.book.socialing.presentation.note
 
-import com.side.book.socialing.presentation.note.dto.GetCurrentNoteResponse
+import com.side.book.socialing.domain.note.service.NoteService
+import com.side.book.socialing.presentation.note.dto.OpenNotesResponse
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import java.time.LocalDateTime
 
 @RestController
-@RequestMapping("/note/v1")
-class NoteController {
+@RequestMapping("/api/note/v1")
+class NoteController (
+    private val noteService: NoteService,
+) {
+    @GetMapping("/open")
+    fun getOpenNotes(): ResponseEntity<List<OpenNotesResponse>> {
 
-    @GetMapping("/current")
-    fun getCurrentNote(): GetCurrentNoteResponse {
-        return GetCurrentNoteResponse(
-            id = 1,
-            clubName = "saisai",
-            bookName = "두 개의 탑",
-            bookAuthor = "JRR Tolkein",
-            bookImageUrl = "https://covers.openlibrary.org/b/id/8231856-L.jpg",
-            description = "~클럽의 몇번째 책임입니다",
-            participantCount = 10,
-            startDateTime = LocalDateTime.of(2025, 6, 22, 0, 0),
-            endDateTime = LocalDateTime.of(2025, 6, 28, 0, 0)
-        )
+        // TODO: 회원 정보 필요
+        val userId = 123L;
+
+        return try {
+            val openNotes = noteService.getParticipatedOpenNotes(userId);
+            ResponseEntity.ok(openNotes) // HTTP 200 OK와 함께 조회된 노트 목록 반환
+        } catch (e: Exception) {
+            System.err.println("Error fetching open notes for user $userId: ${e.message}") // 에러 로깅
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR) // 500 Internal Server Error
+                .body(emptyList()) // 빈 리스트 반환 또는 에러 DTO 반환
+        }
     }
 }
