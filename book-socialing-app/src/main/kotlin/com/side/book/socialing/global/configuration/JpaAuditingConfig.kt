@@ -1,4 +1,4 @@
-package com.side.book.socialing.configuration
+package com.side.book.socialing.global.configuration
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

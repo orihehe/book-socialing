@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-@RequestMapping("/meeting/v1")
+@RequestMapping("/api/meeting/v1")
 @RestController
 class MeetingController(
     private val meetingService: MeetingService,
