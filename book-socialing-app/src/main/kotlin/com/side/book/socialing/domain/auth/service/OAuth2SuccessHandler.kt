@@ -1,0 +1,46 @@
+package com.side.book.socialing.domain.auth.service
+
+import com.side.book.socialing.global.jwt.JwtTokenProvider
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
+import org.springframework.security.core.Authentication
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
+import org.springframework.security.oauth2.core.user.OAuth2User
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler
+import org.springframework.stereotype.Component
+import org.springframework.web.util.UriComponentsBuilder
+
+@Component
+class OAuth2SuccessHandler(
+    private val jwtTokenProvider: JwtTokenProvider
+) : AuthenticationSuccessHandler {
+
+    override fun onAuthenticationSuccess(
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+        authentication: Authentication
+    ) {
+        val oAuth2User = authentication.principal as OAuth2User
+        val oAuth2AuthenticationToken = authentication as OAuth2AuthenticationToken
+
+        val registrationId = oAuth2AuthenticationToken.authorizedClientRegistrationId
+
+        val email = when(registrationId) {
+            "google" -> oAuth2User.attributes["email"] as String
+            "naver" -> (oAuth2User.attributes["response"] as Map<String, Any>)["email"] as String
+            "kakao" -> (oAuth2User.attributes["kakao_account"] as Map<String, Any>)["email"] as String
+            else -> throw IllegalStateException("Unsupported registrationId: $registrationId")
+        }
+
+        val accessToken = jwtTokenProvider.createAccessToken(email)
+        val refreshToken = jwtTokenProvider.createRefreshToken()
+
+        val targetUrl = UriComponentsBuilder.fromUriString("http://localhost:3000/oauth/callback")
+            .queryParam("accessToken", accessToken)
+            .queryParam("refreshToken", refreshToken)
+            .build()
+            .toUriString()
+
+        response.sendRedirect(targetUrl)
+    }
+}
