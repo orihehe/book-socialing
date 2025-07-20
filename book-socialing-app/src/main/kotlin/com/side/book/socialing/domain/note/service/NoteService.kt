@@ -15,8 +15,8 @@ class NoteService(
 ) {
 
     @Transactional(readOnly = true)
-    fun getParticipatedOpenNotes(userId: Long): List<OpenNotesResponse> {
-        val currentDateTime = LocalDateTime.now();
+    fun getOpenNotes(userId: Long): List<OpenNotesResponse> {
+        val currentDateTime = LocalDateTime.now()
         // TODO: DB 로직 구현 필요. 아직 JPA로 JOIN하는 거 이해를 제대로 못함. ㅠ
 //        val notes: List<Note> = noteRepository.findOpenNotesCreatedByUserId(
 //            userId = userId,
