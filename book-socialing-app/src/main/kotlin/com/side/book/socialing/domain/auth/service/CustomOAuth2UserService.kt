@@ -49,12 +49,10 @@ class CustomOAuth2UserService(
     }
 
     private fun saveOrUpdate(attributes: OAuthAttributes): User {
-        val user = userRepository.findByEmail(attributes.email)
-            ?.apply {
-                nickname = attributes.name
-            }
-            ?: attributes.toEntity()
-
-        return userRepository.save(user)
+        var user = userRepository.findByEmail(attributes.email)
+        if (user == null) {
+            user = userRepository.save(attributes.toEntity())
+        }
+        return user
     }
 }
