@@ -3,16 +3,31 @@ package com.side.book.socialing.presentation.note
 import com.side.book.socialing.presentation.note.dto.CommonNoteResponse
 import com.side.book.socialing.presentation.note.dto.OpenNoteResponse
 import com.side.book.socialing.presentation.note.dto.ParticipantInfoResponse
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDateTime
 
+@Tag(name = "노트 API", description = "노트 조회, 생성, 참여, 퇴고 등 노트 관련 API")
 @RestController
 @RequestMapping("/api/note/v1")
 class NoteController (
     // private val noteService: NoteService,
 ) {
+    @Operation(
+        summary = "로그인한 사용자가 참여 중인 열린 노트 목록 조회",
+        description = "현재 로그인한 사용자가 참여자로 등록되어 있고, 모임일이 지나지 않은 (즉, 아직 진행될) 노트 목록을 조회합니다. 각 노트의 상세 정보와 참여자 정보가 함께 반환됩니다."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "성공적으로 열린 노트 목록을 조회함"),
+            ApiResponse(responseCode = "500", description = "서버 내부 오류")
+        ]
+    )
     @GetMapping("/open")
     fun getOpenNotes(): ResponseEntity<List<OpenNoteResponse>> {
 
@@ -185,6 +200,16 @@ class NoteController (
         }
     }
 
+    @Operation(
+        summary = "로그인한 사용자가 생성한 노트 목록 조회",
+        description = "현재 로그인한 사용자가 직접 생성한 노트 목록을 조회합니다. 각 노트의 기본 정보가 반환됩니다."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "성공적으로 생성한 노트 목록을 조회함"),
+            ApiResponse(responseCode = "500", description = "서버 내부 오류")
+        ]
+    )
     @GetMapping("/created")
     fun getCreatedNotes(): ResponseEntity<List<CommonNoteResponse>> {
 
@@ -228,6 +253,16 @@ class NoteController (
         }
     }
 
+    @Operation(
+        summary = "로그인한 사용자가 신청한 (대기 중인) 노트 목록 조회",
+        description = "현재 로그인한 사용자가 참여를 신청했지만, 아직 수락되지 않아 대기 상태인 노트 목록을 조회합니다."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "성공적으로 신청한 노트 목록을 조회함"),
+            ApiResponse(responseCode = "500", description = "서버 내부 오류")
+        ]
+    )
     @GetMapping("/pending")
     fun getPendingNotes(): ResponseEntity<List<CommonNoteResponse>> {
 
@@ -271,6 +306,16 @@ class NoteController (
         }
     }
 
+    @Operation(
+        summary = "로그인한 사용자에게 추천하는 노트 목록 조회",
+        description = "로그인한 사용자에게 추천하는 노트 목록을 조회합니다. 각 노트의 기본 정보가 반환됩니다."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "성공적으로 추천 노트 목록을 조회함"),
+            ApiResponse(responseCode = "500", description = "서버 내부 오류")
+        ]
+    )
     @GetMapping("/recommended")
     fun getRecommendedNotes(): ResponseEntity<List<CommonNoteResponse>> {
 
@@ -314,6 +359,16 @@ class NoteController (
         }
     }
 
+    @Operation(
+        summary = "로그인한 사용자의 퇴고한 노트 목록 조회",
+        description = "현재 로그인한 사용자가 참여했으며, 모임일이 지난 노트 목록을 조회합니다."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "성공적으로 퇴고한 노트 목록을 조회함"),
+            ApiResponse(responseCode = "500", description = "서버 내부 오류")
+        ]
+    )
     @GetMapping("/revised")
     fun getRevisedNotes(): ResponseEntity<List<CommonNoteResponse>> {
 

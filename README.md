@@ -7,6 +7,14 @@
 -Dspring.auth.active=false // 인증 없이 개발을 원한다면
 ```
 
+### Swagger API 문서
+
+개발 환경에서 실행 중인 애플리케이션의 Swagger API 문서는 다음 경로에서 확인하실 수 있습니다:
+
+[Swagger UI 바로가기](http://localhost:8080/swagger-ui/index.html)
+
+**참고:** `localhost:8080`은 로컬 개발 환경의 기본 주소입니다. 실제 배포 환경에서는 해당 서버의 도메인과 포트 번호로 변경됩니다. (예: `https://api.your-service.com/swagger-ui/index.html`)
+
 ## 🛠️ FE Tech Stack
 
 ### 🧱 프로젝트 기반
