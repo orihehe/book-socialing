@@ -359,6 +359,16 @@ class NoteController (
         }
     }
 
+    @Operation(
+        summary = "로그인한 사용자의 퇴고한 노트 목록 조회",
+        description = "현재 로그인한 사용자가 참여했으며, 모임일이 지난 노트 목록을 조회합니다."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "성공적으로 퇴고한 노트 목록을 조회함"),
+            ApiResponse(responseCode = "500", description = "서버 내부 오류")
+        ]
+    )
     @GetMapping("/revised")
     fun getRevisedNotes(): ResponseEntity<List<CommonNoteResponse>> {
 
