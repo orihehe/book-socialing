@@ -5,6 +5,7 @@ import com.side.book.socialing.domain.auth.service.OAuth2SuccessHandler
 import com.side.book.socialing.domain.user.repository.UserRepository
 import com.side.book.socialing.global.jwt.JwtAuthenticationFilter
 import com.side.book.socialing.global.jwt.JwtTokenProvider
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -13,6 +14,11 @@ import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 
+@ConditionalOnProperty(
+    name = ["spring.auth.active"],
+    havingValue = "true",
+    matchIfMissing = true
+)
 @Configuration
 @EnableWebSecurity
 class SecurityConfig(
