@@ -1,14 +1,8 @@
 package com.side.book.socialing.presentation.note
 
-import com.side.book.socialing.domain.enums.ParticipantRole
-import com.side.book.socialing.domain.enums.ParticipantStatus
-import com.side.book.socialing.domain.note.service.NoteService
-import com.side.book.socialing.presentation.note.dto.CreatedNotesResponse
-import com.side.book.socialing.presentation.note.dto.OpenNotesResponse
+import com.side.book.socialing.presentation.note.dto.CommonNoteResponse
+import com.side.book.socialing.presentation.note.dto.OpenNoteResponse
 import com.side.book.socialing.presentation.note.dto.ParticipantInfoResponse
-import com.side.book.socialing.presentation.note.dto.PendingNotesResponse
-import com.side.book.socialing.presentation.note.dto.RecommendedNotesResponse
-import com.side.book.socialing.presentation.note.dto.RevisedNotesResponse
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -17,17 +11,173 @@ import java.time.LocalDateTime
 @RestController
 @RequestMapping("/api/note/v1")
 class NoteController (
-    private val noteService: NoteService,
+    // private val noteService: NoteService,
 ) {
     @GetMapping("/open")
-    fun getOpenNotes(): ResponseEntity<List<OpenNotesResponse>> {
+    fun getOpenNotes(): ResponseEntity<List<OpenNoteResponse>> {
 
         // TODO: 회원 정보 필요
         val userId = 123L
 
         return try {
-            val openNotes = noteService.getOpenNotes(userId)
-            ResponseEntity.ok(openNotes)
+            // val openNotes = noteService.getOpenNotes(userId)
+            // ResponseEntity.ok(openNotes)
+
+            // 실제 DB 호출 로직 대신 더미 데이터 생성
+            val dummyNotes = mutableListOf<OpenNoteResponse>()
+
+            // 첫 번째 더미 노트
+            dummyNotes.add(
+                OpenNoteResponse(
+                    id = 101L,
+                    clubName = "더미 독서모임 A",
+                    bookName = "더미 데미안",
+                    bookAuthor = "더미 헤르만 헤세",
+                    bookImageUrl = "https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9791164053353.jpg", // 더미 이미지 URL
+                    description = "더미 데이터로 채워진 '데미안' 토론 모임입니다.",
+                    participantList = listOf(
+                        ParticipantInfoResponse(
+                            participantId = 1L,
+                            userId = userId, // 요청된 userId가 HOST인 것으로 가정
+                            username = "더미유저_${userId}_HOST",
+                            role = "HOST",
+                            status = "JOINED"
+                        ),
+                        ParticipantInfoResponse(
+                            participantId = 2L,
+                            userId = 99L,
+                            username = "더미유저_99_MEMBER",
+                            role = "MEMBER",
+                            status = "JOINED"
+                        )
+                    ),
+                    startDateTime = LocalDateTime.of(2025, 8, 1, 19, 0),
+                    endDateTime = LocalDateTime.of(2025, 8, 1, 21, 0),
+                )
+            )
+
+            // 두 번째 더미 노트
+            dummyNotes.add(
+                OpenNoteResponse(
+                    id = 102L,
+                    clubName = null, // 클럽이 없는 더미 노트
+                    bookName = "더미 어린 왕자",
+                    bookAuthor = "더미 앙투안 드 생텍쥐페리",
+                    bookImageUrl = "https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9791164455300.jpg", // 또 다른 더미 이미지 URL
+                    description = "더미 데이터로 채워진 '어린 왕자' 자유 토론",
+                    participantList = listOf(
+                        ParticipantInfoResponse(
+                            participantId = 3L,
+                            userId = userId, // 요청된 userId가 MEMBER인 것으로 가정
+                            username = "더미유저_${userId}_MEMBER",
+                            role = "MEMBER",
+                            status = "JOINED"
+                        ),
+                        ParticipantInfoResponse(
+                            participantId = 4L,
+                            userId = 98L,
+                            username = "더미유저_98_HOST",
+                            role = "HOST",
+                            status = "JOINED"
+                        )
+                    ),
+                    startDateTime = LocalDateTime.of(2025, 8, 15, 14, 0),
+                    endDateTime = LocalDateTime.of(2025, 8, 15, 16, 0),
+                )
+            )
+
+
+            // ===== 세 번째 더미 노트 =====
+            dummyNotes.add(
+                OpenNoteResponse(
+                    id = 103L,
+                    clubName = "더미 SF 클럽",
+                    bookName = "더미 은하수를 여행하는 히치하이커를 위한 안내서",
+                    bookAuthor = "더미 더글러스 애덤스",
+                    bookImageUrl = "https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9788970135472.jpg",
+                    description = "더미 SF 소설 토론 모임입니다.",
+                    participantList = listOf(
+                        ParticipantInfoResponse(
+                            participantId = 5L,
+                            userId = 97L,
+                            username = "더미유저_97_HOST",
+                            role = "HOST",
+                            status = "JOINED"
+                        ),
+                        ParticipantInfoResponse(
+                            participantId = 6L,
+                            userId = userId,
+                            username = "더미유저_${userId}_MEMBER",
+                            role = "MEMBER",
+                            status = "JOINED"
+                        ),
+                        ParticipantInfoResponse(
+                            participantId = 7L,
+                            userId = 96L,
+                            username = "더미유저_96_MEMBER",
+                            role = "MEMBER",
+                            status = "JOINED"
+                        )
+                    ),
+                    startDateTime = LocalDateTime.of(2025, 9, 1, 10, 0),
+                    endDateTime = LocalDateTime.of(2025, 9, 1, 12, 0),
+                )
+            )
+
+            // ===== 네 번째 더미 노트 =====
+            dummyNotes.add(
+                OpenNoteResponse(
+                    id = 104L,
+                    clubName = "더미 자기계발 그룹",
+                    bookName = "더미 역행자",
+                    bookAuthor = "더미 자청",
+                    bookImageUrl = "https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9788901272580.jpg",
+                    description = "더미 인생을 변화시키는 독서 모임",
+                    participantList = listOf(
+                        ParticipantInfoResponse(
+                            participantId = 8L,
+                            userId = userId,
+                            username = "더미유저_${userId}_HOST",
+                            role = "HOST",
+                            status = "JOINED"
+                        )
+                    ),
+                    startDateTime = LocalDateTime.of(2025, 9, 10, 20, 0),
+                    endDateTime = LocalDateTime.of(2025, 9, 10, 22, 0),
+                )
+            )
+
+            // ===== 다섯 번째 더미 노트 =====
+            dummyNotes.add(
+                OpenNoteResponse(
+                    id = 105L,
+                    clubName = null,
+                    bookName = "더미 코스모스",
+                    bookAuthor = "더미 칼 세이건",
+                    bookImageUrl = "https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9788983711892.jpg",
+                    description = "더미 우주에 대한 탐구와 토론",
+                    participantList = listOf(
+                        ParticipantInfoResponse(
+                            participantId = 9L,
+                            userId = 95L,
+                            username = "더미유저_95_MEMBER",
+                            role = "MEMBER",
+                            status = "JOINED"
+                        ),
+                        ParticipantInfoResponse(
+                            participantId = 10L,
+                            userId = userId,
+                            username = "더미유저_${userId}_MEMBER",
+                            role = "MEMBER",
+                            status = "JOINED"
+                        )
+                    ),
+                    startDateTime = LocalDateTime.of(2025, 9, 20, 16, 0),
+                    endDateTime = LocalDateTime.of(2025, 9, 20, 18, 0),
+                )
+            )
+
+            ResponseEntity.ok(dummyNotes)
         } catch (e: Exception) {
             System.err.println("Error fetching open notes for user $userId: ${e.message}") // 에러 로깅
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR) // 500 Internal Server Error
@@ -36,7 +186,7 @@ class NoteController (
     }
 
     @GetMapping("/created")
-    fun getCreatedNotes(): ResponseEntity<List<CreatedNotesResponse>> {
+    fun getCreatedNotes(): ResponseEntity<List<CommonNoteResponse>> {
 
         // TODO: 회원 정보 필요
         val userId = 123L
@@ -44,11 +194,11 @@ class NoteController (
         return try {
             // val createdNotes = noteService.getCreatedNotes(userId)
 
-            val dummyNotes = mutableListOf<CreatedNotesResponse>()
+            val dummyNotes = mutableListOf<CommonNoteResponse>()
 
             // 첫 번째 더미 노트
             dummyNotes.add(
-                CreatedNotesResponse(
+                CommonNoteResponse(
                     id = 101L,
                     clubName = "더미 독서모임 A",
                     bookName = "내가 만든 더미 데미안",
@@ -60,7 +210,7 @@ class NoteController (
 
             // 두 번째 더미 노트
             dummyNotes.add(
-                CreatedNotesResponse(
+                CommonNoteResponse(
                     id = 102L,
                     clubName = "더미 독서모임 B",
                     bookName = "내가 만든 더미 어린 왕자",
@@ -79,7 +229,7 @@ class NoteController (
     }
 
     @GetMapping("/pending")
-    fun getPendingNotes(): ResponseEntity<List<PendingNotesResponse>> {
+    fun getPendingNotes(): ResponseEntity<List<CommonNoteResponse>> {
 
         // TODO: 회원 정보 필요
         val userId = 123L
@@ -87,11 +237,11 @@ class NoteController (
         return try {
             // val pendingNotes = noteService.getPendingNotes(userId)
 
-            val dummyNotes = mutableListOf<PendingNotesResponse>()
+            val dummyNotes = mutableListOf<CommonNoteResponse>()
 
             // 첫 번째 더미 노트
             dummyNotes.add(
-                PendingNotesResponse(
+                CommonNoteResponse(
                     id = 101L,
                     clubName = "더미 독서모임 A",
                     bookName = "신청한 더미 데미안",
@@ -103,7 +253,7 @@ class NoteController (
 
             // 두 번째 더미 노트
             dummyNotes.add(
-                PendingNotesResponse(
+                CommonNoteResponse(
                     id = 102L,
                     clubName = null, // 클럽이 없는 더미 노트
                     bookName = "신청한 더미 어린 왕자",
@@ -122,7 +272,7 @@ class NoteController (
     }
 
     @GetMapping("/recommended")
-    fun getRecommendedNotes(): ResponseEntity<List<RecommendedNotesResponse>> {
+    fun getRecommendedNotes(): ResponseEntity<List<CommonNoteResponse>> {
 
         // TODO: 회원 정보 필요
         val userId = 123L
@@ -130,11 +280,11 @@ class NoteController (
         return try {
             // val recommendedNotes = noteService.getRecommendedNotes(userId)
 
-            val dummyNotes = mutableListOf<RecommendedNotesResponse>()
+            val dummyNotes = mutableListOf<CommonNoteResponse>()
 
             // 첫 번째 더미 노트
             dummyNotes.add(
-                RecommendedNotesResponse(
+                CommonNoteResponse(
                     id = 101L,
                     clubName = "더미 독서모임 A",
                     bookName = "추천 더미 데미안",
@@ -146,7 +296,7 @@ class NoteController (
 
             // 두 번째 더미 노트
             dummyNotes.add(
-                RecommendedNotesResponse(
+                CommonNoteResponse(
                     id = 102L,
                     clubName = null, // 클럽이 없는 더미 노트
                     bookName = "추천 더미 어린 왕자",
@@ -165,7 +315,7 @@ class NoteController (
     }
 
     @GetMapping("/revised")
-    fun getRevisedNotes(): ResponseEntity<List<RevisedNotesResponse>> {
+    fun getRevisedNotes(): ResponseEntity<List<CommonNoteResponse>> {
 
         // TODO: 회원 정보 필요
         val userId = 123L
@@ -173,11 +323,11 @@ class NoteController (
         return try {
             // val revisedNotes = noteService.getParticipatedRevisedNotes(userId)
 
-            val dummyNotes = mutableListOf<RevisedNotesResponse>()
+            val dummyNotes = mutableListOf<CommonNoteResponse>()
 
             // 첫 번째 더미 노트
             dummyNotes.add(
-                RevisedNotesResponse(
+                CommonNoteResponse(
                     id = 101L,
                     clubName = "더미 독서모임 A",
                     bookName = "퇴고한 더미 데미안",
@@ -189,7 +339,7 @@ class NoteController (
 
             // 두 번째 더미 노트
             dummyNotes.add(
-                RevisedNotesResponse(
+                CommonNoteResponse(
                     id = 102L,
                     clubName = null, // 클럽이 없는 더미 노트
                     bookName = "퇴고한 더미 어린 왕자",

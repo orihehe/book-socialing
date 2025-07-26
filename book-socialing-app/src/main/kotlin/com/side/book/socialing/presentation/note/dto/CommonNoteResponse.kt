@@ -3,8 +3,8 @@ package com.side.book.socialing.presentation.note.dto
 import io.swagger.v3.oas.annotations.media.Schema
 import java.time.LocalDateTime
 
-@Schema(description = "퇴고한 노트 DTO")
-data class RevisedNotesResponse(
+@Schema(description = "일반 노트 DTO")
+data class CommonNoteResponse(
     @Schema(description = "노트 ID", example = "1")
     val id: Long,
     @Schema(description = "클럽 이름", example = "saisai")

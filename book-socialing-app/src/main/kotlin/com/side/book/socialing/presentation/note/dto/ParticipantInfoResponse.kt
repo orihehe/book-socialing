@@ -1,7 +1,5 @@
 package com.side.book.socialing.presentation.note.dto
 
-import com.side.book.socialing.domain.enums.ParticipantRole
-import com.side.book.socialing.domain.enums.ParticipantStatus
 import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(description = "노트 참여자 정보 DTO")
@@ -13,7 +11,7 @@ data class ParticipantInfoResponse(
     @Schema(description = "노트 참여자 이름", example = "홍길동")
     val username: String,
     @Schema(description = "노트 참여자 역할", example = "HOST")
-    val role: ParticipantRole,
+    val role: String,
     @Schema(description = "노트 참여자 상태", example = "JOINED")
-    val status: ParticipantStatus
+    val status: String
 )
