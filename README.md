@@ -4,6 +4,7 @@
 ### VM Options
 ```
 -Dspring.profiles.active=dev
+-Dspring.auth.active=false // 인증 없이 개발을 원한다면
 ```
 
 ## 🛠️ FE Tech Stack
