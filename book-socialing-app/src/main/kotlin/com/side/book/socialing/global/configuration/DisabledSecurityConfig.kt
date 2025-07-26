@@ -20,7 +20,6 @@ class DisabledSecurityConfig {
         http
             .csrf { it.disable() }
             .authorizeHttpRequests {
-                // 모든 요청을 허용
                 it.anyRequest().permitAll()
             }
         return http.build()
