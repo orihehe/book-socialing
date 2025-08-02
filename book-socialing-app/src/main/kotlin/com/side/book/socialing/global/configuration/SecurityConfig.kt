@@ -1,10 +1,9 @@
 package com.side.book.socialing.global.configuration
 
 import com.side.book.socialing.domain.auth.service.CustomOAuth2UserService
-import com.side.book.socialing.domain.auth.service.OAuth2SuccessHandler
-import com.side.book.socialing.domain.user.repository.UserRepository
-import com.side.book.socialing.global.jwt.JwtAuthenticationFilter
-import com.side.book.socialing.global.jwt.JwtTokenProvider
+import com.side.book.socialing.global.security.handler.OAuth2SuccessHandler
+import com.side.book.socialing.global.security.service.JwtAuthService
+import com.side.book.socialing.global.security.filter.JwtAuthenticationFilter
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -24,8 +23,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 class SecurityConfig(
     private val customOAuth2UserService: CustomOAuth2UserService,
     private val oAuth2SuccessHandler: OAuth2SuccessHandler,
-    private val jwtTokenProvider: JwtTokenProvider,
-    private val userRepository: UserRepository
+    private val jwtAuthService: JwtAuthService
 ) {
 
     @Bean
@@ -49,7 +47,7 @@ class SecurityConfig(
                     .userInfoEndpoint { it.userService(customOAuth2UserService) }
             }
             .addFilterBefore(
-                JwtAuthenticationFilter(jwtTokenProvider, userRepository),
+                JwtAuthenticationFilter(jwtAuthService),
                 UsernamePasswordAuthenticationFilter::class.java
             )
 

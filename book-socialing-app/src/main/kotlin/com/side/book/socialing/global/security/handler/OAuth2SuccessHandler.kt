@@ -1,6 +1,6 @@
-package com.side.book.socialing.domain.auth.service
+package com.side.book.socialing.global.security.handler
 
-import com.side.book.socialing.global.jwt.JwtTokenProvider
+import com.side.book.socialing.global.security.provider.JwtTokenProvider
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.security.core.Authentication

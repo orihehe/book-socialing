@@ -1,6 +1,7 @@
 package com.side.book.socialing.domain.user.entity
 
 import com.side.book.socialing.domain.common.BaseEntity
+import com.side.book.socialing.domain.user.command.CreateUserCommand
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
@@ -14,7 +15,7 @@ import jakarta.persistence.UniqueConstraint
 class User(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    val id: Long? = null,
 
     @Column(nullable = false)
     val provider: String,
@@ -30,4 +31,17 @@ class User(
 
     @Column(nullable = false)
     val role: String = "ROLE_USER"
-) : BaseEntity()
+) : BaseEntity() {
+
+    companion object {
+        fun create(cmd: CreateUserCommand): User {
+            return User(
+                provider = cmd.provider,
+                providerId = cmd.providerId,
+                email = cmd.email,
+                nickname = cmd.nickName,
+                role = cmd.role
+            )
+        }
+    }
+}
