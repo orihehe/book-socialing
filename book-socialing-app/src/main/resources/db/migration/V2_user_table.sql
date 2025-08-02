@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS users;
 CREATE TABLE users (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
 
@@ -9,9 +10,9 @@ CREATE TABLE users (
     role VARCHAR(50),
 
     created_at DATETIME NOT NULL,
-    created_by VARCHAR(255),
+    created_by VARCHAR(255) NOT NULL,
     modified_at DATETIME NOT NULL,
-    modified_by VARCHAR(255),
+    modified_by VARCHAR(255) NOT NULL,
 
     UNIQUE KEY uq_provider_providerId (provider, provider_id),
     INDEX idx_users_created_at (created_at),
