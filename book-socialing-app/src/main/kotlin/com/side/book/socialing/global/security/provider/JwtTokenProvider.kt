@@ -1,4 +1,4 @@
-package com.side.book.socialing.global.jwt
+package com.side.book.socialing.global.security.provider
 
 import com.side.book.socialing.global.utils.log
 import io.jsonwebtoken.*
