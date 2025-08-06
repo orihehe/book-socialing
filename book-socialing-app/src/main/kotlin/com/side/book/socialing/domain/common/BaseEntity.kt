@@ -20,8 +20,8 @@ abstract class BaseEntity {
         protected set
 
     @LastModifiedDate
-    @Column(name = "updated_at")
-    lateinit var updatedAt: LocalDateTime
+    @Column(name = "modified_at")
+    lateinit var modifiedAt: LocalDateTime
         protected set
 
     @CreatedBy
@@ -30,7 +30,7 @@ abstract class BaseEntity {
         protected set
 
     @LastModifiedBy
-    @Column(name = "updated_by")
-    lateinit var updatedBy: String
+    @Column(name = "modified_by")
+    lateinit var modifiedBy: String
         protected set
 }
