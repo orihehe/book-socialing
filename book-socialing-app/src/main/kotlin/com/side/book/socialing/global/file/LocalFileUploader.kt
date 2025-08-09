@@ -1,0 +1,98 @@
+package com.side.book.socialing.global.file
+
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.stereotype.Component
+import org.springframework.web.multipart.MultipartFile
+import java.io.IOException
+
+import java.nio.file.*
+import java.util.UUID
+
+@Component
+class LocalFileUploader(
+    @Value("\${file.base-dir}") private val baseDir: String
+): FileUploader {
+
+    /**
+     * 전달된 파일을 서버의 지정된 경로에 업로드하고 저장 정보를 반환합니다.
+     *
+     * @param file 업로드할 파일 (MultipartFile)
+     * @param path 저장할 하위 경로 (예: "notes/images")
+     * @return 저장된 파일의 정보 (원본명, 저장명, 전체 경로)가 담긴 `StoredFile` 객체.
+     *         (예: StoredFile(originalFileName="내사진.jpg", storedFileName="a1b2c3d4.jpg", filePath="C:/.../a1b2c3d4.jpg"))
+     */
+    override fun upload(file: MultipartFile, path: String): StoredFile {
+        val uploadFileDir = Paths.get(baseDir, path)
+
+        if (!Files.exists(uploadFileDir)) {
+            Files.createDirectories(uploadFileDir)
+        }
+
+        val originalFileName = file.originalFilename ?: "unnamed"
+        val storedFileName = createStoredFileName(originalFileName)
+        val fullPath: Path = uploadFileDir.resolve(storedFileName)
+
+        file.transferTo(fullPath.toFile())
+
+        return StoredFile(
+            originalFileName = originalFileName,
+            storedFileName = storedFileName,
+            filePath = fullPath.toString()
+        )
+    }
+
+    /**
+     * 지정된 전체 경로의 로컬 파일을 삭제합니다.
+     * @param fullPath 삭제할 파일의 전체 경로 (예: "C:/uploads/notes/images/a1b2c3d4.jpg")
+     * @return 삭제에 성공하면 true, 파일이 없거나 다른 이유로 실패하면 false를 반환합니다.
+     */
+    override fun delete(fullPath: String): Boolean {
+        return try {
+            val filePath: Path = Paths.get(fullPath)
+
+            if (Files.exists(filePath)) {
+                Files.delete(filePath)
+                println("[SUCCESS] 파일 삭제 성공: $fullPath")
+                true
+            } else {
+                println("[WARN] 삭제할 파일이 존재하지 않습니다: $fullPath")
+                true
+            }
+
+        } catch (e: IOException) {
+            System.err.println("[ERROR] 파일 삭제 중 오류 발생: $fullPath")
+            false
+        } catch (e: SecurityException) {
+            System.err.println("[ERROR] 파일 삭제에 필요한 권한이 없습니다: $fullPath")
+            e.printStackTrace()
+            false
+        }
+    }
+
+    /**
+     * 저장할 파일의 이름을 생성합니다.
+     * @param originalFilename 원본 파일 이름 (예: "내사진.jpg")
+     * @return 고유한 파일 이름 (예: "a1b2c3d4-e5f6-g7h8-i9j0.jpg")
+     */
+    private fun createStoredFileName(originalFilename: String): String {
+        val fileExtension = extractExtension(originalFilename)
+        val uuid = UUID.randomUUID().toString()
+
+        return "$uuid.$fileExtension"
+    }
+
+    /**
+     * 파일 이름에서 확장자를 추출합니다.
+     * @param originalFilename 원본 파일 이름
+     * @return 확장자 (예: "jpg"). 확장자가 없으면 빈 문자열을 반환합니다.
+     */
+    private fun extractExtension(originalFilename: String): String {
+        val dotPosition = originalFilename.lastIndexOf('.')
+
+        return if (dotPosition != -1 && dotPosition < originalFilename.length - 1) {
+            originalFilename.substring(dotPosition + 1)
+        } else {
+            ""
+        }
+    }
+}
