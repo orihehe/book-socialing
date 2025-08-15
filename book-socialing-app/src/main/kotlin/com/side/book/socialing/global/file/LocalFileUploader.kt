@@ -1,5 +1,6 @@
 package com.side.book.socialing.global.file
 
+import com.side.book.socialing.global.utils.log
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile
@@ -52,18 +53,19 @@ class LocalFileUploader(
 
             if (Files.exists(filePath)) {
                 Files.delete(filePath)
-                println("[SUCCESS] 파일 삭제 성공: $fullPath")
+                log.info("[SUCCESS] 파일 삭제 성공: $fullPath")
                 true
             } else {
-                println("[WARN] 삭제할 파일이 존재하지 않습니다: $fullPath")
+
+                log.error("[WARN] 삭제할 파일이 존재하지 않습니다: $fullPath")
                 true
             }
 
         } catch (e: IOException) {
-            System.err.println("[ERROR] 파일 삭제 중 오류 발생: $fullPath")
+            log.error("[ERROR] 파일 삭제 중 오류 발생: $fullPath")
             false
         } catch (e: SecurityException) {
-            System.err.println("[ERROR] 파일 삭제에 필요한 권한이 없습니다: $fullPath")
+            log.error("[ERROR] 파일 삭제에 필요한 권한이 없습니다: $fullPath")
             e.printStackTrace()
             false
         }

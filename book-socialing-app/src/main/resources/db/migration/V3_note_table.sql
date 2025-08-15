@@ -77,6 +77,6 @@ CREATE TABLE note_participant (
     -- 인덱스
     INDEX idx_note_participant_note_id (note_id),
     INDEX idx_note_participant_user_id (user_id),
-    INDEX idx_note_file_created_at (created_at),
-    INDEX idx_note_file_modified_at (modified_at)
+    INDEX idx_note_participant_created_at (created_at),
+    INDEX idx_note_participant_modified_at (modified_at)
 );
