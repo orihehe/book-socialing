@@ -38,7 +38,7 @@ class LocalFileUploader(
         return StoredFile(
             originalFileName = originalFileName,
             storedFileName = storedFileName,
-            filePath = fullPath.toString()
+            filePath = Paths.get(path, storedFileName).toString()
         )
     }
 
