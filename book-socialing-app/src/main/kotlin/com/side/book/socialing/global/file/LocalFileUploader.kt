@@ -56,18 +56,15 @@ class LocalFileUploader(
                 log.info("[SUCCESS] 파일 삭제 성공: $fullPath")
                 true
             } else {
-
                 log.error("[WARN] 삭제할 파일이 존재하지 않습니다: $fullPath")
                 true
             }
 
         } catch (e: IOException) {
-            log.error("[ERROR] 파일 삭제 중 오류 발생: $fullPath")
-            e.printStackTrace()
+            log.error("[ERROR] 파일 삭제 중 오류 발생: $fullPath", e)
             false
         } catch (e: SecurityException) {
-            log.error("[ERROR] 파일 삭제에 필요한 권한이 없습니다: $fullPath")
-            e.printStackTrace()
+            log.error("[ERROR] 파일 삭제에 필요한 권한이 없습니다: $fullPath", e)
             false
         }
     }
