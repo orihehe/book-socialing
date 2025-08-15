@@ -40,25 +40,25 @@ const dummyCurrentNotes: Note[] = [
   },
 ]
 
-const lnbItems: LNBItem[] = [
-  {
-    name: '클럽',
-    key: 'club',
-    children: [],
-  },
-  {
-    name: '노트',
-    key: 'note',
-    children: [
-      { key: 'all', name: '전체' },
-      { key: 'open', name: '열린노트' },
-      { key: 'closed', name: '닫힌 노트' },
-    ],
-  },
-]
-
 export default function NoteView() {
   const [activeTab, setActiveTab] = useState('all')
+
+  const lnbItems: LNBItem[] = [
+    {
+      name: '클럽',
+      key: 'club',
+      children: [],
+    },
+    {
+      name: '노트',
+      key: 'note',
+      children: [
+        { key: 'all', name: '전체' },
+        { key: 'open', name: '열린노트' },
+        { key: 'closed', name: '닫힌 노트' },
+      ],
+    },
+  ]
 
   return (
     <>
