@@ -5,8 +5,8 @@ import java.time.LocalDateTime
 
 data class CreateNoteCommand(
     val userId: Long,
-    val bookName: String?,
-    val bookAuthor: String?,
+    val bookName: String,
+    val bookAuthor: String,
     val description: String?,
     val startDate: LocalDateTime,
     val endDate: LocalDateTime,

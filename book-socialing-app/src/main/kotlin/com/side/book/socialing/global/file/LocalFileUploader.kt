@@ -1,5 +1,6 @@
 package com.side.book.socialing.global.file
 
+import com.side.book.socialing.global.utils.FileUtils
 import com.side.book.socialing.global.utils.log
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -7,7 +8,6 @@ import org.springframework.web.multipart.MultipartFile
 import java.io.IOException
 
 import java.nio.file.*
-import java.util.UUID
 
 @Component
 class LocalFileUploader(
@@ -30,7 +30,7 @@ class LocalFileUploader(
         }
 
         val originalFileName = file.originalFilename ?: "unnamed"
-        val storedFileName = createStoredFileName(originalFileName)
+        val storedFileName = FileUtils.createStoredFileName(originalFileName)
         val fullPath: Path = uploadFileDir.resolve(storedFileName)
 
         file.transferTo(fullPath.toFile())
@@ -69,33 +69,6 @@ class LocalFileUploader(
             log.error("[ERROR] 파일 삭제에 필요한 권한이 없습니다: $fullPath")
             e.printStackTrace()
             false
-        }
-    }
-
-    /**
-     * 저장할 파일의 이름을 생성합니다.
-     * @param originalFilename 원본 파일 이름 (예: "내사진.jpg")
-     * @return 고유한 파일 이름 (예: "a1b2c3d4-e5f6-g7h8-i9j0.jpg")
-     */
-    private fun createStoredFileName(originalFilename: String): String {
-        val fileExtension = extractExtension(originalFilename)
-        val uuid = UUID.randomUUID().toString()
-
-        return "$uuid.$fileExtension"
-    }
-
-    /**
-     * 파일 이름에서 확장자를 추출합니다.
-     * @param originalFilename 원본 파일 이름
-     * @return 확장자 (예: "jpg"). 확장자가 없으면 빈 문자열을 반환합니다.
-     */
-    private fun extractExtension(originalFilename: String): String {
-        val dotPosition = originalFilename.lastIndexOf('.')
-
-        return if (dotPosition != -1 && dotPosition < originalFilename.length - 1) {
-            originalFilename.substring(dotPosition + 1)
-        } else {
-            ""
         }
     }
 }

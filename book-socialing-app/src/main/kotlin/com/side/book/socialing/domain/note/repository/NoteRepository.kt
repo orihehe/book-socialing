@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query
 
 interface NoteRepository: JpaRepository<Note, Long> {
 
-    @Query("SELECT n FROM Note n JOIN FETCH n.participants p WHERE p.userId = :userId AND p.status = 'JOINED'")
+    @Query("SELECT n FROM Note n JOIN n.participants p WHERE p.userId = :userId AND p.status = 'JOINED'")
     fun findActiveNotesByUserId(userId: Long): List<Note>
 
 }

@@ -26,18 +26,15 @@ class NoteFile (
     @Column(name = "file_size", nullable = false)
     var fileSize: Long,
 
-    @Column(name = "order_index")
-    var orderIndex: Int,
 ): BaseEntity() {
     companion object {
-        fun create(note: Note, originalFileName: String, storedFileName: String, filePath: String, fileSize: Long, orderIndex: Int ): NoteFile {
+        fun create(note: Note, originalFileName: String, storedFileName: String, filePath: String, fileSize: Long ): NoteFile {
             return NoteFile(
                 note = note,
                 originalFileName = originalFileName,
                 storedFileName = storedFileName,
                 filePath = filePath,
-                fileSize = fileSize,
-                orderIndex = orderIndex
+                fileSize = fileSize
             )
         }
     }

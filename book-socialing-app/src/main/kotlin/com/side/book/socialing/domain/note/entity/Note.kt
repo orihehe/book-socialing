@@ -19,10 +19,10 @@ class Note(
 //    var club: Club,
 
     @Column(name = "book_name", length = 200)
-    var bookName: String? = null,
+    var bookName: String,
 
     @Column(name = "book_author", length = 100)
-    var bookAuthor: String? = null,
+    var bookAuthor: String,
 
     @Column(name = "description", length = 1000)
     var description: String? = null,

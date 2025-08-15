@@ -9,8 +9,8 @@ CREATE TABLE note (
 
     -- club_id BIGINT, -- TODO: club 구현 후 FK 제약 추가
 
-    book_name VARCHAR(200),
-    book_author VARCHAR(100),
+    book_name VARCHAR(200) NOT NULL,
+    book_author VARCHAR(100) NOT NULL,
     description VARCHAR(1000),
     start_date DATETIME NOT NULL,
     end_date DATETIME NOT NULL,

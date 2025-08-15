@@ -36,11 +36,9 @@ class NoteService(
      */
     @Transactional
     fun createNote(cmd: CreateNoteCommand): Note {
-        // 노트 정보 저장
         val note = Note.create(cmd)
         noteRepository.save(note)
 
-        // 노트 참여자 초기 저장
         val hostParticipant = NoteParticipant.create(
             note = note,
             userId = cmd.userId,
@@ -49,12 +47,11 @@ class NoteService(
         )
         noteParticipantRepository.save(hostParticipant)
 
-        // 노트 관련 파일 저장
         val noteFilePath = filePath + note.id!!
         val uploadedFiles = mutableListOf<StoredFile>()
 
         try {
-            for((index, file) in cmd.imageFiles.withIndex()) {
+            for((_, file) in cmd.imageFiles.withIndex()) {
                 val storedFile = fileUploader.upload(file, noteFilePath)
                 uploadedFiles.add(storedFile)
 
@@ -63,8 +60,7 @@ class NoteService(
                     originalFileName = storedFile.originalFileName,
                     storedFileName = storedFile.storedFileName,
                     filePath = storedFile.filePath,
-                    fileSize = file.size,
-                    orderIndex = index // 예시
+                    fileSize = file.size
                 )
                 noteFileRepository.save(noteFile)
             }
@@ -89,27 +85,24 @@ class NoteService(
         // 사용자가 참여하고 있는 모든 참여 정보를 찾는다.
         val notes = noteRepository.findActiveNotesByUserId(userId)
 
-        // 조회된 엔티티(notes) 목록을 DTO(OpenNoteResponse) 목록으로 변환한다.
         return notes.map { note ->
-            // 참여자 정보 DTO 목록 생성
             val participantInfos = note.participants.map { participant ->
                 ParticipantInfoResponse(
-                    participantId = participant.id,
+                    participantId = participant.id!!,
                     userId = participant.userId,
                     role = participant.role.name,
                     status = participant.status.name
                 )
             }
 
-            // 책 대표 이미지 URL 결정 (첫 번째 이미지를 사용하거나, 대표 이미지 플래그를 확인)
-            val bookImageUrl = note.files.firstOrNull()?.filePath ?: "/images/default_book_image.svg"
+            // 대표 이미지 경로
+            val bookImageUrl = note.files.firstOrNull()?.filePath ?: "/images/default_book_image.jpg"
 
-            // 최종 OpenNoteResponse DTO 생성
             OpenNoteResponse(
                 id = note.id!!,
                 clubName = "saisai", // TODO: note.club?.name 으로 실제 클럽 이름 가져오기
-                bookName = note.bookName ?: "",
-                bookAuthor = note.bookAuthor ?: "",
+                bookName = note.bookName,
+                bookAuthor = note.bookAuthor,
                 bookImageUrl = bookImageUrl,
                 description = note.description ?: "",
                 participantList = participantInfos,
