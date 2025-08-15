@@ -63,6 +63,7 @@ class LocalFileUploader(
 
         } catch (e: IOException) {
             log.error("[ERROR] 파일 삭제 중 오류 발생: $fullPath")
+            e.printStackTrace()
             false
         } catch (e: SecurityException) {
             log.error("[ERROR] 파일 삭제에 필요한 권한이 없습니다: $fullPath")
