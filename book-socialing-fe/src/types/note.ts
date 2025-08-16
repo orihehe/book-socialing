@@ -7,3 +7,8 @@ export interface Note {
   startDateTime: string
   endDateTime: string
 }
+
+export interface Club {
+  id: string
+  name: string
+}
