@@ -1,5 +1,6 @@
-import { CircleUserRound, Plus, Search } from 'lucide-react'
+import { CircleUserRound, Search } from 'lucide-react'
 
+import { BottomButton } from '@/components/common/BottomButtonl'
 import LNB from '@/components/layout/LNB'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { Button } from '@/components/ui/button'
@@ -115,13 +116,7 @@ export default function ClubView() {
         ))}
       </div>
 
-      {/* Fixed Bottom Action Button */}
-      <div className="fixed bottom-6 left-4 right-4">
-        <Button className="w-full bg-main hover:bg-main/90 text-white py-4 text-base font-medium rounded-lg">
-          <Plus className="mr-2" size={20} />
-          클럽 생성하러가기
-        </Button>
-      </div>
+      <BottomButton onClick={() => {}} children="클럽 생성하러가기" />
     </>
   )
 }

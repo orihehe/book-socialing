@@ -2,6 +2,7 @@ import { useForm } from '@tanstack/react-form'
 import { ArrowLeft, Camera, X } from 'lucide-react'
 import { z } from 'zod'
 
+import { BottomButton } from '@/components/common/BottomButtonl'
 import { Calendar } from '@/components/ui/calendar'
 import { Input } from '@/components/ui/input'
 import {
@@ -205,18 +206,7 @@ export default function CreateNote() {
       </div>
 
       {/* Bottom Button */}
-      <div className="fixed bottom-6 left-4 right-4">
-        <button
-          type="submit"
-          onClick={() => form.handleSubmit()}
-          className="w-full bg-main hover:bg-main/90 text-white py-4 text-base font-medium rounded-lg"
-        >
-          노트생성하기
-        </button>
-      </div>
-
-      {/* 하단 여백 - 고정 버튼 높이만큼 */}
-      <div className="h-24"></div>
+      <BottomButton onClick={() => form.handleSubmit()} children="노트 생성하기" />
     </div>
   )
 }
