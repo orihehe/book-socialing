@@ -1,4 +1,5 @@
 import { CircleUserRound, Search } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
 import { BottomButton } from '@/components/common/BottomButtonl'
 import LNB from '@/components/layout/LNB'
@@ -77,6 +78,8 @@ const mockClubSections: ClubSection[] = [
 ]
 
 export default function ClubView() {
+  const navigate = useNavigate()
+
   const lnbItems = [
     {
       name: '클럽',
@@ -116,7 +119,7 @@ export default function ClubView() {
         ))}
       </div>
 
-      <BottomButton onClick={() => {}} children="클럽 생성하러가기" />
+      <BottomButton onClick={() => navigate('/club/create')} children="클럽 생성하러가기" />
     </>
   )
 }

@@ -3,15 +3,20 @@ export interface Club {
   name: string
   description: string
   memberCount: number
-  imageUrl?: string
-  isCreatedByMe?: boolean
   isMyClub?: boolean
+  isCreatedByMe?: boolean
 }
 
 export interface ClubSection {
   title: string
   count: number
-  clubs: Club[]
   showViewAll?: boolean
   showActions?: boolean
+  clubs: Club[]
+}
+
+export interface CreateClubCommand {
+  name: string
+  description: string
+  images: string[]
 }
