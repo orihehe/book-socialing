@@ -38,5 +38,5 @@ jwt:
   refresh-token-validity-in-seconds: 86400
 
 file:
-  base-dir: ${SAISAI_FILE_BASE_DIR:/Users/bread/saisai-file}
+  base-dir: ${user.home}/dev/saisai-file
   note-dir: note/

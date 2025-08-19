@@ -51,7 +51,7 @@ class NoteService(
         val uploadedFiles = mutableListOf<StoredFile>()
 
         try {
-            for((_, file) in cmd.imageFiles.withIndex()) {
+            for(file in cmd.imageFiles) {
                 val storedFile = fileUploader.upload(file, noteFilePath)
                 uploadedFiles.add(storedFile)
 
