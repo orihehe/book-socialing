@@ -8,8 +8,6 @@ data class ParticipantInfoResponse(
     val participantId: Long,
     @Schema(description = "노트 참여자 user id", example = "1")
     val userId: Long,
-    @Schema(description = "노트 참여자 이름", example = "홍길동")
-    val username: String,
     @Schema(description = "노트 참여자 역할", example = "HOST")
     val role: String,
     @Schema(description = "노트 참여자 상태", example = "JOINED")

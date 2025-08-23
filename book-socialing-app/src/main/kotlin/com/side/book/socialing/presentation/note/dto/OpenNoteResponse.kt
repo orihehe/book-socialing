@@ -16,7 +16,7 @@ data class OpenNoteResponse(
     @Schema(description = "책 이미지 URL", example = "https://covers.openlibrary.org/b/id/8231856-L.jpg")
     val bookImageUrl: String,
     @Schema(description = "노트 소개", example = "~클럽의 몇번째 책임입니다")
-    val description: String,
+    val description: String?,
     @Schema(description = "노트 참여 멤버 목록")
     val participantList: List<ParticipantInfoResponse>,
     @Schema(description = "모임일", example = "2025-06-22")

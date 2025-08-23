@@ -5,6 +5,8 @@ spring:
 
   jpa:
     hibernate:
+      # 세션 팩토리 시작 시 기존 스키마를 삭제하고 새로 생성
+      # ddl-auto: create
       ddl-auto: update
     properties:
       hibernate:
@@ -20,3 +22,7 @@ logging:
   level:
     org.hibernate.SQL: debug
     org.hibernate.type.descriptor.sql.BasicBinder: trace
+
+file:
+  base-dir: ${user.home}/dev/saisai-file
+  note-dir: note/
