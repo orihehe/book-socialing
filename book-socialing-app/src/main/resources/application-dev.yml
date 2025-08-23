@@ -22,3 +22,7 @@ logging:
   level:
     org.hibernate.SQL: debug
     org.hibernate.type.descriptor.sql.BasicBinder: trace
+
+file:
+  base-dir: ${user.home}/dev/saisai-file
+  note-dir: note/
