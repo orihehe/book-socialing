@@ -10,7 +10,7 @@ CREATE TABLE chat_rooms (
     modified_at DATETIME(6) NOT NULL,
     modified_by VARCHAR(255) NOT NULL,
 
-    INDEX idx_chat_rooms_room_type (room_type)
+    INDEX idx_chat_rooms_state (state)
 ) COMMENT = '채팅방 정보';
 
 DROP TABLE IF EXISTS chat_room_participants;

@@ -21,7 +21,7 @@ class ChatRoomService(
 
     @Transactional
     fun joinRoom(roomId: Long, userId: Long) {
-        val chatRoom = chatRoomRepository.findByIdOrNull(roomId)
+            ?: throw ResourceNotFoundException("Not Found ChatRoom")
             ?: throw IllegalArgumentException("Not Found ChatRoom")
 
         chatRoomParticipantRepository.findByChatRoomIdAndUserId(chatRoom.id!!, userId)?.let {
