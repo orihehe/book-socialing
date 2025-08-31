@@ -4,7 +4,7 @@ CREATE TABLE chat_rooms (
     note_id BIGINT NOT NULL,
     room_name VARCHAR(255) NOT NULL,
     state VARCHAR(255)
-
+    state VARCHAR(255),
     created_at DATETIME(6) NOT NULL,
     created_by VARCHAR(255) NOT NULL,
     modified_at DATETIME(6) NOT NULL,
