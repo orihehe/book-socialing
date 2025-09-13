@@ -1,6 +1,7 @@
 // App.tsx
 import { Routes, Route, Navigate } from 'react-router-dom'
 
+import ChatView from './features/chat/ChatView'
 import ClubView from './features/club/ClubView'
 import CreateClub from './features/club/pages/CreateClub'
 import EditClub from './features/club/pages/EditClub'
@@ -13,6 +14,7 @@ function App() {
       <Route path="/" element={<Navigate to="/note" replace />} />
       <Route path="/note" element={<NoteView />} />
       <Route path="/note/create" element={<CreateNote />} />
+      <Route path="/note/:id/chat" element={<ChatView />} />
       <Route path="/club" element={<ClubView />} />
       <Route path="/club/create" element={<CreateClub />} />
       <Route path="/club/:id/edit" element={<EditClub />} />
