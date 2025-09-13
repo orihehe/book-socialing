@@ -12,16 +12,25 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class ChatRoomService(
     private val chatRoomRepository: ChatRoomRepository,
-    private val chatRoomParticipantRepository: ChatRoomParticipantRepository
+    private val chatRoomParticipantRepository: ChatRoomParticipantRepository,
 ) {
-
-    fun createChatRoom(roomName: String) {
-        val chatRoom = ChatRoom.create(roomName)
+    @Transactional
+    fun createChatRoomForNote(
+        noteId: Long,
+        roomName: String,
+    ) {
+        val chatRoom = ChatRoom.create(
+            roomName = roomName,
+            noteId = noteId,
+        )
         chatRoomRepository.save(chatRoom)
     }
 
     @Transactional
-    fun joinRoom(roomId: Long, userId: Long) {
+    fun joinRoom(
+        roomId: Long,
+        userId: Long,
+    ) {
         val chatRoom = chatRoomRepository.findByIdOrNull(roomId)
             ?: throw ResourceNotFoundException("Not Found ChatRoom")
 

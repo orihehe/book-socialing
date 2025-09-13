@@ -6,6 +6,7 @@ import com.side.book.socialing.domain.note.entity.NoteFile
 import com.side.book.socialing.domain.note.entity.NoteParticipant
 import com.side.book.socialing.domain.note.enum.ParticipantRole
 import com.side.book.socialing.domain.note.enum.ParticipantStatus
+import com.side.book.socialing.domain.note.event.NoteCreatedEvent
 import com.side.book.socialing.domain.note.repository.NoteFileRepository
 import com.side.book.socialing.domain.note.repository.NoteParticipantRepository
 import com.side.book.socialing.domain.note.repository.NoteRepository
@@ -14,6 +15,7 @@ import com.side.book.socialing.global.file.StoredFile
 import com.side.book.socialing.presentation.note.dto.OpenNoteResponse
 import com.side.book.socialing.presentation.note.dto.ParticipantInfoResponse
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -23,6 +25,7 @@ class NoteService(
     private val noteFileRepository: NoteFileRepository,
     private val noteParticipantRepository: NoteParticipantRepository,
     private val fileUploader: FileUploader,
+    private val applicationEventPublisher: ApplicationEventPublisher,
 
     @Value("\${file.note-dir}") private val filePath: String
 )
@@ -38,6 +41,7 @@ class NoteService(
     fun createNote(cmd: CreateNoteCommand): Note {
         val note = Note.create(cmd)
         noteRepository.save(note)
+        applicationEventPublisher.publishEvent(NoteCreatedEvent(note.id!!, note.bookName))
 
         val hostParticipant = NoteParticipant.create(
             note = note,
