@@ -1,8 +1,8 @@
 package com.side.book.socialing.domain.club.entity
 
+import com.side.book.socialing.domain.club.enum.ParticipantRole
+import com.side.book.socialing.domain.club.enum.ParticipantStatus
 import com.side.book.socialing.domain.common.BaseEntity
-import com.side.book.socialing.domain.note.enum.ParticipantRole
-import com.side.book.socialing.domain.note.enum.ParticipantStatus
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType

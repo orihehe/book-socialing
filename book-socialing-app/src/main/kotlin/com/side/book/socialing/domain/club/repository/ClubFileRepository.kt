@@ -1,8 +1,8 @@
 package com.side.book.socialing.domain.club.repository
 
-import com.side.book.socialing.domain.note.entity.NoteFile
+ import com.side.book.socialing.domain.club.entity.ClubFile
 import org.springframework.data.jpa.repository.JpaRepository
 
-interface ClubFileRepository: JpaRepository<NoteFile, Long> {
+interface ClubFileRepository: JpaRepository<ClubFile, Long> {
 
 }
