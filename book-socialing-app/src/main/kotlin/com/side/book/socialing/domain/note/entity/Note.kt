@@ -1,5 +1,6 @@
 package com.side.book.socialing.domain.note.entity
 
+import com.side.book.socialing.domain.club.entity.Club
 import com.side.book.socialing.domain.common.BaseEntity
 import com.side.book.socialing.domain.note.command.CreateNoteCommand
 import jakarta.persistence.*
@@ -13,10 +14,9 @@ class Note(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
 
-// TODO: club 구현 후
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "club_id", nullable = false)
-//    var club: Club,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "club_id", nullable = true)
+    var club: Club? = null,
 
     @Column(name = "book_name", length = 200)
     var bookName: String,
@@ -42,8 +42,9 @@ class Note(
     var files: MutableList<NoteFile> = mutableListOf()
 ): BaseEntity() {
     companion object {
-        fun create(cmd: CreateNoteCommand): Note {
+        fun create(cmd: CreateNoteCommand, club: Club?): Note {
             return Note(
+                club = club,
                 bookName = cmd.bookName,
                 bookAuthor = cmd.bookAuthor,
                 description = cmd.description,

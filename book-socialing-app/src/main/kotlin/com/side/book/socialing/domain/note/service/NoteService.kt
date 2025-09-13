@@ -1,5 +1,7 @@
 package com.side.book.socialing.domain.note.service
 
+import com.side.book.socialing.domain.club.entity.Club
+import com.side.book.socialing.domain.club.repository.ClubRepository
 import com.side.book.socialing.domain.note.command.CreateNoteCommand
 import com.side.book.socialing.domain.note.entity.Note
 import com.side.book.socialing.domain.note.entity.NoteFile
@@ -23,6 +25,7 @@ import java.time.LocalDateTime
 class NoteService(
     private val noteRepository: NoteRepository,
     private val noteFileRepository: NoteFileRepository,
+    private val clubRepository: ClubRepository,
     private val noteParticipantRepository: NoteParticipantRepository,
     private val fileUploader: FileUploader,
 
@@ -38,8 +41,18 @@ class NoteService(
      */
     @Transactional
     fun createNote(cmd: CreateNoteCommand): Note {
-        val note = Note.create(cmd)
-        noteRepository.save(note)
+
+        val club: Club? = cmd.clubId?.let { clubId ->
+            clubRepository.findById(clubId).orElse(null)
+        }
+
+        if (club == null && cmd.clubId != null) {
+            throw IllegalArgumentException("Club with ID ${cmd.clubId} not found.")
+        }
+
+        // Note.create에 찾아온 club 객체를 전달
+        val note = Note.create(cmd, club)
+        noteRepository.save(note) // note 저장 시 club과의 관계도 함께 저장됨
 
         val hostParticipant = NoteParticipant.create(
             note = note,
