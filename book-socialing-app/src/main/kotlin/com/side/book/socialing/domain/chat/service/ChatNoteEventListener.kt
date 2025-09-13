@@ -17,7 +17,7 @@ class ChatNoteEventListener(
                 roomName = event.noteTitle,
             )
         } catch (e: Exception) {
-            log.error("Failed to create chat room for noteId: {}. Error: {}", event.noteId, e.message)
+            log.error("Failed to create chat room for noteId: {}.", event.noteId, e)
         }
     }
 }
