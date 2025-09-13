@@ -2,14 +2,26 @@ package com.side.book.socialing.presentation.note.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 
-@Schema(description = "노트 참여자 정보 DTO")
+@Schema(name = "ParticipantInfoResponse", description = "노트 참여자 정보 DTO")
 data class ParticipantInfoResponse(
-    @Schema(description = "노트 참여자 id", example = "1")
+    @field:Schema(description = "노트 참여자 ID", example = "28")
     val participantId: Long,
-    @Schema(description = "노트 참여자 user id", example = "1")
+
+    @field:Schema(description = "사용자 ID", example = "1")
     val userId: Long,
-    @Schema(description = "노트 참여자 역할", example = "HOST")
+
+    @field:Schema(
+        description = "노트 참여자 역할",
+        example = "HOST",
+        allowableValues = ["HOST", "MEMBER"]
+    )
     val role: String,
-    @Schema(description = "노트 참여자 상태", example = "JOINED")
+
+    @field:Schema(
+        description = "노트 참여자 상태",
+        example = "JOINED",
+        allowableValues = ["JOINED", "PENDING_APPROVAL", "CANCEL", "REJECTED", "LEFT", "KICKED"]
+    )
     val status: String
 )
+

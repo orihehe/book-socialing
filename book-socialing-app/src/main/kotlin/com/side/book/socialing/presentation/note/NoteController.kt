@@ -3,6 +3,7 @@ package com.side.book.socialing.presentation.note
 import com.side.book.socialing.domain.note.command.CreateNoteCommand
 import com.side.book.socialing.domain.note.service.NoteService
 import com.side.book.socialing.global.auth.UserPrincipalResolver
+import com.side.book.socialing.presentation.note.dto.ClubNotesPageResponse
 import com.side.book.socialing.presentation.note.dto.CommonNoteResponse
 import com.side.book.socialing.presentation.note.dto.CreateNoteRequest
 import com.side.book.socialing.presentation.note.dto.OpenNoteResponse
@@ -24,6 +25,10 @@ class NoteController(
     private val userPrincipalResolver: UserPrincipalResolver
 ) {
     @PostMapping("/create", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    @Operation(
+        summary = "노트 생성",
+        description = "JSON(요청 본문) + 이미지 파일 업로드"
+    )
     fun createNote(
         @RequestPart("request") request: CreateNoteRequest,
         @RequestPart("images") imageFiles: List<MultipartFile>
@@ -74,16 +79,20 @@ class NoteController(
         ]
     )
     @GetMapping("/open")
-    fun getOpenNotes(): ResponseEntity<List<OpenNoteResponse>> {
+    fun getOpenNotes(
+        @RequestParam(defaultValue = "10") pageSize: Int,
+        @RequestParam(defaultValue = "1") pageNum: Int
+    ): ResponseEntity<ClubNotesPageResponse<OpenNoteResponse>> {
         val userId = userPrincipalResolver.getUserId()
+        val offset = (pageNum - 1) * pageSize
 
         return try {
-            val openNotes = noteService.getOpenNotes(userId)
+            val openNotes = noteService.getOpenNotes(userId, pageSize, offset)
             ResponseEntity.ok(openNotes)
         } catch (e: Exception) {
             System.err.println("Error fetching open notes for user $userId: ${e.message}")
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(emptyList())
+                .body(ClubNotesPageResponse(totalCount = 0L, groups = emptyList()))
         }
     }
 
@@ -98,16 +107,20 @@ class NoteController(
         ]
     )
     @GetMapping("/created")
-    fun getCreatedNotes(): ResponseEntity<List<CommonNoteResponse>> {
+    fun getCreatedNotes(
+        @RequestParam(defaultValue = "10") pageSize: Int,
+        @RequestParam(defaultValue = "1") pageNum: Int
+    ): ResponseEntity<ClubNotesPageResponse<CommonNoteResponse>> {
         val userId = userPrincipalResolver.getUserId()
+        val offset = (pageNum - 1) * pageSize
 
         return try {
-            val createdNotes = noteService.getCreatedNotes(userId)
+            val createdNotes = noteService.getCreatedNotes(userId, pageSize, offset)
             ResponseEntity.ok(createdNotes)
         } catch (e: Exception) {
             System.err.println("Error fetching created notes for user $userId: ${e.message}") // 에러 로깅
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR) // 500 Internal Server Error
-                .body(emptyList()) // 빈 리스트 반환 또는 에러 DTO 반환
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ClubNotesPageResponse(totalCount = 0L, groups = emptyList()))
         }
     }
 
@@ -122,16 +135,20 @@ class NoteController(
         ]
     )
     @GetMapping("/pending")
-    fun getPendingNotes(): ResponseEntity<List<CommonNoteResponse>> {
+    fun getPendingNotes(
+        @RequestParam(defaultValue = "10") pageSize: Int,
+        @RequestParam(defaultValue = "1") pageNum: Int
+    ): ResponseEntity<ClubNotesPageResponse<CommonNoteResponse>> {
         val userId = userPrincipalResolver.getUserId()
+        val offset = (pageNum - 1) * pageSize
 
         return try {
-            val pendingNotes = noteService.getPendingNotes(userId)
+            val pendingNotes = noteService.getPendingNotes(userId, pageSize, offset)
             ResponseEntity.ok(pendingNotes)
         } catch (e: Exception) {
             System.err.println("Error fetching pending notes for user $userId: ${e.message}") // 에러 로깅
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR) // 500 Internal Server Error
-                .body(emptyList()) // 빈 리스트 반환 또는 에러 DTO 반환
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ClubNotesPageResponse(totalCount = 0L, groups = emptyList()))
         }
     }
 
@@ -154,8 +171,8 @@ class NoteController(
             ResponseEntity.ok(recommendNotes)
         } catch (e: Exception) {
             System.err.println("Error fetching recommend notes for user $userId: ${e.message}") // 에러 로깅
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR) // 500 Internal Server Error
-                .body(emptyList()) // 빈 리스트 반환 또는 에러 DTO 반환
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(emptyList())
         }
     }
 
@@ -170,16 +187,20 @@ class NoteController(
         ]
     )
     @GetMapping("/revised")
-    fun getRevisedNotes(): ResponseEntity<List<CommonNoteResponse>> {
+    fun getRevisedNotes(
+        @RequestParam(defaultValue = "10") pageSize: Int,
+        @RequestParam(defaultValue = "1") pageNum: Int
+    ): ResponseEntity<ClubNotesPageResponse<CommonNoteResponse>> {
         val userId = userPrincipalResolver.getUserId()
+        val offset = (pageNum - 1) * pageSize
 
         return try {
-            val revisedNotes = noteService.getParticipatedRevisedNotes(userId)
+            val revisedNotes = noteService.getRevisedNotes(userId, pageSize, offset)
             ResponseEntity.ok(revisedNotes)
         } catch (e: Exception) {
             System.err.println("Error fetching revised notes for user $userId: ${e.message}") // 에러 로깅
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR) // 500 Internal Server Error
-                .body(emptyList()) // 빈 리스트 반환 또는 에러 DTO 반환
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ClubNotesPageResponse(totalCount = 0L, groups = emptyList()))
         }
     }
 }
