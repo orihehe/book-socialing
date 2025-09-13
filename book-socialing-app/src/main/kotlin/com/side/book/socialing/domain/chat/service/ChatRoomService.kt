@@ -12,16 +12,16 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class ChatRoomService(
     private val chatRoomRepository: ChatRoomRepository,
-    private val chatRoomParticipantRepository: ChatRoomParticipantRepository,
+    private val chatRoomParticipantRepository: ChatRoomParticipantRepository
 ) {
     @Transactional
     fun createChatRoomForNote(
         noteId: Long,
-        roomName: String,
+        roomName: String
     ) {
         val chatRoom = ChatRoom.create(
             roomName = roomName,
-            noteId = noteId,
+            noteId = noteId
         )
         chatRoomRepository.save(chatRoom)
     }
@@ -29,7 +29,7 @@ class ChatRoomService(
     @Transactional
     fun joinRoom(
         roomId: Long,
-        userId: Long,
+        userId: Long
     ) {
         val chatRoom = chatRoomRepository.findByIdOrNull(roomId)
             ?: throw ResourceNotFoundException("Not Found ChatRoom")

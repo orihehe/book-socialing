@@ -14,17 +14,17 @@ class ChatRoom(
     @Column(nullable = false)
     val roomName: String,
     @Column(nullable = false)
-    var state: ChatRoomState,
+    var state: ChatRoomState
 ) : BaseEntity() {
     companion object {
         fun create(
             roomName: String,
-            noteId: Long,
+            noteId: Long
         ): ChatRoom {
             return ChatRoom(
                 roomName = roomName,
                 state = ChatRoomState.OPENED,
-                noteId = noteId,
+                noteId = noteId
             )
         }
     }
