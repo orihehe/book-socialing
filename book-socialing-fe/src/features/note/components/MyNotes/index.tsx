@@ -20,7 +20,7 @@ export function MyNotes({ myNotes }: MyNotesProps) {
   const visibleNotes = !showToggle || open ? myNotes : [...myNotes].splice(0, VISIBLE_NOTE_COUNT)
 
   return (
-    <BaseCard title={`내가 생성한 노트 (${myNotes.length})`}>
+    <BaseCard title={`생성한 노트 (${myNotes.length})`}>
       <CardContent>
         <div className="flex flex-col gap-2">
           {visibleNotes.slice(0, VISIBLE_NOTE_COUNT).map(({ id, ...note }) => (

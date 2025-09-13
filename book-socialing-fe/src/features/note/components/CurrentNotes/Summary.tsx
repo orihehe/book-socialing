@@ -12,7 +12,7 @@ interface Props {
   currentNotes: Note[]
 }
 
-export function CurrentNotes({ currentNotes }: Props) {
+export function Summary({ currentNotes }: Props) {
   const [api, setApi] = useState<CarouselApi>()
   const [current, setCurrent] = useState(0)
 
@@ -28,7 +28,7 @@ export function CurrentNotes({ currentNotes }: Props) {
   }, [api])
 
   return (
-    <BaseCard title="작성중인 노트">
+    <BaseCard title={`📖 열린 노트 (${currentNotes.length})`}>
       <CardContent>
         <Carousel setApi={setApi}>
           <CarouselContent>

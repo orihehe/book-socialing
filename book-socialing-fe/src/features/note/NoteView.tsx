@@ -6,7 +6,8 @@ import { PageHeader } from '@/components/layout/PageHeader'
 import { Button } from '@/components/ui/button'
 import type { Note } from '@/types/note'
 
-import { CurrentNotes } from './components/CurrentNotes'
+import { Notes as CurrentNotes } from './components/CurrentNotes/Notes'
+import { Summary } from './components/CurrentNotes/Summary'
 import { MyNotes } from './components/MyNotes'
 import { RevisedNotes } from './components/RevisedNotes'
 
@@ -78,15 +79,14 @@ export default function NoteView() {
       <div className="flex flex-col p-2 mx-auto">
         {activeTab === 'all' && (
           <>
-            <CurrentNotes currentNotes={dummyCurrentNotes} />
+            <Summary currentNotes={dummyCurrentNotes} />
             <MyNotes myNotes={dummyCurrentNotes} />
             <RevisedNotes revisedNotes={dummyCurrentNotes} />
           </>
         )}
         {activeTab === 'open' && (
           <>
-            <CurrentNotes currentNotes={dummyCurrentNotes} />
-            <MyNotes myNotes={dummyCurrentNotes} />
+            <CurrentNotes />
           </>
         )}
         {activeTab === 'closed' && <RevisedNotes revisedNotes={dummyCurrentNotes} />}
