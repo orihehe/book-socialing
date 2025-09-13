@@ -50,8 +50,7 @@ class NoteController(
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "201", description = "성공적으로 노트 참여 신청함"),
-            ApiResponse(responseCode = "404", description = "해당 노트를 찾을 수 없음"),
-            ApiResponse(responseCode = "409", description = "이미 참여 신청했거나 참여 중인 노트")
+            ApiResponse(responseCode = "404", description = "해당 노트를 찾을 수 없음")
         ]
     )
     @PostMapping("/{noteId}/join")
