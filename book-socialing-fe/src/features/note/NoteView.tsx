@@ -1,15 +1,12 @@
-import { CircleUserRound, Search } from 'lucide-react'
 import { useState } from 'react'
 
-import LNB, { type LNBItem } from '@/components/layout/LNB'
-import { PageHeader } from '@/components/layout/PageHeader'
-import { Button } from '@/components/ui/button'
 import type { Note } from '@/types/note'
 
 import { Notes as CurrentNotes } from './components/CurrentNotes/Notes'
 import { Summary as CurrentSummary } from './components/CurrentNotes/Summary'
 import { MyNotes } from './components/MyNotes'
 import { RevisedNotes } from './components/RevisedNotes'
+import { MainLayout } from '../shared/MainLayout'
 
 const dummyCurrentNotes: Note[] = [
   {
@@ -44,38 +41,8 @@ const dummyCurrentNotes: Note[] = [
 export default function NoteView() {
   const [activeTab, setActiveTab] = useState('all')
 
-  const lnbItems: LNBItem[] = [
-    {
-      name: '클럽',
-      key: 'club',
-      children: [],
-    },
-    {
-      name: '노트',
-      key: 'note',
-      children: [
-        { key: 'all', name: '전체' },
-        { key: 'open', name: '열린노트' },
-        { key: 'closed', name: '닫힌 노트' },
-      ],
-    },
-  ]
-
   return (
-    <>
-      <PageHeader title="SAISAI">
-        <div className="flex items-center">
-          <Button variant="ghost" size="icon">
-            <Search />
-          </Button>
-          <Button variant="ghost" className="-ml-1">
-            <CircleUserRound />
-          </Button>
-        </div>
-      </PageHeader>
-
-      <LNB items={lnbItems} activeTab={activeTab} onTabChange={setActiveTab} />
-
+    <MainLayout activeTab={activeTab} onTabChange={setActiveTab}>
       <div className="flex flex-col p-2 mx-auto">
         {activeTab === 'all' && (
           <>
@@ -107,6 +74,6 @@ export default function NoteView() {
           <ArrowUp />
         </Button>
       </div> */}
-    </>
+    </MainLayout>
   )
 }
