@@ -5,7 +5,6 @@ import com.side.book.socialing.domain.chat.entity.ChatRoomParticipant
 import com.side.book.socialing.domain.chat.repository.ChatRoomParticipantRepository
 import com.side.book.socialing.domain.chat.repository.ChatRoomRepository
 import com.side.book.socialing.global.error.exception.ResourceNotFoundException
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -28,10 +27,10 @@ class ChatRoomService(
 
     @Transactional
     fun joinRoom(
-        roomId: Long,
+        noteId: Long,
         userId: Long
     ) {
-        val chatRoom = chatRoomRepository.findByIdOrNull(roomId)
+        val chatRoom = chatRoomRepository.findByNoteId(noteId)
             ?: throw ResourceNotFoundException("Not Found ChatRoom")
 
         chatRoomParticipantRepository.findByChatRoomIdAndUserId(chatRoom.id!!, userId)?.let {
