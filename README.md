@@ -1,4 +1,16 @@
-### ⚠️ Caution: After cloning the repository, run installGitHooks to protect the main branch! 🔒
+## 🚀 초기 개발 환경 설정
+
+### Git Pre-commit Hook 설정 (필수)
+
+이 프로젝트는 `ktlint`를 사용하여 Kotlin 코드 스타일을 자동으로 검사하고 수정합니다. 모든 팀원이 일관된 코드 스타일을 유지하기 위해, 저장소를 클론한 후 다음 명령어를 실행하여 Git hook을 활성화해야 합니다.
+
+```bash
+git config core.hooksPath hooks
+```
+
+이 설정을 통해 커밋 시마다 자동으로 코드 스타일이 검사 및 적용됩니다.
+
+---
 
 ## 🛠️ BE Environment
 ### VM Options
@@ -39,3 +51,4 @@
 ```bash
 pnpm install
 pnpm dev
+```
