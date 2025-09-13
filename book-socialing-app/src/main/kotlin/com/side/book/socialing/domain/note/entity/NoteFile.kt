@@ -5,7 +5,7 @@ import jakarta.persistence.*
 
 @Entity
 @Table(name = "note_file")
-class NoteFile (
+class NoteFile(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
@@ -24,11 +24,11 @@ class NoteFile (
     var filePath: String,
 
     @Column(name = "file_size", nullable = false)
-    var fileSize: Long,
+    var fileSize: Long
 
-): BaseEntity() {
+) : BaseEntity() {
     companion object {
-        fun create(note: Note, originalFileName: String, storedFileName: String, filePath: String, fileSize: Long ): NoteFile {
+        fun create(note: Note, originalFileName: String, storedFileName: String, filePath: String, fileSize: Long): NoteFile {
             return NoteFile(
                 note = note,
                 originalFileName = originalFileName,

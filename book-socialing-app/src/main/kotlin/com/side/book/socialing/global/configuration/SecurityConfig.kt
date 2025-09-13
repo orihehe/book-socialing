@@ -1,9 +1,9 @@
 package com.side.book.socialing.global.configuration
 
 import com.side.book.socialing.domain.auth.service.CustomOAuth2UserService
+import com.side.book.socialing.global.security.filter.JwtAuthenticationFilter
 import com.side.book.socialing.global.security.handler.OAuth2SuccessHandler
 import com.side.book.socialing.global.security.service.JwtAuthService
-import com.side.book.socialing.global.security.filter.JwtAuthenticationFilter
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

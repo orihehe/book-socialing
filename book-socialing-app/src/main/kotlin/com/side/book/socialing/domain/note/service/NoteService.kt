@@ -8,6 +8,7 @@ import com.side.book.socialing.domain.note.entity.NoteFile
 import com.side.book.socialing.domain.note.entity.NoteParticipant
 import com.side.book.socialing.domain.note.enum.ParticipantRole
 import com.side.book.socialing.domain.note.enum.ParticipantStatus
+import com.side.book.socialing.domain.note.event.NoteCreatedEvent
 import com.side.book.socialing.domain.note.repository.NoteFileRepository
 import com.side.book.socialing.domain.note.repository.NoteParticipantRepository
 import com.side.book.socialing.domain.note.repository.NoteRepository
@@ -16,7 +17,9 @@ import com.side.book.socialing.global.file.StoredFile
 import com.side.book.socialing.presentation.note.dto.CommonNoteResponse
 import com.side.book.socialing.presentation.note.dto.OpenNoteResponse
 import com.side.book.socialing.presentation.note.dto.ParticipantInfoResponse
+import jakarta.persistence.EntityNotFoundException
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -28,10 +31,10 @@ class NoteService(
     private val clubRepository: ClubRepository,
     private val noteParticipantRepository: NoteParticipantRepository,
     private val fileUploader: FileUploader,
+    private val applicationEventPublisher: ApplicationEventPublisher,
 
     @Value("\${file.note-dir}") private val filePath: String
-)
-{
+) {
     /**
      * 새로운 노트를 생성하고 관련된 파일 및 참여자 정보를 함께 저장합니다.
      *
@@ -41,7 +44,6 @@ class NoteService(
      */
     @Transactional
     fun createNote(cmd: CreateNoteCommand): Note {
-
         val club: Club? = cmd.clubId?.let { clubId ->
             clubRepository.findById(clubId).orElse(null)
         }
@@ -52,7 +54,8 @@ class NoteService(
 
         // Note.create에 찾아온 club 객체를 전달
         val note = Note.create(cmd, club)
-        noteRepository.save(note) // note 저장 시 club과의 관계도 함께 저장됨
+        noteRepository.save(note)
+        applicationEventPublisher.publishEvent(NoteCreatedEvent(note.id!!, note.bookName))
 
         val hostParticipant = NoteParticipant.create(
             note = note,
@@ -66,7 +69,7 @@ class NoteService(
         val uploadedFiles = mutableListOf<StoredFile>()
 
         try {
-            for(file in cmd.imageFiles) {
+            for (file in cmd.imageFiles) {
                 val storedFile = fileUploader.upload(file, noteFilePath)
                 uploadedFiles.add(storedFile)
 
@@ -231,5 +234,24 @@ class NoteService(
                 endDateTime = note.endDate
             )
         }
+    }
+
+    @Transactional
+    fun joinNote(userId: Long, noteId: Long) {
+        val note = noteRepository.findById(noteId)
+            .orElseThrow { throw EntityNotFoundException("Note not found with id: $noteId") }
+
+        noteParticipantRepository.findByNoteIdAndUserId(noteId, userId)?.let {
+            throw IllegalStateException("User $userId is already a participant in note $noteId")
+        }
+
+        val participant = NoteParticipant.create(
+            note = note,
+            userId = userId,
+            role = ParticipantRole.MEMBER,
+            status = ParticipantStatus.JOINED
+        )
+
+        noteParticipantRepository.save(participant)
     }
 }

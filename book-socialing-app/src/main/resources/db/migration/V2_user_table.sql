@@ -15,6 +15,7 @@ CREATE TABLE users (
     modified_by VARCHAR(255) NOT NULL,
 
     UNIQUE KEY uq_provider_providerId (provider, provider_id),
+    UNIQUE KEY uq_email (email),
     INDEX idx_users_created_at (created_at),
     INDEX idx_users_modified_at (modified_at)
 );

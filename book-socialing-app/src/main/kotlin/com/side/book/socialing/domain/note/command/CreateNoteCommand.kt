@@ -1,6 +1,5 @@
 package com.side.book.socialing.domain.note.command
 
-import com.side.book.socialing.domain.club.entity.Club
 import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDateTime
 

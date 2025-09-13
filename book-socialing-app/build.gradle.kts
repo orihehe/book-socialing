@@ -5,6 +5,7 @@ plugins {
 
     id("org.springframework.boot")
     id("io.spring.dependency-management")
+    id("org.jlleitschuh.gradle.ktlint")
 }
 
 group = "com.side.book"

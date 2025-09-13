@@ -1,7 +1,7 @@
 package com.side.book.socialing.global.security.handler
 
-import com.side.book.socialing.global.security.service.AuthService
 import com.side.book.socialing.global.security.exception.JwtAuthenticationException
+import com.side.book.socialing.global.security.service.AuthService
 import com.side.book.socialing.global.utils.log
 import org.springframework.messaging.Message
 import org.springframework.messaging.MessageChannel

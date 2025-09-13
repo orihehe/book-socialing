@@ -1,5 +1,6 @@
 package com.side.book.socialing.presentation.club
 
+import com.side.book.socialing.global.auth.UserPrincipalResolver
 import com.side.book.socialing.presentation.club.dto.CommonClubResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -14,7 +15,9 @@ import org.springframework.web.bind.annotation.RestController
 @Tag(name = "클럽 API", description = "클럽 생성, 조회, 수정, 삭제 관련 API")
 @RestController
 @RequestMapping("/api/club/v1")
-class ClubController () {
+class ClubController(
+    private val userPrincipalResolver: UserPrincipalResolver
+) {
 
     @Operation(
         summary = "로그인한 사용자가 속한 클럽 목록 조회",
@@ -28,9 +31,7 @@ class ClubController () {
     )
     @GetMapping("/joined")
     fun getJoinedClubs(): ResponseEntity<List<CommonClubResponse>> {
-
-        // TODO: 회원 정보 필요
-        val userId = 123L
+        val userId = userPrincipalResolver.getUserId()
 
         return try {
             // 실제 DB 호출 로직 대신 더미 데이터 생성
@@ -106,9 +107,7 @@ class ClubController () {
     )
     @GetMapping("/created")
     fun getCreatedClubs(): ResponseEntity<List<CommonClubResponse>> {
-
-        // TODO: 회원 정보 필요
-        val userId = 123L
+        val userId = userPrincipalResolver.getUserId()
 
         return try {
             val dummyClubs = mutableListOf<CommonClubResponse>()
@@ -173,9 +172,7 @@ class ClubController () {
     )
     @GetMapping("/recommended")
     fun getRecommendedClubs(): ResponseEntity<List<CommonClubResponse>> {
-
-        // TODO: 회원 정보 필요
-        val userId = 123L
+        val userId = userPrincipalResolver.getUserId()
 
         return try {
             val dummyClubs = mutableListOf<CommonClubResponse>()
@@ -207,5 +204,4 @@ class ClubController () {
                 .body(emptyList()) // 빈 리스트 반환 또는 에러 DTO 반환
         }
     }
-
 }

@@ -6,8 +6,7 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import java.time.LocalDateTime
 
-
-interface NoteRepository: JpaRepository<Note, Long> {
+interface NoteRepository : JpaRepository<Note, Long> {
 
     @Query("SELECT n FROM Note n JOIN n.participants p WHERE p.userId = :userId AND p.status = 'JOINED' AND n.endDate > :currentDateTime ORDER BY n.endDate")
     fun findActiveNotesByUserId(

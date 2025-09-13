@@ -2,7 +2,6 @@ package com.side.book.socialing.global.file
 
 import org.springframework.web.multipart.MultipartFile
 
-
 // 파일 저장 후의 결과 정보를 담을 데이터 클래스
 data class StoredFile(
     val originalFileName: String,

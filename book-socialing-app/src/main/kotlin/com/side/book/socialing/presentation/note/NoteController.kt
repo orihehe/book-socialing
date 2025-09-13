@@ -14,13 +14,12 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
-import java.time.LocalDateTime
 
 @Tag(name = "노트 API", description = "노트 조회, 생성, 참여, 퇴고 등 노트 관련 API")
 @RestController
 @RequestMapping("/api/note/v1")
-class NoteController (
-    private val noteService: NoteService,
+class NoteController(
+    private val noteService: NoteService
 ) {
     @PostMapping("/create", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun createNote(
@@ -44,6 +43,25 @@ class NoteController (
     }
 
     @Operation(
+        summary = "노트 참여 신청",
+        description = "사용자가 특정 노트에 참여를 신청합니다."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "201", description = "성공적으로 노트 참여 신청함"),
+            ApiResponse(responseCode = "404", description = "해당 노트를 찾을 수 없음")
+        ]
+    )
+    @PostMapping("/{noteId}/join")
+    @ResponseStatus(HttpStatus.CREATED)
+    fun joinNote(@PathVariable noteId: Long) {
+        // TODO: 회원 정보 필요
+        val userId = 123L
+
+        noteService.joinNote(userId, noteId)
+    }
+
+    @Operation(
         summary = "로그인한 사용자가 참여 중인 열린 노트 목록 조회",
         description = "현재 로그인한 사용자가 참여자로 등록되어 있고, 모임일이 지나지 않은 (즉, 아직 진행될) 노트 목록을 조회합니다. 각 노트의 상세 정보와 참여자 정보가 함께 반환됩니다."
     )
@@ -55,7 +73,6 @@ class NoteController (
     )
     @GetMapping("/open")
     fun getOpenNotes(): ResponseEntity<List<OpenNoteResponse>> {
-
         // TODO: 회원 정보 필요
         val userId = 123L
 
@@ -81,7 +98,6 @@ class NoteController (
     )
     @GetMapping("/created")
     fun getCreatedNotes(): ResponseEntity<List<CommonNoteResponse>> {
-
         // TODO: 회원 정보 필요
         val userId = 123L
 
@@ -107,7 +123,6 @@ class NoteController (
     )
     @GetMapping("/pending")
     fun getPendingNotes(): ResponseEntity<List<CommonNoteResponse>> {
-
         // TODO: 회원 정보 필요
         val userId = 123L
 
@@ -133,7 +148,6 @@ class NoteController (
     )
     @GetMapping("/recommend")
     fun getRecommendNotes(): ResponseEntity<List<CommonNoteResponse>> {
-
         // TODO: 회원 정보 필요
         val userId = 123L
 
@@ -159,7 +173,6 @@ class NoteController (
     )
     @GetMapping("/revised")
     fun getRevisedNotes(): ResponseEntity<List<CommonNoteResponse>> {
-
         // TODO: 회원 정보 필요
         val userId = 123L
 

@@ -36,7 +36,7 @@ class Club(
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "club")
     var reviews: MutableList<ClubReview> = mutableListOf()
-): BaseEntity() {
+) : BaseEntity() {
     companion object {
         fun create(cmd: CreateClubCommand): Club {
             return Club(

@@ -1,9 +1,11 @@
 package com.side.book.socialing.presentation.chat.dto
 
+import java.time.LocalDateTime
+
 data class ChatMessageRequest(
+    val roomId: Long,
     val content: String,
-    val type: String,
-    val emojis: List<String> = listOf()
+    val type: String
 )
 
 data class ChatMessageResponse(
@@ -11,6 +13,5 @@ data class ChatMessageResponse(
     val senderNickname: String,
     val content: String,
     val type: String,
-    val emojis: List<String> = listOf(),
-    val sentAt: String
+    val sentAt: LocalDateTime
 )

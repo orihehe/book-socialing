@@ -1,48 +1,80 @@
 package com.side.book.socialing.presentation.chat
 
+import com.side.book.socialing.domain.chat.command.SaveMessageCommand
+import com.side.book.socialing.domain.chat.service.ChatMessageService
+import com.side.book.socialing.global.auth.UserPrincipalResolver
 import com.side.book.socialing.presentation.chat.dto.ChatMessageRequest
 import com.side.book.socialing.presentation.chat.dto.ChatMessageResponse
+import com.side.book.socialing.presentation.chat.dto.ChatMessagesApiResponse
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.handler.annotation.SendTo
-import org.springframework.stereotype.Controller
-import java.security.Principal
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
 
-@Controller
+@Tag(name = "채팅 API", description = "채팅 관련 API")
+@RestController
+@RequestMapping("/api/chat/v1")
 class ChatController(
-    // private val chatService: ChatService // TODO: 도메인 서비스 계층 주입
+    private val chatMessageService: ChatMessageService,
+    private val userPrincipalResolver: UserPrincipalResolver
 ) {
 
-    /**
-     * /app/chat.sendMessage 경로로 메시지가 오면 이 메서드가 처리합니다.
-     */
     @MessageMapping("/chat.sendMessage")
     @SendTo("/topic/public")
     fun sendMessage(
-        request: ChatMessageRequest,
-        principal: Principal
+        request: ChatMessageRequest
     ): ChatMessageResponse {
+        val userId = userPrincipalResolver.getUserId()
 
-        // principal.name은 보통 사용자의 username (ID) 입니다.
-        val username = principal.name
-
-        // TODO: username으로 DB에서 유저의 닉네임 등 상세 정보 조회
-        // val user = userService.findByUsername(username)
-        // val senderNickname = user.nickname
-        val senderNickname = "임시닉네임($username)" // 임시로 닉네임 설정
-
-        // TODO: 받은 메시지를 ChatService를 통해 DB에 저장하는 로직
-        // val savedMessage = chatService.save(request, user)
-
-        // 응답 DTO 생성
-        return ChatMessageResponse(
-            messageId = System.currentTimeMillis(), // TODO: 임시 ID
-            senderNickname = senderNickname,
+        val command = SaveMessageCommand(
+            roomId = request.roomId,
+            senderId = userId,
             content = request.content,
-            type = request.type,
-            emojis = request.emojis,
-            sentAt = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+            messageType = request.type
+        )
+
+        val savedMessageDto = chatMessageService.saveMessage(command)
+
+        return ChatMessageResponse(
+            messageId = savedMessageDto.messageId,
+            senderNickname = savedMessageDto.senderNickname,
+            content = savedMessageDto.content,
+            type = savedMessageDto.messageType,
+            sentAt = savedMessageDto.sentAt
+        )
+    }
+
+    @Operation(
+        summary = "채팅방의 이전 대화 내역 조회",
+        description = "특정 채팅방에 입장했을 때, 이전에 나눈 대화 내역을 모두 조회합니다."
+    )
+    @GetMapping("/rooms/{roomId}/messages")
+    fun getChatMessages(
+        @PathVariable roomId: Long,
+        @RequestParam(required = false) lastMessageId: Long?,
+        @RequestParam(defaultValue = "20") size: Int
+    ): ChatMessagesApiResponse {
+        val userId = userPrincipalResolver.getUserId()
+        val chatMessagesResponse = chatMessageService.findMessagesByRoomId(roomId, userId, lastMessageId, size)
+
+        val messages = chatMessagesResponse.messages.map {
+            ChatMessageResponse(
+                messageId = it.messageId,
+                senderNickname = it.senderNickname,
+                content = it.content,
+                type = it.messageType,
+                sentAt = it.sentAt
+            )
+        }
+
+        return ChatMessagesApiResponse(
+            messages = messages,
+            hasNext = chatMessagesResponse.hasNext
         )
     }
 }
