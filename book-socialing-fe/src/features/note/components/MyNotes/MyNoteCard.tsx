@@ -14,12 +14,8 @@ export function MyNoteCard({ imageUrl, title, startDateTime }: MyNoteCardProps) 
         <div className="font-semibold truncate">{title}</div>
       </div>
       <div className="flex flex-wrap gap-2 md:flex-nowrap">
-        <BaseButton size="sm" className="min-w-[5rem] flex-shrink-0">
-          수정
-        </BaseButton>
-        <BaseButton size="sm" className="min-w-[6rem] flex-shrink-0">
-          회원관리
-        </BaseButton>
+        <BaseButton className="flex-shrink-0">수정</BaseButton>
+        <BaseButton className="flex-shrink-0">관리</BaseButton>
       </div>
     </div>
   )

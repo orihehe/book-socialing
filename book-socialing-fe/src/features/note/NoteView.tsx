@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import type { Note } from '@/types/note'
 
 import { Notes as CurrentNotes } from './components/CurrentNotes/Notes'
-import { Summary } from './components/CurrentNotes/Summary'
+import { Summary as CurrentSummary } from './components/CurrentNotes/Summary'
 import { MyNotes } from './components/MyNotes'
 import { RevisedNotes } from './components/RevisedNotes'
 
@@ -79,7 +79,10 @@ export default function NoteView() {
       <div className="flex flex-col p-2 mx-auto">
         {activeTab === 'all' && (
           <>
-            <Summary currentNotes={dummyCurrentNotes} />
+            <CurrentSummary
+              currentNotes={dummyCurrentNotes}
+              moveToAll={() => setActiveTab('open')}
+            />
             <MyNotes myNotes={dummyCurrentNotes} />
             <RevisedNotes revisedNotes={dummyCurrentNotes} />
           </>

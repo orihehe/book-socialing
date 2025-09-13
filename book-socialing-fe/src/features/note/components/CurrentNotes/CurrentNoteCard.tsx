@@ -11,8 +11,8 @@ export function CurrentNoteCard({ imageUrl, title, author, description, endDateT
 
   return (
     <>
-      <div className="flex gap-4">
-        <img src={imageUrl} alt={title} className="w-24 h-32 object-cover rounded-md border" />
+      <div className="flex gap-4 mt-5">
+        <img src={imageUrl} alt={title} className="w-30 h-54 object-cover rounded-md border" />
         <div className="flex flex-col justify-between flex-1">
           <div>
             <div className="font-bold text-lg">{title}</div>

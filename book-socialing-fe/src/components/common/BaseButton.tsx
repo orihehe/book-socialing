@@ -17,7 +17,7 @@ export function BaseButton({ children, className, type, ...buttonProps }: BaseBu
         type === 'primary'
           ? 'bg-main text-white rounded-full border-none'
           : 'bg-[#F7F8F9] text-main rounded-full border-none',
-        'h-7 px-2 text-sm rounded-full bg-gray-100 text-main',
+        'h-7 p-3 text-sm rounded-full bg-gray-100 text-main min-w-0',
         className
       )}
       {...buttonProps}

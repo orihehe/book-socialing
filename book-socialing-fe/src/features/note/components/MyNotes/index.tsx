@@ -22,11 +22,6 @@ export function MyNotes({ myNotes }: MyNotesProps) {
   return (
     <BaseCard title={`생성한 노트 (${myNotes.length})`}>
       <CardContent>
-        <div className="flex flex-col gap-2">
-          {visibleNotes.slice(0, VISIBLE_NOTE_COUNT).map(({ id, ...note }) => (
-            <MyNoteCard key={id} {...note} />
-          ))}
-        </div>
         <AnimatePresence initial={false}>
           {open && visibleNotes.length > 2 && (
             <motion.div
@@ -35,10 +30,10 @@ export function MyNotes({ myNotes }: MyNotesProps) {
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="overflow-hidden"
+              className="overflow-hidden mb-2"
             >
               <div className="flex flex-col gap-2 mt-2">
-                {visibleNotes.slice(2).map(({ id, ...note }) => (
+                {visibleNotes.map(({ id, ...note }) => (
                   <MyNoteCard key={id} {...note} />
                 ))}
               </div>
@@ -47,11 +42,7 @@ export function MyNotes({ myNotes }: MyNotesProps) {
         </AnimatePresence>
 
         {showToggle && (
-          <Button
-            variant="ghost"
-            className="w-full mt-2 text-gray-400"
-            onClick={() => setOpen(o => !o)}
-          >
+          <Button variant="ghost" className="w-full text-gray-400" onClick={() => setOpen(o => !o)}>
             {open ? (
               <>
                 생성한 노트 접기{' '}
