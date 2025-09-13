@@ -1,5 +1,6 @@
 import { useForm } from '@tanstack/react-form'
-import { ArrowLeft, Camera, X } from 'lucide-react'
+import { Camera, ChevronLeft, X } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { z } from 'zod'
 
 import { BottomButton } from '@/components/common/BottomButtonl'
@@ -33,6 +34,7 @@ const noteSchema = z.object({
 })
 
 export default function CreateNote() {
+  const navigate = useNavigate()
   const form = useForm({
     defaultValues: {
       title: '',
@@ -56,7 +58,7 @@ export default function CreateNote() {
       {/* Header */}
       <div className="flex items-center p-4 border-b border-gray-200">
         <button className="mr-4">
-          <ArrowLeft size={24} />
+          <ChevronLeft onClick={() => navigate(-1)} />
         </button>
         <h1 className="text-lg font-semibold">노트 생성</h1>
       </div>
