@@ -38,7 +38,6 @@ CREATE TABLE note_file (
     stored_file_name VARCHAR(255) NOT NULL UNIQUE, -- 서버에 저장될 고유한 파일명
     file_path VARCHAR(500) NOT NULL, -- 파일 저장 경로 또는 URL
     file_size BIGINT NOT NULL, -- 파일 크기 (바이트 단위)
-    order_index INT, -- 파일 정렬 순서 (nullable)
 
     created_at DATETIME NOT NULL,
     created_by BIGINT,
@@ -63,7 +62,7 @@ CREATE TABLE note_participant (
     user_id BIGINT NOT NULL, -- 사용자 테이블의 ID를 참조 (실제 User 테이블과 FK 맺는 것을 고려)
 
     role VARCHAR(20) NOT NULL, -- 참여자 역할 (HOST, MEMBER)
-    status VARCHAR(20) NOT NULL, -- 참여자 상태 (JOINED, LEFT, KICKED)
+    status VARCHAR(20) NOT NULL, -- 참여자 상태 (JOINED, PENDING_APPROVAL, CANCEL, REJECTED, LEFT, KICKED)
 
     created_at DATETIME NOT NULL,
     created_by BIGINT,
