@@ -3,6 +3,7 @@ package com.side.book.socialing.global.error
 import com.side.book.socialing.global.error.exception.ResourceNotFoundException
 import com.side.book.socialing.global.security.exception.JwtAuthenticationException
 import com.side.book.socialing.global.utils.log
+import jakarta.persistence.EntityNotFoundException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -33,6 +34,14 @@ class GlobalExceptionHandler {
         log.error("Illegal argument", e)
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
+            .body(ErrorResponse(e.message))
+    }
+
+    @ExceptionHandler(EntityNotFoundException::class)
+    fun handleEntityNotFoundException(e: EntityNotFoundException): ResponseEntity<ErrorResponse> {
+        log.error("Entity not found", e)
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
             .body(ErrorResponse(e.message))
     }
 }

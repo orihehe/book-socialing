@@ -14,6 +14,7 @@ import com.side.book.socialing.global.file.FileUploader
 import com.side.book.socialing.global.file.StoredFile
 import com.side.book.socialing.presentation.note.dto.OpenNoteResponse
 import com.side.book.socialing.presentation.note.dto.ParticipantInfoResponse
+import jakarta.persistence.EntityNotFoundException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
@@ -113,5 +114,23 @@ class NoteService(
                 endDateTime = note.endDate
             )
         }
+    }
+
+    @Transactional
+    fun joinNote(userId: Long, noteId: Long) {
+        val note = noteRepository.findById(noteId).orElseThrow { throw EntityNotFoundException("Note not found") }
+
+        noteParticipantRepository.findByNoteIdAndUserId(noteId, userId)?.let {
+            throw IllegalStateException("User already a participant")
+        }
+
+        val participant = NoteParticipant.create(
+            note = note,
+            userId = userId,
+            role = ParticipantRole.MEMBER,
+            status = ParticipantStatus.JOINED
+        )
+
+        noteParticipantRepository.save(participant)
     }
 }
