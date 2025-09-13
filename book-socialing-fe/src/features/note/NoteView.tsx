@@ -5,8 +5,10 @@ import type { Note } from '@/types/note'
 import { Notes as CurrentNotes } from './components/CurrentNotes/Notes'
 import { Summary as CurrentSummary } from './components/CurrentNotes/Summary'
 import { MyNotes } from './components/MyNotes'
-import { RevisedNotes } from './components/RevisedNotes'
 import { MainLayout } from '../shared/MainLayout'
+import { Notes as RevisedNotes } from './components/RevisedNotes/Notes'
+import { Summary as RevisedSummary } from './components/RevisedNotes/Summary'
+import { SuggestedNotes } from './components/shared/SuggestedNotes'
 
 const dummyCurrentNotes: Note[] = [
   {
@@ -51,15 +53,15 @@ export default function NoteView() {
               moveToAll={() => setActiveTab('open')}
             />
             <MyNotes myNotes={dummyCurrentNotes} />
-            <RevisedNotes revisedNotes={dummyCurrentNotes} />
+            <SuggestedNotes />
+            <RevisedSummary
+              revisedNotes={dummyCurrentNotes}
+              moveToAll={() => setActiveTab('closed')}
+            />
           </>
         )}
-        {activeTab === 'open' && (
-          <>
-            <CurrentNotes />
-          </>
-        )}
-        {activeTab === 'closed' && <RevisedNotes revisedNotes={dummyCurrentNotes} />}
+        {activeTab === 'open' && <CurrentNotes />}
+        {activeTab === 'closed' && <RevisedNotes />}
       </div>
       {/* <div className="fixed bottom-10 right-10 flex flex-col gap-4">
         <Button className="rounded-full w-28 h-12 shadow-lg" size="lg">

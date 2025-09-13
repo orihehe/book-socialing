@@ -32,7 +32,7 @@ export function Summary({ currentNotes, moveToAll }: Props) {
 
   return (
     <div>
-      <BaseCard title={`📖 열린 노트 (${currentNotes.length})`}>
+      <BaseCard title={`열린 노트 (${currentNotes.length})`}>
         <CardContent>
           <Carousel setApi={setApi}>
             <CarouselContent>
@@ -77,17 +77,19 @@ export function Summary({ currentNotes, moveToAll }: Props) {
           ))}
         </div>
       )}
-      <Button
-        variant="ghost"
-        className="w-full mx-4 mt-5 justify-center items-center gap-1 text-muted-foreground text-sm px-6 py-6 rounded-5 border"
-        style={{
-          borderColor: '#E7ECEC',
-          color: '#7D7D7D',
-        }}
-        onClick={moveToAll}
-      >
-        열린 노트 전체보기 <ChevronRight />
-      </Button>
+      <div className="px-4 mt-4">
+        <Button
+          variant="ghost"
+          className="w-full justify-center items-center gap-1 text-muted-foreground text-sm px-6 py-6 rounded-5 border"
+          style={{
+            borderColor: '#E7ECEC',
+            color: '#7D7D7D',
+          }}
+          onClick={moveToAll}
+        >
+          열린 노트 전체보기 <ChevronRight />
+        </Button>
+      </div>
     </div>
   )
 }
