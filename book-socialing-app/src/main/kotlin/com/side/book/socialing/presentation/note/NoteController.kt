@@ -44,6 +44,25 @@ class NoteController(
     }
 
     @Operation(
+        summary = "노트 참여 신청",
+        description = "사용자가 특정 노트에 참여를 신청합니다."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "201", description = "성공적으로 노트 참여 신청함"),
+            ApiResponse(responseCode = "404", description = "해당 노트를 찾을 수 없음")
+        ]
+    )
+    @PostMapping("/{noteId}/join")
+    @ResponseStatus(HttpStatus.CREATED)
+    fun joinNote(@PathVariable noteId: Long) {
+        // TODO: 회원 정보 필요
+        val userId = 123L
+
+        noteService.joinNote(userId, noteId)
+    }
+
+    @Operation(
         summary = "로그인한 사용자가 참여 중인 열린 노트 목록 조회",
         description = "현재 로그인한 사용자가 참여자로 등록되어 있고, 모임일이 지나지 않은 (즉, 아직 진행될) 노트 목록을 조회합니다. 각 노트의 상세 정보와 참여자 정보가 함께 반환됩니다."
     )
