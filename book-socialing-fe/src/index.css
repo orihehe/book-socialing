@@ -4,7 +4,33 @@
 @tailwind components;
 @tailwind utilities;
 
-
 @theme {
   --color-main: rgba(20, 90, 68, 1);
+}
+
+@layer base {
+  /* Input focus 스타일 개선 */
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: none;
+    border-color: rgb(20, 90, 68);
+    border-width: 1px;
+    box-shadow: 0 0 0 1px rgb(20, 90, 68);
+  }
+  
+  /* shadcn/ui 컴포넌트 focus 스타일 개선 */
+  .focus-within {
+    border-color: rgb(20, 90, 68) !important;
+    border-width: 1px !important;
+    box-shadow: 0 0 0 1px rgb(20, 90, 68) !important;
+  }
+  
+  /* 기본 input 스타일 */
+  input,
+  textarea,
+  select {
+    border-width: 1px;
+    border-color: rgb(209, 213, 219);
+  }
 }
