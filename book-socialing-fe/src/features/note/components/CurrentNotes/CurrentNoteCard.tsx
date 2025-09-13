@@ -1,14 +1,15 @@
 import dayjs from 'dayjs'
+import { useNavigate } from 'react-router-dom'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import type { Note } from '@/types/note'
 
-type Props = Omit<Note, 'id' | 'startDateTime'>
+type Props = Omit<Note, 'startDateTime'>
 
-export function CurrentNoteCard({ imageUrl, title, author, description, endDateTime }: Props) {
+export function CurrentNoteCard({ imageUrl, title, author, description, endDateTime, id }: Props) {
   const dDay = dayjs(endDateTime).diff(dayjs().startOf('day'), 'day')
-
+  const navigate = useNavigate()
   return (
     <>
       <div className="flex gap-4 mt-5">
@@ -29,7 +30,9 @@ export function CurrentNoteCard({ imageUrl, title, author, description, endDateT
         >
           D-{dDay}
         </Badge>
-        <span className="ml-6">노트하러가기</span>
+        <span className="ml-6" onClick={() => navigate(`/note/${id}`)}>
+          노트하러가기
+        </span>
       </Button>
     </>
   )

@@ -1,6 +1,6 @@
 import { useForm } from '@tanstack/react-form'
 import { Camera, ChevronLeft, X } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { z } from 'zod'
 
 import { BottomButton } from '@/components/common/BottomButtonl'
@@ -33,8 +33,16 @@ const noteSchema = z.object({
   endDateTime: z.string().min(1, '종료일을 선택해주세요'),
 })
 
-export default function CreateNote() {
+interface EditNoteProps {
+  mode: 'create' | 'edit'
+}
+
+export default function EditNote({ mode }: EditNoteProps) {
   const navigate = useNavigate()
+  const { id } = useParams<{ id: string }>()
+
+  console.log({ id, mode })
+
   const form = useForm({
     defaultValues: {
       title: '',

@@ -40,6 +40,7 @@ export function Summary({ currentNotes, moveToAll }: Props) {
                 <div className="min-w-full" key={id}>
                   <CarouselItem>
                     <CurrentNoteCard
+                      id={id}
                       title={title}
                       author={author}
                       imageUrl={imageUrl}

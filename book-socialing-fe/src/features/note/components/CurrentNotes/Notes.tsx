@@ -1,7 +1,8 @@
 import { NoteGrid } from '@/components/common/NoteGird'
+import { Note } from '@/types/note'
 
 export function Notes() {
-  const notes = []
+  const notes: Note[] = []
 
   return (
     <>
