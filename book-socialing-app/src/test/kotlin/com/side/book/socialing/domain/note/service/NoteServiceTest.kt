@@ -1,5 +1,6 @@
 package com.side.book.socialing.domain.note.service
 
+import com.side.book.socialing.domain.club.repository.ClubRepository
 import com.side.book.socialing.domain.note.entity.Note
 import com.side.book.socialing.domain.note.entity.NoteParticipant
 import com.side.book.socialing.domain.note.enum.ParticipantRole
@@ -39,6 +40,9 @@ class NoteServiceTest {
     private lateinit var noteFileRepository: NoteFileRepository
 
     @MockK(relaxed = true)
+    private lateinit var clubRepository: ClubRepository
+
+    @MockK(relaxed = true)
     private lateinit var fileUploader: FileUploader
 
     @MockK(relaxed = true)
@@ -51,6 +55,7 @@ class NoteServiceTest {
         noteService = NoteService(
             noteRepository = noteRepository,
             noteFileRepository = noteFileRepository,
+            clubRepository = clubRepository,
             noteParticipantRepository = noteParticipantRepository,
             fileUploader = fileUploader,
             applicationEventPublisher = applicationEventPublisher,
