@@ -25,7 +25,7 @@ class OAuth2SuccessHandler(
 
         val registrationId = oAuth2AuthenticationToken.authorizedClientRegistrationId
 
-        val email = when(registrationId) {
+        val email = when (registrationId) {
             "kakao" -> (oAuth2User.attributes["kakao_account"] as Map<String, Any>)["email"] as String
             else -> throw IllegalStateException("Unsupported registrationId: $registrationId")
         }

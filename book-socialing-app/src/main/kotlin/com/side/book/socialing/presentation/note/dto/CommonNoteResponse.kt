@@ -16,5 +16,5 @@ data class CommonNoteResponse(
     @Schema(description = "모임일", example = "2025-06-22")
     val startDateTime: LocalDateTime,
     @Schema(description = "탈고일", example = "2025-06-28")
-    val endDateTime: LocalDateTime,
+    val endDateTime: LocalDateTime
 )

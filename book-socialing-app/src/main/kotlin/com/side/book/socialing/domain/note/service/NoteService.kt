@@ -25,8 +25,7 @@ class NoteService(
     private val fileUploader: FileUploader,
 
     @Value("\${file.note-dir}") private val filePath: String
-)
-{
+) {
     /**
      * 새로운 노트를 생성하고 관련된 파일 및 참여자 정보를 함께 저장합니다.
      *
@@ -51,7 +50,7 @@ class NoteService(
         val uploadedFiles = mutableListOf<StoredFile>()
 
         try {
-            for(file in cmd.imageFiles) {
+            for (file in cmd.imageFiles) {
                 val storedFile = fileUploader.upload(file, noteFilePath)
                 uploadedFiles.add(storedFile)
 

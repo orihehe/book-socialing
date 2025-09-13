@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/meeting/v1")
 @RestController
 class MeetingController(
-    private val meetingService: MeetingService,
+    private val meetingService: MeetingService
 ) {
     @PostMapping("/create")
     fun create(
-        @RequestBody request: CreateMeetingRequest,
+        @RequestBody request: CreateMeetingRequest
     ): Long {
         val command =
             CreateMeetingCommand(
@@ -27,7 +27,7 @@ class MeetingController(
                 meetDate = request.meetDate,
                 round = request.round,
                 // TODO: 로그인 유저로 대체
-                createdBy = "anonymous",
+                createdBy = "anonymous"
             )
 
         return meetingService.createMeeting(command).id!!

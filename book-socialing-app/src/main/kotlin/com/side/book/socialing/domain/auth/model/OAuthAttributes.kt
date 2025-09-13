@@ -12,7 +12,7 @@ data class OAuthAttributes(
     val nameAttributeKey: String,
     val name: String,
     val email: String,
-    val picture: String,
+    val picture: String
 ) {
 
     fun toEntity(): User {

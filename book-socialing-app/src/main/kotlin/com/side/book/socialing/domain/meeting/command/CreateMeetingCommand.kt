@@ -10,5 +10,5 @@ data class CreateMeetingCommand(
     val bookLink: String?,
     val meetDate: LocalDateTime,
     val round: Int,
-    val createdBy: String,
+    val createdBy: String
 )

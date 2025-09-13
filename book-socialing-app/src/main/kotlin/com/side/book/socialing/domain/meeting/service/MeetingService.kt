@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class MeetingService(
-    private val meetingRepository: MeetingRepository,
+    private val meetingRepository: MeetingRepository
 ) {
     @Transactional
     fun createMeeting(cmd: CreateMeetingCommand): Meeting {

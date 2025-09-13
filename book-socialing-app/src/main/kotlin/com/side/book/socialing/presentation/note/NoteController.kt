@@ -19,8 +19,8 @@ import java.time.LocalDateTime
 @Tag(name = "노트 API", description = "노트 조회, 생성, 참여, 퇴고 등 노트 관련 API")
 @RestController
 @RequestMapping("/api/note/v1")
-class NoteController (
-    private val noteService: NoteService,
+class NoteController(
+    private val noteService: NoteService
 ) {
     @PostMapping("/create", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun createNote(
@@ -55,7 +55,6 @@ class NoteController (
     )
     @GetMapping("/open")
     fun getOpenNotes(): ResponseEntity<List<OpenNoteResponse>> {
-
         // TODO: 회원 정보 필요
         val userId = 123L
 
@@ -81,7 +80,6 @@ class NoteController (
     )
     @GetMapping("/created")
     fun getCreatedNotes(): ResponseEntity<List<CommonNoteResponse>> {
-
         // TODO: 회원 정보 필요
         val userId = 123L
 
@@ -98,7 +96,7 @@ class NoteController (
                     bookName = "내가 만든 더미 데미안",
                     bookImageUrl = "https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9791164053353.jpg", // 더미 이미지 URL
                     startDateTime = LocalDateTime.of(2025, 8, 1, 19, 0),
-                    endDateTime = LocalDateTime.of(2025, 8, 1, 21, 0),
+                    endDateTime = LocalDateTime.of(2025, 8, 1, 21, 0)
                 )
             )
 
@@ -110,7 +108,7 @@ class NoteController (
                     bookName = "내가 만든 더미 어린 왕자",
                     bookImageUrl = "https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9791164455300.jpg", // 또 다른 더미 이미지 URL
                     startDateTime = LocalDateTime.of(2025, 8, 15, 14, 0),
-                    endDateTime = LocalDateTime.of(2025, 8, 15, 16, 0),
+                    endDateTime = LocalDateTime.of(2025, 8, 15, 16, 0)
                 )
             )
 
@@ -134,7 +132,6 @@ class NoteController (
     )
     @GetMapping("/pending")
     fun getPendingNotes(): ResponseEntity<List<CommonNoteResponse>> {
-
         // TODO: 회원 정보 필요
         val userId = 123L
 
@@ -151,7 +148,7 @@ class NoteController (
                     bookName = "신청한 더미 데미안",
                     bookImageUrl = "https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9791164053353.jpg", // 더미 이미지 URL
                     startDateTime = LocalDateTime.of(2025, 8, 1, 19, 0),
-                    endDateTime = LocalDateTime.of(2025, 8, 1, 21, 0),
+                    endDateTime = LocalDateTime.of(2025, 8, 1, 21, 0)
                 )
             )
 
@@ -163,7 +160,7 @@ class NoteController (
                     bookName = "신청한 더미 어린 왕자",
                     bookImageUrl = "https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9791164455300.jpg", // 또 다른 더미 이미지 URL
                     startDateTime = LocalDateTime.of(2025, 8, 15, 14, 0),
-                    endDateTime = LocalDateTime.of(2025, 8, 15, 16, 0),
+                    endDateTime = LocalDateTime.of(2025, 8, 15, 16, 0)
                 )
             )
 
@@ -187,7 +184,6 @@ class NoteController (
     )
     @GetMapping("/recommended")
     fun getRecommendedNotes(): ResponseEntity<List<CommonNoteResponse>> {
-
         // TODO: 회원 정보 필요
         val userId = 123L
 
@@ -204,7 +200,7 @@ class NoteController (
                     bookName = "추천 더미 데미안",
                     bookImageUrl = "https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9791164053353.jpg", // 더미 이미지 URL
                     startDateTime = LocalDateTime.of(2025, 8, 1, 19, 0),
-                    endDateTime = LocalDateTime.of(2025, 8, 1, 21, 0),
+                    endDateTime = LocalDateTime.of(2025, 8, 1, 21, 0)
                 )
             )
 
@@ -216,7 +212,7 @@ class NoteController (
                     bookName = "추천 더미 어린 왕자",
                     bookImageUrl = "https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9791164455300.jpg", // 또 다른 더미 이미지 URL
                     startDateTime = LocalDateTime.of(2025, 8, 15, 14, 0),
-                    endDateTime = LocalDateTime.of(2025, 8, 15, 16, 0),
+                    endDateTime = LocalDateTime.of(2025, 8, 15, 16, 0)
                 )
             )
 
@@ -240,7 +236,6 @@ class NoteController (
     )
     @GetMapping("/revised")
     fun getRevisedNotes(): ResponseEntity<List<CommonNoteResponse>> {
-
         // TODO: 회원 정보 필요
         val userId = 123L
 
@@ -257,7 +252,7 @@ class NoteController (
                     bookName = "퇴고한 더미 데미안",
                     bookImageUrl = "https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9791164053353.jpg", // 더미 이미지 URL
                     startDateTime = LocalDateTime.of(2025, 8, 1, 19, 0),
-                    endDateTime = LocalDateTime.of(2025, 8, 1, 21, 0),
+                    endDateTime = LocalDateTime.of(2025, 8, 1, 21, 0)
                 )
             )
 
@@ -269,7 +264,7 @@ class NoteController (
                     bookName = "퇴고한 더미 어린 왕자",
                     bookImageUrl = "https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9791164455300.jpg", // 또 다른 더미 이미지 URL
                     startDateTime = LocalDateTime.of(2025, 8, 15, 14, 0),
-                    endDateTime = LocalDateTime.of(2025, 8, 15, 16, 0),
+                    endDateTime = LocalDateTime.of(2025, 8, 15, 16, 0)
                 )
             )
 
