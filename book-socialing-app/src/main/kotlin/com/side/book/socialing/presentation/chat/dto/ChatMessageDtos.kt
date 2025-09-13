@@ -10,7 +10,7 @@ data class ChatMessageRequest(
 
 data class ChatMessageResponse(
     val messageId: Long,
-    val senderNickname: String,
+    val userId: Long,
     val content: String,
     val type: String,
     val sentAt: LocalDateTime

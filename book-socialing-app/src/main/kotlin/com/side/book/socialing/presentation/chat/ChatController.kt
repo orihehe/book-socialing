@@ -42,7 +42,7 @@ class ChatController(
 
         return ChatMessageResponse(
             messageId = savedMessageDto.messageId,
-            senderNickname = savedMessageDto.senderNickname,
+            userId = savedMessageDto.userId,
             content = savedMessageDto.content,
             type = savedMessageDto.messageType,
             sentAt = savedMessageDto.sentAt
@@ -56,16 +56,17 @@ class ChatController(
     @GetMapping("/rooms/{roomId}/messages")
     fun getChatMessages(
         @PathVariable roomId: Long,
+        @RequestParam(required = false) messageType: String,
         @RequestParam(required = false) lastMessageId: Long?,
         @RequestParam(defaultValue = "20") size: Int
     ): ChatMessagesApiResponse {
         val userId = userPrincipalResolver.getUserId()
-        val chatMessagesResponse = chatMessageService.findMessagesByRoomId(roomId, userId, lastMessageId, size)
+        val queryResult = chatMessageService.findMessagesByRoomId(roomId, userId, messageType, lastMessageId, size)
 
-        val messages = chatMessagesResponse.messages.map {
+        val messages = queryResult.messages.map {
             ChatMessageResponse(
                 messageId = it.messageId,
-                senderNickname = it.senderNickname,
+                userId = it.userId,
                 content = it.content,
                 type = it.messageType,
                 sentAt = it.sentAt
@@ -74,7 +75,7 @@ class ChatController(
 
         return ChatMessagesApiResponse(
             messages = messages,
-            hasNext = chatMessagesResponse.hasNext
+            hasNext = queryResult.hasNext
         )
     }
 }

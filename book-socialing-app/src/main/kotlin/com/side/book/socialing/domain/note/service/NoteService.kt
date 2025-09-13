@@ -9,6 +9,7 @@ import com.side.book.socialing.domain.note.entity.NoteParticipant
 import com.side.book.socialing.domain.note.enum.ParticipantRole
 import com.side.book.socialing.domain.note.enum.ParticipantStatus
 import com.side.book.socialing.domain.note.event.NoteCreatedEvent
+import com.side.book.socialing.domain.note.event.NoteJoinedEvent
 import com.side.book.socialing.domain.note.repository.NoteFileRepository
 import com.side.book.socialing.domain.note.repository.NoteParticipantRepository
 import com.side.book.socialing.domain.note.repository.NoteRepository
@@ -55,7 +56,7 @@ class NoteService(
         // Note.create에 찾아온 club 객체를 전달
         val note = Note.create(cmd, club)
         noteRepository.save(note)
-        applicationEventPublisher.publishEvent(NoteCreatedEvent(note.id!!, note.bookName))
+        applicationEventPublisher.publishEvent(NoteCreatedEvent(note.id!!, note.bookName, cmd.userId))
 
         val hostParticipant = NoteParticipant.create(
             note = note,
@@ -253,5 +254,12 @@ class NoteService(
         )
 
         noteParticipantRepository.save(participant)
+
+        applicationEventPublisher.publishEvent(
+            NoteJoinedEvent(
+                noteId = noteId,
+                userId = userId
+            )
+        )
     }
 }
