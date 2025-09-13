@@ -1,32 +1,41 @@
 package com.side.book.socialing.domain.note.service
 
+import com.side.book.socialing.domain.club.entity.Club
+import com.side.book.socialing.domain.club.repository.ClubRepository
 import com.side.book.socialing.domain.note.command.CreateNoteCommand
 import com.side.book.socialing.domain.note.entity.Note
 import com.side.book.socialing.domain.note.entity.NoteFile
 import com.side.book.socialing.domain.note.entity.NoteParticipant
 import com.side.book.socialing.domain.note.enum.ParticipantRole
 import com.side.book.socialing.domain.note.enum.ParticipantStatus
+import com.side.book.socialing.domain.note.event.NoteCreatedEvent
+import com.side.book.socialing.domain.note.event.NoteJoinedEvent
 import com.side.book.socialing.domain.note.repository.NoteFileRepository
 import com.side.book.socialing.domain.note.repository.NoteParticipantRepository
 import com.side.book.socialing.domain.note.repository.NoteRepository
 import com.side.book.socialing.global.file.FileUploader
 import com.side.book.socialing.global.file.StoredFile
+import com.side.book.socialing.presentation.note.dto.CommonNoteResponse
 import com.side.book.socialing.presentation.note.dto.OpenNoteResponse
 import com.side.book.socialing.presentation.note.dto.ParticipantInfoResponse
+import jakarta.persistence.EntityNotFoundException
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
 class NoteService(
     private val noteRepository: NoteRepository,
     private val noteFileRepository: NoteFileRepository,
+    private val clubRepository: ClubRepository,
     private val noteParticipantRepository: NoteParticipantRepository,
     private val fileUploader: FileUploader,
+    private val applicationEventPublisher: ApplicationEventPublisher,
 
     @Value("\${file.note-dir}") private val filePath: String
-)
-{
+) {
     /**
      * 새로운 노트를 생성하고 관련된 파일 및 참여자 정보를 함께 저장합니다.
      *
@@ -36,8 +45,18 @@ class NoteService(
      */
     @Transactional
     fun createNote(cmd: CreateNoteCommand): Note {
-        val note = Note.create(cmd)
+        val club: Club? = cmd.clubId?.let { clubId ->
+            clubRepository.findById(clubId).orElse(null)
+        }
+
+        if (club == null && cmd.clubId != null) {
+            throw IllegalArgumentException("Club with ID ${cmd.clubId} not found.")
+        }
+
+        // Note.create에 찾아온 club 객체를 전달
+        val note = Note.create(cmd, club)
         noteRepository.save(note)
+        applicationEventPublisher.publishEvent(NoteCreatedEvent(note.id!!, note.bookName, cmd.userId))
 
         val hostParticipant = NoteParticipant.create(
             note = note,
@@ -51,7 +70,7 @@ class NoteService(
         val uploadedFiles = mutableListOf<StoredFile>()
 
         try {
-            for(file in cmd.imageFiles) {
+            for (file in cmd.imageFiles) {
                 val storedFile = fileUploader.upload(file, noteFilePath)
                 uploadedFiles.add(storedFile)
 
@@ -83,7 +102,7 @@ class NoteService(
     @Transactional(readOnly = true)
     fun getOpenNotes(userId: Long): List<OpenNoteResponse> {
         // 사용자가 참여하고 있는 모든 참여 정보를 찾는다.
-        val notes = noteRepository.findActiveNotesByUserId(userId)
+        val notes = noteRepository.findActiveNotesByUserId(userId, LocalDateTime.now())
 
         return notes.map { note ->
             val participantInfos = note.participants.map { participant ->
@@ -110,5 +129,137 @@ class NoteService(
                 endDateTime = note.endDate
             )
         }
+    }
+
+    /**
+     * 특정 사용자가 생성한 모든 노트 목록을 반환합니다.
+     *
+     * @param userId 정보를 조회할 사용자의 ID.
+     * @return 사용자가 생성한 노트 정보가 담긴 `CreatedNoteResponse` DTO 리스트.
+     *         만약 생성한 노트가 없으면 빈 리스트를 반환합니다.
+     */
+    @Transactional(readOnly = true)
+    fun getCreatedNotes(userId: Long): List<CommonNoteResponse> {
+        // 사용자가 참여하고 있는 모든 참여 정보를 찾는다.
+        val notes = noteRepository.findCreatedNotesByUserId(userId, LocalDateTime.now())
+
+        return notes.map { note ->
+            // 대표 이미지 경로
+            val bookImageUrl = note.files.firstOrNull()?.filePath ?: "/images/default_book_image.jpg"
+
+            CommonNoteResponse(
+                id = note.id!!,
+                clubName = "saisai", // TODO: note.club?.name 으로 실제 클럽 이름 가져오기
+                bookName = note.bookName,
+                bookImageUrl = bookImageUrl,
+                startDateTime = note.startDate,
+                endDateTime = note.endDate
+            )
+        }
+    }
+
+    /**
+     * 특정 사용자가 신청한 모든 노트 목록을 반환합니다.
+     *
+     * @param userId 정보를 조회할 사용자의 ID.
+     * @return 사용자가 신청한 노트 정보가 담긴 `PendingNoteResponse` DTO 리스트.
+     *         만약 신청한 노트가 없으면 빈 리스트를 반환합니다.
+     */
+    @Transactional(readOnly = true)
+    fun getPendingNotes(userId: Long): List<CommonNoteResponse> {
+        // 사용자가 참여하고 있는 모든 참여 정보를 찾는다.
+        val notes = noteRepository.findPendingNotesByUserId(userId, LocalDateTime.now())
+
+        return notes.map { note ->
+            // 대표 이미지 경로
+            val bookImageUrl = note.files.firstOrNull()?.filePath ?: "/images/default_book_image.jpg"
+
+            CommonNoteResponse(
+                id = note.id!!,
+                clubName = "saisai", // TODO: note.club?.name 으로 실제 클럽 이름 가져오기
+                bookName = note.bookName,
+                bookImageUrl = bookImageUrl,
+                startDateTime = note.startDate,
+                endDateTime = note.endDate
+            )
+        }
+    }
+
+    /**
+     * 추천 노트 목록을 반환합니다.
+     *
+     * @return 추천 노트 정보가 담긴 `RecommendNoteResponse` DTO 리스트.
+     *         만약 추천 노트가 없으면 빈 리스트를 반환합니다.
+     */
+    @Transactional(readOnly = true)
+    fun getRecommendNotes(userId: Long): List<CommonNoteResponse> {
+        // 사용자가 참여하고 있는 모든 참여 정보를 찾는다.
+        val notes = noteRepository.findRecommendNotesByUserId(userId, LocalDateTime.now())
+
+        return notes.map { note ->
+            // 대표 이미지 경로
+            val bookImageUrl = note.files.firstOrNull()?.filePath ?: "/images/default_book_image.jpg"
+
+            CommonNoteResponse(
+                id = note.id!!,
+                clubName = "saisai", // TODO: note.club?.name 으로 실제 클럽 이름 가져오기
+                bookName = note.bookName,
+                bookImageUrl = bookImageUrl,
+                startDateTime = note.startDate,
+                endDateTime = note.endDate
+            )
+        }
+    }
+
+    /**
+     * 퇴고한 노트 목록을 반환합니다.
+     *
+     * @return 추천 노트 정보가 담긴 `RevisedNoteResponse` DTO 리스트.
+     *         만약 추천 노트가 없으면 빈 리스트를 반환합니다.
+     */
+    @Transactional(readOnly = true)
+    fun getParticipatedRevisedNotes(userId: Long): List<CommonNoteResponse> {
+        // 사용자가 참여하고 있는 모든 참여 정보를 찾는다.
+        val notes = noteRepository.findRevisedNotesByUserId(userId, LocalDateTime.now())
+
+        return notes.map { note ->
+            // 대표 이미지 경로
+            val bookImageUrl = note.files.firstOrNull()?.filePath ?: "/images/default_book_image.jpg"
+
+            CommonNoteResponse(
+                id = note.id!!,
+                clubName = "saisai", // TODO: note.club?.name 으로 실제 클럽 이름 가져오기
+                bookName = note.bookName,
+                bookImageUrl = bookImageUrl,
+                startDateTime = note.startDate,
+                endDateTime = note.endDate
+            )
+        }
+    }
+
+    @Transactional
+    fun joinNote(userId: Long, noteId: Long) {
+        val note = noteRepository.findById(noteId)
+            .orElseThrow { throw EntityNotFoundException("Note not found with id: $noteId") }
+
+        noteParticipantRepository.findByNoteIdAndUserId(noteId, userId)?.let {
+            throw IllegalStateException("User $userId is already a participant in note $noteId")
+        }
+
+        val participant = NoteParticipant.create(
+            note = note,
+            userId = userId,
+            role = ParticipantRole.MEMBER,
+            status = ParticipantStatus.JOINED
+        )
+
+        noteParticipantRepository.save(participant)
+
+        applicationEventPublisher.publishEvent(
+            NoteJoinedEvent(
+                noteId = noteId,
+                userId = userId
+            )
+        )
     }
 }

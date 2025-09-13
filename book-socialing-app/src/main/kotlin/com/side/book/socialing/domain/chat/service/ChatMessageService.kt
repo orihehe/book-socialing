@@ -23,9 +23,6 @@ class ChatMessageService(
 
     @Transactional
     fun saveMessage(command: SaveMessageCommand): SavedMessageDto {
-        // TODO: 추후 User 모듈을 추가하여 실제 사용자 닉네임을 조회해야함
-        val senderNickname = "임시닉네임(ID: ${command.senderId})"
-
         val chatRoom = chatRoomRepository.findByIdOrNull(command.roomId)
             ?: throw ResourceNotFoundException("ChatRoom not found")
         chatRoomParticipantRepository.findByChatRoomIdAndUserId(command.roomId, command.senderId)
@@ -41,7 +38,7 @@ class ChatMessageService(
 
         return SavedMessageDto(
             messageId = savedMessage.id!!,
-            senderNickname = senderNickname,
+            userId = command.senderId,
             content = savedMessage.content,
             messageType = savedMessage.messageType.name,
             sentAt = savedMessage.createdAt
@@ -49,20 +46,29 @@ class ChatMessageService(
     }
 
     @Transactional(readOnly = true)
-    fun findMessagesByRoomId(roomId: Long, userId: Long, lastMessageId: Long?, pageSize: Int): ChatMessagesResponse {
+    fun findMessagesByRoomId(
+        roomId: Long,
+        userId: Long,
+        messageType: String,
+        lastMessageId: Long?,
+        pageSize: Int
+    ): ChatMessagesResponse {
         if (!chatRoomRepository.existsById(roomId)) {
             throw ResourceNotFoundException("ChatRoom not found")
         }
 
-        val cursor = lastMessageId ?: chatRoomParticipantRepository.findByChatRoomIdAndUserId(roomId, userId)?.lastReadMessageId ?: Long.MAX_VALUE
+        val cursor = lastMessageId
+            ?: chatRoomParticipantRepository.findByChatRoomIdAndUserId(roomId, userId)?.lastReadMessageId
+            ?: Long.MAX_VALUE
         val pageable = PageRequest.of(0, pageSize)
 
-        val messagesSlice = chatMessageRepository.findByChatRoomIdAndIdLessThanOrderByIdDesc(roomId, cursor, pageable)
+        val messageTypeEnum = MessageType.valueOf(messageType)
+        val messagesSlice = chatMessageRepository.findByChatRoomIdAndMessageTypeAndIdLessThanOrderByIdDesc(roomId, messageTypeEnum, cursor, pageable)
 
         val savedMessageDtos = messagesSlice.content.map {
             SavedMessageDto(
                 messageId = it.id!!,
-                senderNickname = "임시닉네임(ID: ${it.senderId})",
+                userId = it.senderId,
                 content = it.content,
                 messageType = it.messageType.name,
                 sentAt = it.createdAt

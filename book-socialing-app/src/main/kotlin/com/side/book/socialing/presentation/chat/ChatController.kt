@@ -2,6 +2,7 @@ package com.side.book.socialing.presentation.chat
 
 import com.side.book.socialing.domain.chat.command.SaveMessageCommand
 import com.side.book.socialing.domain.chat.service.ChatMessageService
+import com.side.book.socialing.global.auth.UserPrincipalResolver
 import com.side.book.socialing.presentation.chat.dto.ChatMessageRequest
 import com.side.book.socialing.presentation.chat.dto.ChatMessageResponse
 import com.side.book.socialing.presentation.chat.dto.ChatMessagesApiResponse
@@ -14,23 +15,21 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import java.security.Principal
 
 @Tag(name = "채팅 API", description = "채팅 관련 API")
 @RestController
 @RequestMapping("/api/chat/v1")
 class ChatController(
-    private val chatMessageService: ChatMessageService
+    private val chatMessageService: ChatMessageService,
+    private val userPrincipalResolver: UserPrincipalResolver
 ) {
 
     @MessageMapping("/chat.sendMessage")
     @SendTo("/topic/public")
     fun sendMessage(
-        request: ChatMessageRequest,
-        principal: Principal
+        request: ChatMessageRequest
     ): ChatMessageResponse {
-        // TODO: 추후 인증 모듈에서 실제 userId를 가져와야 함
-        val userId = 1L
+        val userId = userPrincipalResolver.getUserId()
 
         val command = SaveMessageCommand(
             roomId = request.roomId,
@@ -43,7 +42,7 @@ class ChatController(
 
         return ChatMessageResponse(
             messageId = savedMessageDto.messageId,
-            senderNickname = savedMessageDto.senderNickname,
+            userId = savedMessageDto.userId,
             content = savedMessageDto.content,
             type = savedMessageDto.messageType,
             sentAt = savedMessageDto.sentAt
@@ -57,18 +56,17 @@ class ChatController(
     @GetMapping("/rooms/{roomId}/messages")
     fun getChatMessages(
         @PathVariable roomId: Long,
+        @RequestParam(required = false) messageType: String,
         @RequestParam(required = false) lastMessageId: Long?,
-        @RequestParam(defaultValue = "20") size: Int,
-        principal: Principal
+        @RequestParam(defaultValue = "20") size: Int
     ): ChatMessagesApiResponse {
-        // TODO: 추후 인증 모듈에서 실제 userId를 가져와야 함
-        val userId = 1L
-        val chatMessagesResponse = chatMessageService.findMessagesByRoomId(roomId, userId, lastMessageId, size)
+        val userId = userPrincipalResolver.getUserId()
+        val queryResult = chatMessageService.findMessagesByRoomId(roomId, userId, messageType, lastMessageId, size)
 
-        val messages = chatMessagesResponse.messages.map {
+        val messages = queryResult.messages.map {
             ChatMessageResponse(
                 messageId = it.messageId,
-                senderNickname = it.senderNickname,
+                userId = it.userId,
                 content = it.content,
                 type = it.messageType,
                 sentAt = it.sentAt
@@ -77,7 +75,7 @@ class ChatController(
 
         return ChatMessagesApiResponse(
             messages = messages,
-            hasNext = chatMessagesResponse.hasNext
+            hasNext = queryResult.hasNext
         )
     }
 }

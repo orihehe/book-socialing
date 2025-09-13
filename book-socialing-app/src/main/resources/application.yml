@@ -40,3 +40,4 @@ jwt:
 file:
   base-dir: /var/data/saisai-file
   note-dir: note/
+  club-dir: club/

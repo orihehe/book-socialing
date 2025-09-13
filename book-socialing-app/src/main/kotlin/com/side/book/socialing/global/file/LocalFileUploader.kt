@@ -6,13 +6,12 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile
 import java.io.IOException
-
 import java.nio.file.*
 
 @Component
 class LocalFileUploader(
     @Value("\${file.base-dir}") private val baseDir: String
-): FileUploader {
+) : FileUploader {
 
     /**
      * 전달된 파일을 서버의 지정된 경로에 업로드하고 저장 정보를 반환합니다.
@@ -59,7 +58,6 @@ class LocalFileUploader(
                 log.error("[WARN] 삭제할 파일이 존재하지 않습니다: $fullPath")
                 true
             }
-
         } catch (e: IOException) {
             log.error("[ERROR] 파일 삭제 중 오류 발생: $fullPath", e)
             false

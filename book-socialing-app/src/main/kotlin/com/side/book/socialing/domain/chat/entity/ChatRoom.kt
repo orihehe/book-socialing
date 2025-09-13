@@ -9,20 +9,22 @@ class ChatRoom(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
-
+    @Column(nullable = false)
+    var noteId: Long,
     @Column(nullable = false)
     val roomName: String,
-
     @Column(nullable = false)
     var state: ChatRoomState
-
 ) : BaseEntity() {
-
     companion object {
-        fun create(roomName: String): ChatRoom {
+        fun create(
+            roomName: String,
+            noteId: Long
+        ): ChatRoom {
             return ChatRoom(
                 roomName = roomName,
-                state = ChatRoomState.OPENED
+                state = ChatRoomState.OPENED,
+                noteId = noteId
             )
         }
     }

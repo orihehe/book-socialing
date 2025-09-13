@@ -2,6 +2,7 @@ package com.side.book.socialing.presentation.note
 
 import com.side.book.socialing.domain.note.command.CreateNoteCommand
 import com.side.book.socialing.domain.note.service.NoteService
+import com.side.book.socialing.global.auth.UserPrincipalResolver
 import com.side.book.socialing.presentation.note.dto.CommonNoteResponse
 import com.side.book.socialing.presentation.note.dto.CreateNoteRequest
 import com.side.book.socialing.presentation.note.dto.OpenNoteResponse
@@ -14,24 +15,25 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
-import java.time.LocalDateTime
 
 @Tag(name = "노트 API", description = "노트 조회, 생성, 참여, 퇴고 등 노트 관련 API")
 @RestController
 @RequestMapping("/api/note/v1")
-class NoteController (
+class NoteController(
     private val noteService: NoteService,
+    private val userPrincipalResolver: UserPrincipalResolver
 ) {
     @PostMapping("/create", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun createNote(
         @RequestPart("request") request: CreateNoteRequest,
         @RequestPart("images") imageFiles: List<MultipartFile>
     ): Long {
-        val userId = 123L
+        val userId = userPrincipalResolver.getUserId()
 
         val command =
             CreateNoteCommand(
                 userId = userId,
+                clubId = request.clubId,
                 bookName = request.bookName,
                 bookAuthor = request.bookAuthor,
                 description = request.description,
@@ -41,6 +43,24 @@ class NoteController (
             )
 
         return noteService.createNote(command).id!!
+    }
+
+    @Operation(
+        summary = "노트 참여 신청",
+        description = "사용자가 특정 노트에 참여를 신청합니다."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "201", description = "성공적으로 노트 참여 신청함"),
+            ApiResponse(responseCode = "404", description = "해당 노트를 찾을 수 없음")
+        ]
+    )
+    @PostMapping("/{noteId}/join")
+    @ResponseStatus(HttpStatus.CREATED)
+    fun joinNote(@PathVariable noteId: Long) {
+        val userId = userPrincipalResolver.getUserId()
+
+        noteService.joinNote(userId, noteId)
     }
 
     @Operation(
@@ -55,9 +75,7 @@ class NoteController (
     )
     @GetMapping("/open")
     fun getOpenNotes(): ResponseEntity<List<OpenNoteResponse>> {
-
-        // TODO: 회원 정보 필요
-        val userId = 123L
+        val userId = userPrincipalResolver.getUserId()
 
         return try {
             val openNotes = noteService.getOpenNotes(userId)
@@ -81,40 +99,11 @@ class NoteController (
     )
     @GetMapping("/created")
     fun getCreatedNotes(): ResponseEntity<List<CommonNoteResponse>> {
-
-        // TODO: 회원 정보 필요
-        val userId = 123L
+        val userId = userPrincipalResolver.getUserId()
 
         return try {
-            // val createdNotes = noteService.getCreatedNotes(userId)
-
-            val dummyNotes = mutableListOf<CommonNoteResponse>()
-
-            // 첫 번째 더미 노트
-            dummyNotes.add(
-                CommonNoteResponse(
-                    id = 101L,
-                    clubName = "더미 독서모임 A",
-                    bookName = "내가 만든 더미 데미안",
-                    bookImageUrl = "https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9791164053353.jpg", // 더미 이미지 URL
-                    startDateTime = LocalDateTime.of(2025, 8, 1, 19, 0),
-                    endDateTime = LocalDateTime.of(2025, 8, 1, 21, 0),
-                )
-            )
-
-            // 두 번째 더미 노트
-            dummyNotes.add(
-                CommonNoteResponse(
-                    id = 102L,
-                    clubName = "더미 독서모임 B",
-                    bookName = "내가 만든 더미 어린 왕자",
-                    bookImageUrl = "https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9791164455300.jpg", // 또 다른 더미 이미지 URL
-                    startDateTime = LocalDateTime.of(2025, 8, 15, 14, 0),
-                    endDateTime = LocalDateTime.of(2025, 8, 15, 16, 0),
-                )
-            )
-
-            ResponseEntity.ok(dummyNotes)
+            val createdNotes = noteService.getCreatedNotes(userId)
+            ResponseEntity.ok(createdNotes)
         } catch (e: Exception) {
             System.err.println("Error fetching created notes for user $userId: ${e.message}") // 에러 로깅
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR) // 500 Internal Server Error
@@ -134,40 +123,11 @@ class NoteController (
     )
     @GetMapping("/pending")
     fun getPendingNotes(): ResponseEntity<List<CommonNoteResponse>> {
-
-        // TODO: 회원 정보 필요
-        val userId = 123L
+        val userId = userPrincipalResolver.getUserId()
 
         return try {
-            // val pendingNotes = noteService.getPendingNotes(userId)
-
-            val dummyNotes = mutableListOf<CommonNoteResponse>()
-
-            // 첫 번째 더미 노트
-            dummyNotes.add(
-                CommonNoteResponse(
-                    id = 101L,
-                    clubName = "더미 독서모임 A",
-                    bookName = "신청한 더미 데미안",
-                    bookImageUrl = "https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9791164053353.jpg", // 더미 이미지 URL
-                    startDateTime = LocalDateTime.of(2025, 8, 1, 19, 0),
-                    endDateTime = LocalDateTime.of(2025, 8, 1, 21, 0),
-                )
-            )
-
-            // 두 번째 더미 노트
-            dummyNotes.add(
-                CommonNoteResponse(
-                    id = 102L,
-                    clubName = null, // 클럽이 없는 더미 노트
-                    bookName = "신청한 더미 어린 왕자",
-                    bookImageUrl = "https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9791164455300.jpg", // 또 다른 더미 이미지 URL
-                    startDateTime = LocalDateTime.of(2025, 8, 15, 14, 0),
-                    endDateTime = LocalDateTime.of(2025, 8, 15, 16, 0),
-                )
-            )
-
-            ResponseEntity.ok(dummyNotes)
+            val pendingNotes = noteService.getPendingNotes(userId)
+            ResponseEntity.ok(pendingNotes)
         } catch (e: Exception) {
             System.err.println("Error fetching pending notes for user $userId: ${e.message}") // 에러 로깅
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR) // 500 Internal Server Error
@@ -185,44 +145,15 @@ class NoteController (
             ApiResponse(responseCode = "500", description = "서버 내부 오류")
         ]
     )
-    @GetMapping("/recommended")
-    fun getRecommendedNotes(): ResponseEntity<List<CommonNoteResponse>> {
-
-        // TODO: 회원 정보 필요
-        val userId = 123L
+    @GetMapping("/recommend")
+    fun getRecommendNotes(): ResponseEntity<List<CommonNoteResponse>> {
+        val userId = userPrincipalResolver.getUserId()
 
         return try {
-            // val recommendedNotes = noteService.getRecommendedNotes(userId)
-
-            val dummyNotes = mutableListOf<CommonNoteResponse>()
-
-            // 첫 번째 더미 노트
-            dummyNotes.add(
-                CommonNoteResponse(
-                    id = 101L,
-                    clubName = "더미 독서모임 A",
-                    bookName = "추천 더미 데미안",
-                    bookImageUrl = "https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9791164053353.jpg", // 더미 이미지 URL
-                    startDateTime = LocalDateTime.of(2025, 8, 1, 19, 0),
-                    endDateTime = LocalDateTime.of(2025, 8, 1, 21, 0),
-                )
-            )
-
-            // 두 번째 더미 노트
-            dummyNotes.add(
-                CommonNoteResponse(
-                    id = 102L,
-                    clubName = null, // 클럽이 없는 더미 노트
-                    bookName = "추천 더미 어린 왕자",
-                    bookImageUrl = "https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9791164455300.jpg", // 또 다른 더미 이미지 URL
-                    startDateTime = LocalDateTime.of(2025, 8, 15, 14, 0),
-                    endDateTime = LocalDateTime.of(2025, 8, 15, 16, 0),
-                )
-            )
-
-            ResponseEntity.ok(dummyNotes)
+            val recommendNotes = noteService.getRecommendNotes(userId)
+            ResponseEntity.ok(recommendNotes)
         } catch (e: Exception) {
-            System.err.println("Error fetching recommended notes for user $userId: ${e.message}") // 에러 로깅
+            System.err.println("Error fetching recommend notes for user $userId: ${e.message}") // 에러 로깅
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR) // 500 Internal Server Error
                 .body(emptyList()) // 빈 리스트 반환 또는 에러 DTO 반환
         }
@@ -240,40 +171,11 @@ class NoteController (
     )
     @GetMapping("/revised")
     fun getRevisedNotes(): ResponseEntity<List<CommonNoteResponse>> {
-
-        // TODO: 회원 정보 필요
-        val userId = 123L
+        val userId = userPrincipalResolver.getUserId()
 
         return try {
-            // val revisedNotes = noteService.getParticipatedRevisedNotes(userId)
-
-            val dummyNotes = mutableListOf<CommonNoteResponse>()
-
-            // 첫 번째 더미 노트
-            dummyNotes.add(
-                CommonNoteResponse(
-                    id = 101L,
-                    clubName = "더미 독서모임 A",
-                    bookName = "퇴고한 더미 데미안",
-                    bookImageUrl = "https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9791164053353.jpg", // 더미 이미지 URL
-                    startDateTime = LocalDateTime.of(2025, 8, 1, 19, 0),
-                    endDateTime = LocalDateTime.of(2025, 8, 1, 21, 0),
-                )
-            )
-
-            // 두 번째 더미 노트
-            dummyNotes.add(
-                CommonNoteResponse(
-                    id = 102L,
-                    clubName = null, // 클럽이 없는 더미 노트
-                    bookName = "퇴고한 더미 어린 왕자",
-                    bookImageUrl = "https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9791164455300.jpg", // 또 다른 더미 이미지 URL
-                    startDateTime = LocalDateTime.of(2025, 8, 15, 14, 0),
-                    endDateTime = LocalDateTime.of(2025, 8, 15, 16, 0),
-                )
-            )
-
-            ResponseEntity.ok(dummyNotes)
+            val revisedNotes = noteService.getParticipatedRevisedNotes(userId)
+            ResponseEntity.ok(revisedNotes)
         } catch (e: Exception) {
             System.err.println("Error fetching revised notes for user $userId: ${e.message}") // 에러 로깅
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR) // 500 Internal Server Error

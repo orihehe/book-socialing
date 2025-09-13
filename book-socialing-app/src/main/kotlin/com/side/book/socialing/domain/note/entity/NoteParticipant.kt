@@ -7,7 +7,7 @@ import jakarta.persistence.*
 
 @Entity
 @Table(name = "note_participant")
-class NoteParticipant (
+class NoteParticipant(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
@@ -25,8 +25,8 @@ class NoteParticipant (
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
-    var status: ParticipantStatus = ParticipantStatus.JOINED,
-): BaseEntity() {
+    var status: ParticipantStatus = ParticipantStatus.JOINED
+) : BaseEntity() {
     companion object {
         fun create(note: Note, userId: Long, role: ParticipantRole, status: ParticipantStatus): NoteParticipant {
             return NoteParticipant(
