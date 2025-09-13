@@ -9,5 +9,5 @@ data class CreateMeetingRequest(
     val bookAuthor: String?,
     val bookLink: String?,
     val meetDate: LocalDateTime,
-    val round: Int,
+    val round: Int
 )

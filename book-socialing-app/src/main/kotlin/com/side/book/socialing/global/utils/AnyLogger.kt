@@ -5,10 +5,10 @@ import com.nimbusds.jose.shaded.gson.GsonBuilder
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-val <R: Any> R.logger
+val <R : Any> R.logger
     get() = lazy { LoggerFactory.getLogger(this::class.java) }
 
-val <R: Any> R.log: Logger
+val <R : Any> R.log: Logger
     get() = logger.value
 
 class AnyLogger {

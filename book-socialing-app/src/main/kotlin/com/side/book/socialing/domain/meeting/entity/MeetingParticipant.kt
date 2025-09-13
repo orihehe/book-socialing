@@ -40,5 +40,5 @@ class MeetingParticipant(
 
     @LastModifiedBy
     @Column(name = "modified_by")
-    var modifiedBy: String? = null,
+    var modifiedBy: String? = null
 )

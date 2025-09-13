@@ -34,7 +34,7 @@ class MeetingServiceTest {
                 bookLink = "https://example.com",
                 meetDate = LocalDateTime.of(2025, 7, 1, 19, 0),
                 round = 1,
-                createdBy = "tester",
+                createdBy = "tester"
             )
 
         val savedMeeting = Meeting.create(command).apply { id = 1L }

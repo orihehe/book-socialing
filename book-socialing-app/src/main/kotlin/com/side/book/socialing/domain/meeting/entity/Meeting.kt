@@ -53,7 +53,7 @@ class Meeting(
 
     @LastModifiedBy
     @Column(name = "modified_by")
-    var modifiedBy: String? = null,
+    var modifiedBy: String? = null
 ) {
     companion object {
         fun create(cmd: CreateMeetingCommand): Meeting {
@@ -66,7 +66,7 @@ class Meeting(
                 meetDate = cmd.meetDate,
                 round = cmd.round,
                 createdBy = cmd.createdBy,
-                modifiedBy = cmd.createdBy,
+                modifiedBy = cmd.createdBy
             )
         }
     }

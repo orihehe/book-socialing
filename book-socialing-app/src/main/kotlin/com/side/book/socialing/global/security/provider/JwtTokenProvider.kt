@@ -33,7 +33,11 @@ class JwtTokenProvider(
         val expiryDate = Date(now.time + validity)
 
         return Jwts.builder()
-            .apply { if (subject != null) { setSubject(subject) } }
+            .apply {
+                if (subject != null) {
+                    setSubject(subject)
+                }
+            }
             .setIssuedAt(now)
             .setExpiration(expiryDate)
             .signWith(secretKey, SignatureAlgorithm.HS256)
@@ -56,7 +60,6 @@ class JwtTokenProvider(
                 is IllegalArgumentException -> log.error("JWT token is invalid.")
                 else -> log.error("An unknown JWT error occurred.", e)
             }
-
         }
         return false
     }

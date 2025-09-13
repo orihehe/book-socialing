@@ -3,6 +3,4 @@ package com.side.book.socialing.domain.note.repository
 import com.side.book.socialing.domain.note.entity.NoteParticipant
 import org.springframework.data.jpa.repository.JpaRepository
 
-
-interface NoteParticipantRepository: JpaRepository<NoteParticipant, Long> {
-}
+interface NoteParticipantRepository : JpaRepository<NoteParticipant, Long>
