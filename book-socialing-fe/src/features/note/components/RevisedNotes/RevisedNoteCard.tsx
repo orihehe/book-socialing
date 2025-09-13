@@ -9,13 +9,17 @@ type RevisedNoteCardProps = {
 }
 
 export function RevisedNoteCard({ note }: RevisedNoteCardProps) {
-  const { title, author, imageUrl } = note
+  const { bookName, bookAuthor, bookImageUrl } = note
   return (
     <Card className="border-none shadow-none">
       <div className="relative">
         <div className="aspect-[3/4] bg-gray-200 rounded-md">
-          {imageUrl && (
-            <img src={imageUrl} alt={title} className="w-full h-full object-cover rounded-md" />
+          {bookImageUrl && (
+            <img
+              src={bookImageUrl}
+              alt={bookName}
+              className="w-full h-full object-cover rounded-md"
+            />
           )}
         </div>
         <Button
@@ -26,8 +30,8 @@ export function RevisedNoteCard({ note }: RevisedNoteCardProps) {
         </Button>
       </div>
       <div className="mt-1">
-        <div className="text-xs font-semibold truncate">{title}</div>
-        <div className="text-[10px] text-gray-500 truncate">{author}</div>
+        <div className="text-xs font-semibold truncate">{bookName}</div>
+        <div className="text-[10px] text-gray-500 truncate">{bookAuthor}</div>
       </div>
     </Card>
   )

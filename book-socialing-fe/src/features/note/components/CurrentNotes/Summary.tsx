@@ -36,20 +36,22 @@ export function Summary({ currentNotes, moveToAll }: Props) {
         <CardContent>
           <Carousel setApi={setApi}>
             <CarouselContent>
-              {currentNotes.map(({ id, title, author, description, endDateTime, imageUrl }) => (
-                <div className="min-w-full" key={id}>
-                  <CarouselItem>
-                    <CurrentNoteCard
-                      id={id}
-                      title={title}
-                      author={author}
-                      imageUrl={imageUrl}
-                      description={description}
-                      endDateTime={endDateTime}
-                    />
-                  </CarouselItem>
-                </div>
-              ))}
+              {currentNotes.map(
+                ({ id, bookName, bookAuthor, description, endDateTime, bookImageUrl }) => (
+                  <div className="min-w-full" key={id}>
+                    <CarouselItem>
+                      <CurrentNoteCard
+                        id={id}
+                        bookName={bookName}
+                        bookAuthor={bookAuthor}
+                        bookImageUrl={bookImageUrl}
+                        description={description}
+                        endDateTime={endDateTime}
+                      />
+                    </CarouselItem>
+                  </div>
+                )
+              )}
             </CarouselContent>
           </Carousel>
         </CardContent>

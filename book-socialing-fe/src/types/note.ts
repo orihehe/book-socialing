@@ -1,9 +1,10 @@
 export interface Note {
-  id: string
-  title: string
-  author: string
+  id: number
+  clubName?: string
+  bookName: string
+  bookAuthor: string
+  bookImageUrl?: string
   description?: string
-  imageUrl?: string
   startDateTime: string
   endDateTime: string
 }
