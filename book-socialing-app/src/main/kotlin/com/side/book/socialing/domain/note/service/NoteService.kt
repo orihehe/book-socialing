@@ -118,10 +118,11 @@ class NoteService(
 
     @Transactional
     fun joinNote(userId: Long, noteId: Long) {
-        val note = noteRepository.findById(noteId).orElseThrow { throw EntityNotFoundException("Note not found") }
+        val note = noteRepository.findById(noteId)
+            .orElseThrow { throw EntityNotFoundException("Note not found with id: $noteId") }
 
         noteParticipantRepository.findByNoteIdAndUserId(noteId, userId)?.let {
-            throw IllegalStateException("User already a participant")
+            throw IllegalStateException("User $userId is already a participant in note $noteId")
         }
 
         val participant = NoteParticipant.create(
