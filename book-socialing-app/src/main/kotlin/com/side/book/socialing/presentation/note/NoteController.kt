@@ -31,6 +31,7 @@ class NoteController(
         val command =
             CreateNoteCommand(
                 userId = userId,
+                clubId = request.clubId,
                 bookName = request.bookName,
                 bookAuthor = request.bookAuthor,
                 description = request.description,
