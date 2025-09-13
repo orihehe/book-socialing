@@ -2,6 +2,7 @@ package com.side.book.socialing.presentation.note
 
 import com.side.book.socialing.domain.note.command.CreateNoteCommand
 import com.side.book.socialing.domain.note.service.NoteService
+import com.side.book.socialing.global.auth.UserPrincipalResolver
 import com.side.book.socialing.presentation.note.dto.CommonNoteResponse
 import com.side.book.socialing.presentation.note.dto.CreateNoteRequest
 import com.side.book.socialing.presentation.note.dto.OpenNoteResponse
@@ -19,14 +20,15 @@ import org.springframework.web.multipart.MultipartFile
 @RestController
 @RequestMapping("/api/note/v1")
 class NoteController(
-    private val noteService: NoteService
+    private val noteService: NoteService,
+    private val userPrincipalResolver: UserPrincipalResolver
 ) {
     @PostMapping("/create", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun createNote(
         @RequestPart("request") request: CreateNoteRequest,
         @RequestPart("images") imageFiles: List<MultipartFile>
     ): Long {
-        val userId = 123L
+        val userId = userPrincipalResolver.getUserId()
 
         val command =
             CreateNoteCommand(
@@ -56,8 +58,7 @@ class NoteController(
     @PostMapping("/{noteId}/join")
     @ResponseStatus(HttpStatus.CREATED)
     fun joinNote(@PathVariable noteId: Long) {
-        // TODO: 회원 정보 필요
-        val userId = 123L
+        val userId = userPrincipalResolver.getUserId()
 
         noteService.joinNote(userId, noteId)
     }
@@ -74,8 +75,7 @@ class NoteController(
     )
     @GetMapping("/open")
     fun getOpenNotes(): ResponseEntity<List<OpenNoteResponse>> {
-        // TODO: 회원 정보 필요
-        val userId = 123L
+        val userId = userPrincipalResolver.getUserId()
 
         return try {
             val openNotes = noteService.getOpenNotes(userId)
@@ -99,8 +99,7 @@ class NoteController(
     )
     @GetMapping("/created")
     fun getCreatedNotes(): ResponseEntity<List<CommonNoteResponse>> {
-        // TODO: 회원 정보 필요
-        val userId = 123L
+        val userId = userPrincipalResolver.getUserId()
 
         return try {
             val createdNotes = noteService.getCreatedNotes(userId)
@@ -124,8 +123,7 @@ class NoteController(
     )
     @GetMapping("/pending")
     fun getPendingNotes(): ResponseEntity<List<CommonNoteResponse>> {
-        // TODO: 회원 정보 필요
-        val userId = 123L
+        val userId = userPrincipalResolver.getUserId()
 
         return try {
             val pendingNotes = noteService.getPendingNotes(userId)
@@ -149,8 +147,7 @@ class NoteController(
     )
     @GetMapping("/recommend")
     fun getRecommendNotes(): ResponseEntity<List<CommonNoteResponse>> {
-        // TODO: 회원 정보 필요
-        val userId = 123L
+        val userId = userPrincipalResolver.getUserId()
 
         return try {
             val recommendNotes = noteService.getRecommendNotes(userId)
@@ -174,8 +171,7 @@ class NoteController(
     )
     @GetMapping("/revised")
     fun getRevisedNotes(): ResponseEntity<List<CommonNoteResponse>> {
-        // TODO: 회원 정보 필요
-        val userId = 123L
+        val userId = userPrincipalResolver.getUserId()
 
         return try {
             val revisedNotes = noteService.getParticipatedRevisedNotes(userId)
