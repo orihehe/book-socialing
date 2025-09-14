@@ -37,6 +37,14 @@ class GlobalExceptionHandler {
             .body(ErrorResponse(e.message))
     }
 
+    @ExceptionHandler(IllegalStateException::class)
+    fun handleIllegalStateException(e: IllegalStateException): ResponseEntity<ErrorResponse> {
+        log.error("Illegal state", e)
+        return ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(ErrorResponse(e.message))
+    }
+
     @ExceptionHandler(EntityNotFoundException::class)
     fun handleEntityNotFoundException(e: EntityNotFoundException): ResponseEntity<ErrorResponse> {
         log.error("Entity not found", e)
