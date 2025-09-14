@@ -41,7 +41,7 @@ class GlobalExceptionHandler {
     fun handleIllegalStateException(e: IllegalStateException): ResponseEntity<ErrorResponse> {
         log.error("Illegal state", e)
         return ResponseEntity
-            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .status(HttpStatus.BAD_REQUEST)
             .body(ErrorResponse(e.message))
     }
 
