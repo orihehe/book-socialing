@@ -55,6 +55,6 @@ class Note(
     }
 
     fun isHost(userId: Long): Boolean {
-        return this.participants.find { it.userId == userId && it.isHost() } != null
+        return this.participants.any { it.userId == userId && it.isHost() }
     }
 }

@@ -77,14 +77,14 @@ class NoteParticipant(
     }
 
     fun kick() {
-        if (isJoined()) {
+        if (!isJoined()) {
             throw IllegalStateException("Only joined participant can be kicked. Current status: ${this.status}")
         }
         this.status = ParticipantStatus.KICKED
     }
 
     fun left() {
-        if (isJoined()) {
+        if (!isJoined()) {
             throw IllegalStateException("Only joined participant can be left. Current status: ${this.status}")
         }
         this.status = ParticipantStatus.LEFT

@@ -66,7 +66,7 @@ class NoteJoinController(
             ApiResponse(responseCode = "404", description = "해당 노트 또는 참가자를 찾을 수 없음")
         ]
     )
-    @PatchMapping("/{noteId}/participants/{participantId}/approve")
+    @PatchMapping("/participants/{participantId}/approve")
     @ResponseStatus(HttpStatus.OK)
     fun approve(@PathVariable noteId: Long, @PathVariable participantId: Long) {
         val userId = userPrincipalResolver.getUserId()
@@ -83,7 +83,7 @@ class NoteJoinController(
             ApiResponse(responseCode = "404", description = "해당 노트 또는 참가자를 찾을 수 없음")
         ]
     )
-    @PatchMapping("/{noteId}/participants/{participantId}/reject")
+    @PatchMapping("/participants/{participantId}/reject")
     @ResponseStatus(HttpStatus.OK)
     fun reject(@PathVariable noteId: Long, @PathVariable participantId: Long) {
         val userId = userPrincipalResolver.getUserId()
