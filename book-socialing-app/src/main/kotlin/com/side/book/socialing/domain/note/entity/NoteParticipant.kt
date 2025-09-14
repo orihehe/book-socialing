@@ -28,13 +28,70 @@ class NoteParticipant(
     var status: ParticipantStatus = ParticipantStatus.JOINED
 ) : BaseEntity() {
     companion object {
-        fun create(note: Note, userId: Long, role: ParticipantRole, status: ParticipantStatus): NoteParticipant {
+
+        fun createHost(note: Note, userId: Long): NoteParticipant {
             return NoteParticipant(
                 note = note,
                 userId = userId,
-                role = role,
-                status = status
+                role = ParticipantRole.HOST,
+                status = ParticipantStatus.JOINED
             )
         }
+
+        fun createMember(note: Note, userId: Long): NoteParticipant {
+            return NoteParticipant(
+                note = note,
+                userId = userId,
+                role = ParticipantRole.MEMBER,
+                status = ParticipantStatus.PENDING_APPROVAL
+            )
+        }
+    }
+
+    fun cancel() {
+        if (isWaitingApproval()) {
+            throw IllegalStateException("Only pending approval participant can be canceled. Current status: ${this.status}")
+        }
+        this.status = ParticipantStatus.CANCEL
+    }
+    
+    fun approve() {
+        if (isWaitingApproval()) {
+            throw IllegalStateException("Only pending approval participant can be approved. Current status: ${this.status}")
+        }
+        this.status = ParticipantStatus.JOINED
+    }
+    
+    fun reject() {
+        if (isWaitingApproval()) {
+            throw IllegalStateException("Only pending approval participant can be rejected. Current status: ${this.status}")
+        }
+        this.status = ParticipantStatus.REJECTED
+    }
+
+    fun kick() {
+        if (isJoined()) {
+            throw IllegalStateException("Only joined participant can be kicked. Current status: ${this.status}")
+        }
+        this.status = ParticipantStatus.KICKED
+    }
+
+    fun left() {
+        if (isJoined()) {
+            throw IllegalStateException("Only joined participant can be left. Current status: ${this.status}")
+        }
+        this.status = ParticipantStatus.LEFT
+    }
+    
+    fun isHost(): Boolean {
+        return this.role == ParticipantRole.HOST
+    }
+    
+    private fun isWaitingApproval(): Boolean {
+        return this.status == ParticipantStatus.PENDING_APPROVAL
+    }
+    
+    private fun isJoined(): Boolean {
+        return this.status == ParticipantStatus.JOINED
     }
 }

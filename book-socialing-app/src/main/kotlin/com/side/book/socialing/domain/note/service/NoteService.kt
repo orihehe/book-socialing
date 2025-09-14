@@ -58,11 +58,9 @@ class NoteService(
         noteRepository.save(note)
         applicationEventPublisher.publishEvent(NoteCreatedEvent(note.id!!, note.bookName, cmd.userId))
 
-        val hostParticipant = NoteParticipant.create(
+        val hostParticipant = NoteParticipant.createHost(
             note = note,
-            userId = cmd.userId,
-            role = ParticipantRole.HOST,
-            status = ParticipantStatus.JOINED
+            userId = cmd.userId
         )
         noteParticipantRepository.save(hostParticipant)
 
@@ -90,32 +88,6 @@ class NoteService(
             throw e
         }
         return note
-    }
-
-    @Transactional
-    fun joinNote(userId: Long, noteId: Long) {
-        val note = noteRepository.findById(noteId)
-            .orElseThrow { throw EntityNotFoundException("Note not found with id: $noteId") }
-
-        noteParticipantRepository.findByNoteIdAndUserId(noteId, userId)?.let {
-            throw IllegalStateException("User $userId is already a participant in note $noteId")
-        }
-
-        val participant = NoteParticipant.create(
-            note = note,
-            userId = userId,
-            role = ParticipantRole.MEMBER,
-            status = ParticipantStatus.JOINED
-        )
-
-        noteParticipantRepository.save(participant)
-
-        applicationEventPublisher.publishEvent(
-            NoteJoinedEvent(
-                noteId = noteId,
-                userId = userId
-            )
-        )
     }
 
     /**

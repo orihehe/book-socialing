@@ -53,4 +53,8 @@ class Note(
             )
         }
     }
+
+    fun isHost(userId: Long): Boolean {
+        return this.participants.find { it.userId == userId && it.isHost() } != null
+    }
 }
