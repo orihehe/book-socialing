@@ -8,7 +8,7 @@ interface Props {
 export function NoteGrid({ notes, children }: Props) {
   return (
     <div className="p2">
-      <div className="flex items-center justify-between mb-6 mt-8 mx-4">
+      <div className="flex items-center justify-between my-4 mx-4">
         <div className="flex items-center">
           <h4 className="text-lg font-bold">{notes.length ?? 0}권</h4>
           <ArrowDownUp className="h-5 w-5 text-gray-500 cursor-pointer mx-2" />

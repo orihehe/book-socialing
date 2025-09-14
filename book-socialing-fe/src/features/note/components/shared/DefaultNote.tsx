@@ -7,12 +7,12 @@ interface Props extends Omit<Note, 'id'> {
   children: React.ReactNode
 }
 
-export function DefaultNote({ bookImageUrl, bookName, startDateTime, children }: Props) {
+export function DefaultNote({ bookImageUrl, bookName, startAt, children }: Props) {
   return (
     <div className="flex items-center gap-4 py-2 flex-wrap">
       <img src={bookImageUrl} alt={bookName} className="w-14 h-14 rounded-md object-cover border" />
       <div className="flex-1 min-w-0">
-        <div className="text-xs text-gray-400">{dayjs(startDateTime).format('YYYY.MM.DD')}</div>
+        <div className="text-xs text-gray-400">{dayjs(startAt).format('YYYY.MM.DD')}</div>
         <div className="font-semibold truncate">{bookName}</div>
       </div>
       <div className="flex flex-wrap gap-2 md:flex-nowrap">{children}</div>

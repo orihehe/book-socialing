@@ -9,13 +9,7 @@ import { z } from 'zod'
 
 import { BottomButton } from '@/components/common/BottomButtonl'
 import { Calendar } from '@/components/ui/calendar'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -44,8 +38,8 @@ const noteSchema = z.object({
     .array(z.instanceof(File))
     .min(1, '이미지는 최소 1장 이상 필요해요')
     .max(5, '최대 5장까지만 등록할 수 있어요'),
-  startDateTime: z.string().min(1, '시작일을 선택해 주세요'),
-  endDateTime: z.string().min(1, '종료일을 선택해 주세요'),
+  startAt: z.string().min(1, '시작일을 선택해 주세요'),
+  endAt: z.string().min(1, '종료일을 선택해 주세요'),
   clubId: z.union([z.number(), z.undefined()]),
 })
 
@@ -75,7 +69,7 @@ export default function EditNote({ mode }: EditNoteProps) {
         formData.append('images', file) // 각 파일을 개별적으로 추가
       })
 
-      const response = await fetch('http://localhost:8080/api/note/v1/create', {
+      const response = await fetch('/api/note/v1/create', {
         method: 'POST',
         body: formData,
       })
@@ -86,8 +80,7 @@ export default function EditNote({ mode }: EditNoteProps) {
 
       return response.json()
     },
-    onSuccess: data => {
-      console.log('Note created successfully:', data)
+    onSuccess: () => {
       navigate('/notes')
     },
     onError: error => {
@@ -105,12 +98,11 @@ export default function EditNote({ mode }: EditNoteProps) {
       bookAuthor: '',
       description: '',
       bookImages: [] as File[],
-      startDateTime: '',
-      endDateTime: '',
+      startAt: '',
+      endAt: '',
       clubId: undefined as number | undefined,
     },
     onSubmit: async ({ value }) => {
-      console.log(value)
       mutation.mutate(value)
     },
     validators: {
@@ -125,7 +117,7 @@ export default function EditNote({ mode }: EditNoteProps) {
         <button className="mr-4">
           <ChevronLeft onClick={() => navigate(-1)} />
         </button>
-        <h1 className="text-lg font-semibold">노트 생성</h1>
+        <h1 className="text-lg font-semibold">노트 {mode === 'edit' ? '수정' : '생성'}</h1>
       </div>
 
       <div className="p-4 space-y-6">
@@ -134,7 +126,6 @@ export default function EditNote({ mode }: EditNoteProps) {
           name="bookImages"
           children={field => {
             const handleFiles = (files: FileList | null) => {
-              console.log('hey')
               if (!files) return
               const newFiles = Array.from(files)
               const updated = [...field.state.value, ...newFiles].slice(0, 5) // 최대 5개 유지
@@ -294,9 +285,9 @@ export default function EditNote({ mode }: EditNoteProps) {
 
         {/* Meeting Date Selection */}
 
-        <form.Field name="startDateTime">
+        <form.Field name="startAt">
           {startField => (
-            <form.Field name="endDateTime">
+            <form.Field name="endAt">
               {endField => (
                 <>
                   <Label className="text-lg font-bold">

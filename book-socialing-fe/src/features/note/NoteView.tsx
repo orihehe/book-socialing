@@ -19,24 +19,24 @@ const dummyCurrentNotes: Note[] = [
     clubName: 'saisai',
     bookName: '스프링 부트의 정석',
     bookImageUrl: 'note\\1\\0d1d9143-b7db-4461-abc2-ef36db902917.png',
-    startDateTime: '2025-08-15T10:00:00',
-    endDateTime: '2025-09-29T12:00:00',
+    startAt: '2025-08-15T10:00:00',
+    endAt: '2025-09-29T12:00:00',
   },
   {
     id: 2,
     clubName: 'saisai',
     bookName: '스프링 부트의 정석',
     bookImageUrl: 'note\\1\\0d1d9143-b7db-4461-abc2-ef36db902917.png',
-    startDateTime: '2025-08-15T10:00:00',
-    endDateTime: '2025-09-29T12:00:00',
+    startAt: '2025-08-15T10:00:00',
+    endAt: '2025-09-29T12:00:00',
   },
   {
     id: 3,
     clubName: 'saisai',
     bookName: '스프링 부트의 정석',
     bookImageUrl: 'note\\1\\0d1d9143-b7db-4461-abc2-ef36db902917.png',
-    startDateTime: '2025-08-15T10:00:00',
-    endDateTime: '2025-09-29T12:00:00',
+    startAt: '2025-08-15T10:00:00',
+    endAt: '2025-09-29T12:00:00',
   },
 ]
 
@@ -50,11 +50,8 @@ export default function NoteView() {
         <div className="flex flex-col p-2 mx-auto">
           {activeTab === 'all' && (
             <>
-              <CurrentSummary
-                currentNotes={dummyCurrentNotes}
-                moveToAll={() => setActiveTab('open')}
-              />
-              <MyNotes myNotes={dummyCurrentNotes} />
+              <CurrentSummary moveToAll={() => setActiveTab('open')} />
+              <MyNotes />
               <SuggestedNotes />
               <RevisedSummary
                 revisedNotes={dummyCurrentNotes}

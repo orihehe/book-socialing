@@ -24,7 +24,7 @@ export function Summary({ revisedNotes, moveToAll }: RevisedNotesProps) {
           </div>
         </CardContent>
       </BaseCard>
-      <div className="px-4 mb-4">
+      <div className="px-4 mb-8">
         <Button
           variant="ghost"
           className="w-full justify-center items-center gap-1 text-muted-foreground text-sm px-6 py-6 rounded-5 border"

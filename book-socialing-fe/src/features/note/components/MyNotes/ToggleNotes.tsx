@@ -4,22 +4,27 @@ import { useState } from 'react'
 import { BaseCard } from '@/components/common/BaseCard'
 import { Button } from '@/components/ui/button'
 import { CardContent } from '@/components/ui/card'
-import type { Note } from '@/types/note'
+import type { ClubNotesGroup, ClubNotesPageResponse } from '@/types/note'
 
 interface MyNotesProps {
   title: string
-  myNotes: Note[]
-  NoteComponent: React.ComponentType<Note>
+  result: ClubNotesPageResponse
+  NoteComponent: React.ComponentType<ClubNotesGroup>
 }
 
-export function ToggleNotes({ title, myNotes, NoteComponent }: MyNotesProps) {
+export function ToggleNotes({ title, result, NoteComponent }: MyNotesProps) {
   const [open, setOpen] = useState(true)
+  const { groups, totalCount } = result ?? { groups: [], totalCount: 0 }
+
+  if (!groups.length) {
+    return null
+  }
 
   return (
-    <BaseCard title={`${title} (${myNotes.length})`}>
+    <BaseCard title={`${title} (${totalCount})`}>
       <CardContent>
         <AnimatePresence initial={true}>
-          {open && myNotes.length > 2 && (
+          {open && (
             <motion.div
               key="extra-note-list"
               initial={{ height: 0, opacity: 0 }}
@@ -29,8 +34,8 @@ export function ToggleNotes({ title, myNotes, NoteComponent }: MyNotesProps) {
               className="overflow-hidden mb-2"
             >
               <div className="flex flex-col gap-2 mt-2">
-                {myNotes.map(note => (
-                  <NoteComponent key={note.id} {...note} />
+                {groups.map(group => (
+                  <NoteComponent key={group.clubId} {...group} />
                 ))}
               </div>
             </motion.div>
