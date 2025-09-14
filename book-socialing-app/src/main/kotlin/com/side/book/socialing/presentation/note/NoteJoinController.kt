@@ -66,11 +66,11 @@ class NoteJoinController(
             ApiResponse(responseCode = "404", description = "해당 노트 또는 참가자를 찾을 수 없음")
         ]
     )
-    @PatchMapping("/participants/{participantId}/approve")
+    @PatchMapping("/{noteId}/participants/{approvedUserId}/approve")
     @ResponseStatus(HttpStatus.OK)
-    fun approve(@PathVariable noteId: Long, @PathVariable participantId: Long) {
+    fun approve(@PathVariable noteId: Long, @PathVariable approvedUserId: Long) {
         val userId = userPrincipalResolver.getUserId()
-        noteJoinService.approve(userId, participantId)
+        noteJoinService.approve(userId, noteId, approvedUserId)
     }
 
     @Operation(
@@ -83,10 +83,27 @@ class NoteJoinController(
             ApiResponse(responseCode = "404", description = "해당 노트 또는 참가자를 찾을 수 없음")
         ]
     )
-    @PatchMapping("/participants/{participantId}/reject")
+    @PatchMapping("/{noteId}/participants/{rejectedUserId}/reject")
     @ResponseStatus(HttpStatus.OK)
-    fun reject(@PathVariable noteId: Long, @PathVariable participantId: Long) {
+    fun reject(@PathVariable noteId: Long, @PathVariable rejectedUserId: Long) {
         val userId = userPrincipalResolver.getUserId()
-        noteJoinService.reject(userId, participantId)
+        noteJoinService.reject(userId, noteId, rejectedUserId)
+    }
+
+    @Operation(
+        summary = "노트 참여자 강퇴",
+        description = "관리자가 노트 참여자를 강퇴합니다."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "204", description = "성공적으로 노트 참여자를 강퇴함"),
+            ApiResponse(responseCode = "404", description = "해당 노트 또는 참가자를 찾을 수 없음")
+        ]
+    )
+    @PatchMapping("/{noteId}/participants/{kickedUserId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun kick(@PathVariable noteId: Long, @PathVariable kickedUserId: Long) {
+        val userId = userPrincipalResolver.getUserId()
+        noteJoinService.kick(userId, noteId, kickedUserId)
     }
 }

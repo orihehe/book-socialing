@@ -45,14 +45,17 @@ class NoteJoinService(
     }
 
     @Transactional
-    fun approve(userId: Long, participantId: Long) {
-        val participant = noteParticipantRepository.findById(participantId).getOrNull()
-            ?: throw EntityNotFoundException("Participant $participantId doesn't exist")
+    fun approve(userId: Long, noteId: Long, approvedUserId: Long) {
+        val note = noteRepository.findById(noteId).getOrNull()
+            ?: throw EntityNotFoundException("Note $noteId doesn't exist")
 
-        val note = participant.note
         if (!note.isHost(userId)) {
             throw IllegalStateException("User $userId is not a host of note ${note.id}")
         }
+
+        val participant = noteParticipantRepository.findByNoteIdAndUserId(noteId, approvedUserId)
+            ?: throw EntityNotFoundException("User $approvedUserId is not a participant in note $noteId")
+
         participant.approve()
 
         applicationEventPublisher.publishEvent(
@@ -64,15 +67,36 @@ class NoteJoinService(
     }
 
     @Transactional
-    fun reject(userId: Long, participantId: Long) {
-        val participant = noteParticipantRepository.findById(participantId).getOrNull()
-            ?: throw EntityNotFoundException("Participant $participantId doesn't exist")
+    fun reject(userId: Long, noteId: Long, rejectedUserId: Long) {
+        val note = noteRepository.findById(noteId).getOrNull()
+            ?: throw EntityNotFoundException("Note $noteId doesn't exist")
 
-        val note = participant.note
         if (!note.isHost(userId)) {
             throw IllegalStateException("User $userId is not a host of note ${note.id}")
         }
 
+        val participant = noteParticipantRepository.findByNoteIdAndUserId(noteId, rejectedUserId)
+            ?: throw EntityNotFoundException("User $rejectedUserId is not a participant in note $noteId")
+
         participant.reject()
+    }
+
+    @Transactional
+    fun kick(userId: Long, noteId: Long, kickedUserId: Long) {
+        val note = noteRepository.findById(noteId).getOrNull()
+            ?: throw EntityNotFoundException("Note $noteId doesn't exist")
+
+        if (!note.isHost(userId)) {
+            throw IllegalStateException("User $userId is not a host of note ${note.id}")
+        }
+
+        if (userId == kickedUserId) {
+            throw IllegalStateException("Host can't kick themselves")
+        }
+
+        val participant = noteParticipantRepository.findByNoteIdAndUserId(noteId, kickedUserId)
+            ?: throw EntityNotFoundException("User $kickedUserId is not a participant in note $noteId")
+
+        participant.kick()
     }
 }
