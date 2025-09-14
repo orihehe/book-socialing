@@ -27,11 +27,11 @@ class Note(
     @Column(name = "description", length = 1000)
     var description: String? = null,
 
-    @Column(name = "start_date")
-    var startDate: LocalDateTime,
+    @Column(name = "start_at")
+    var startAt: LocalDateTime,
 
-    @Column(name = "end_date")
-    var endDate: LocalDateTime,
+    @Column(name = "end_at")
+    var endAt: LocalDateTime,
 
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "note")
@@ -48,8 +48,8 @@ class Note(
                 bookName = cmd.bookName,
                 bookAuthor = cmd.bookAuthor,
                 description = cmd.description,
-                startDate = cmd.startDate,
-                endDate = cmd.endDate
+                startAt = cmd.startAt,
+                endAt = cmd.endAt
             )
         }
     }
