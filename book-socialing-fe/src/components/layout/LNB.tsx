@@ -34,7 +34,7 @@ export default function LNB({ items, activeTab, onTabChange }: LNBProps) {
             <Link
               key={item.key}
               to={`/${item.key}`}
-              className={`text-sm font-medium transition-colors ${
+              className={`text-sm font-semibold transition-colors ${
                 activeFirstLevel === item.key
                   ? 'text-gray-900 border-b-2 border-gray-900 pb-1'
                   : 'text-gray-500 hover:text-gray-700'
@@ -57,10 +57,8 @@ export default function LNB({ items, activeTab, onTabChange }: LNBProps) {
               <button
                 key={child.key}
                 onClick={() => onTabChange?.(child.key)}
-                className={`text-sm font-medium transition-colors ${
-                  activeTab === child.key
-                    ? 'text-gray-900 font-semibold'
-                    : 'text-gray-500 hover:text-gray-700'
+                className={`text-sm transition-colors font-semibold ${
+                  activeTab === child.key ? 'text-gray-900' : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
                 {child.name}

@@ -12,10 +12,10 @@ type BaseCardProps = {
 
 export function BaseCard({ children, className, title }: BaseCardProps) {
   return (
-    <div className="mb-4">
+    <div className="mb-8">
       {/* Header outside the card */}
       {title && (
-        <div className="mb-6 mt-8 mx-4">
+        <div className="my-4 mx-4">
           <h2 className="text-lg font-bold text-gray-900">{title}</h2>
         </div>
       )}
