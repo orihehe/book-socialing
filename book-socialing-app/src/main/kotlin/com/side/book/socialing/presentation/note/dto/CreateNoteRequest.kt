@@ -38,7 +38,7 @@ data class CreateNoteRequest(
         format = "date-time",
         example = "2025-08-15T10:00:00"
     )
-    val startDate: LocalDateTime,
+    val startAt: LocalDateTime,
 
     @field:Schema(
         description = "탈고일(ISO-8601 LocalDateTime)",
@@ -46,5 +46,5 @@ data class CreateNoteRequest(
         format = "date-time",
         example = "2025-09-29T12:00:00"
     )
-    val endDate: LocalDateTime
+    val endAt: LocalDateTime
 )

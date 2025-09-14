@@ -41,10 +41,10 @@ data class CommonNoteResponse(
     val bookImageUrl: String,
 
     @field:Schema(description = "모임일(ISO-8601)", type = "string", format = "date-time", example = "2025-06-22T10:00:00")
-    val startDateTime: LocalDateTime,
+    val startAt: LocalDateTime,
 
     @field:Schema(description = "탈고일(ISO-8601)", type = "string", format = "date-time", example = "2025-06-28T12:00:00")
-    val endDateTime: LocalDateTime
+    val endAt: LocalDateTime
 )
 
 @Schema(description = "작성중인 노트 DTO")

@@ -30,6 +30,8 @@ class NoteServiceTest {
 
     private lateinit var noteService: NoteService
 
+    private lateinit var noteJoinService: NoteJoinService
+
     @MockK
     private lateinit var noteRepository: NoteRepository
 
@@ -66,8 +68,8 @@ class NoteServiceTest {
             id = 1L,
             bookName = "Test Book",
             bookAuthor = "Test Author",
-            startDate = LocalDateTime.now(),
-            endDate = LocalDateTime.now().plusHours(2)
+            startAt = LocalDateTime.now(),
+            endAt = LocalDateTime.now().plusHours(2)
         )
     }
 
@@ -84,7 +86,7 @@ class NoteServiceTest {
         every { noteParticipantRepository.save(capture(participantSlot)) } returns NoteParticipant(1L, note, userId)
 
         // When
-        noteService.joinNote(userId, noteId)
+        noteJoinService.joinRequest(userId, noteId)
 
         // Then
         verify(exactly = 1) { noteParticipantRepository.save(any()) }
@@ -106,7 +108,7 @@ class NoteServiceTest {
 
         // When & Then
         assertThrows<EntityNotFoundException> {
-            noteService.joinNote(userId, noteId)
+            noteJoinService.joinRequest(userId, noteId)
         }
         verify(exactly = 0) { noteParticipantRepository.save(any()) }
     }
@@ -124,7 +126,7 @@ class NoteServiceTest {
 
         // When & Then
         assertThrows<IllegalStateException> {
-            noteService.joinNote(userId, noteId)
+            noteJoinService.joinRequest(userId, noteId)
         }
         verify(exactly = 0) { noteParticipantRepository.save(any()) }
     }
