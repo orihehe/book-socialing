@@ -49,24 +49,31 @@ class NoteParticipant(
     }
 
     fun cancel() {
-        if (isWaitingApproval()) {
+        if (!isWaitingApproval()) {
             throw IllegalStateException("Only pending approval participant can be canceled. Current status: ${this.status}")
         }
         this.status = ParticipantStatus.CANCEL
     }
-    
+
     fun approve() {
-        if (isWaitingApproval()) {
+        if (!isWaitingApproval()) {
             throw IllegalStateException("Only pending approval participant can be approved. Current status: ${this.status}")
         }
         this.status = ParticipantStatus.JOINED
     }
-    
+
     fun reject() {
-        if (isWaitingApproval()) {
+        if (!isWaitingApproval()) {
             throw IllegalStateException("Only pending approval participant can be rejected. Current status: ${this.status}")
         }
         this.status = ParticipantStatus.REJECTED
+    }
+
+    fun joinRequest() {
+        if (!canRequestJoin()) {
+            throw IllegalStateException("User $userId can't request join. Current status: ${this.status}")
+        }
+        this.status = ParticipantStatus.PENDING_APPROVAL
     }
 
     fun kick() {
@@ -82,15 +89,21 @@ class NoteParticipant(
         }
         this.status = ParticipantStatus.LEFT
     }
-    
+
     fun isHost(): Boolean {
         return this.role == ParticipantRole.HOST
     }
-    
+
+    private fun canRequestJoin(): Boolean {
+        // TODO: consider REJECTED / KICKED status
+        return this.status != ParticipantStatus.PENDING_APPROVAL &&
+            this.status != ParticipantStatus.JOINED
+    }
+
     private fun isWaitingApproval(): Boolean {
         return this.status == ParticipantStatus.PENDING_APPROVAL
     }
-    
+
     private fun isJoined(): Boolean {
         return this.status == ParticipantStatus.JOINED
     }

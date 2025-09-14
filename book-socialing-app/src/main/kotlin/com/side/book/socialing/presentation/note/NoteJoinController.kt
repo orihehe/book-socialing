@@ -32,7 +32,7 @@ class NoteJoinController(
             ApiResponse(responseCode = "404", description = "해당 노트를 찾을 수 없음")
         ]
     )
-    @PostMapping("/{noteId}/join")
+    @PostMapping("/{noteId}/join/request")
     @ResponseStatus(HttpStatus.CREATED)
     fun joinRequest(@PathVariable noteId: Long) {
         val userId = userPrincipalResolver.getUserId()
@@ -49,7 +49,7 @@ class NoteJoinController(
             ApiResponse(responseCode = "404", description = "해당 노트를 찾을 수 없음")
         ]
     )
-    @PatchMapping("/{noteId}/join")
+    @PatchMapping("/{noteId}/join/cancel")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun cancelRequest(@PathVariable noteId: Long) {
         val userId = userPrincipalResolver.getUserId()

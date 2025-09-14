@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import kotlin.jvm.optionals.getOrNull
 
+// TODO: move logics to Note entity
 @Service
 class NoteJoinService(
     private val noteRepository: NoteRepository,
@@ -22,8 +23,9 @@ class NoteJoinService(
         val note = noteRepository.findById(noteId).getOrNull()
             ?: throw EntityNotFoundException("Note $noteId doesn't exist")
 
-        if (noteParticipantRepository.findByNoteIdAndUserId(noteId, userId) != null) {
-            throw IllegalStateException("User $userId is already a participant in note $noteId")
+        noteParticipantRepository.findByNoteIdAndUserId(noteId, userId)?.let {
+            it.joinRequest()
+            return
         }
 
         val participant = NoteParticipant.createMember(
