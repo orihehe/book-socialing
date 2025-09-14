@@ -44,7 +44,7 @@ class NoteService(
      * @throws Exception 파일 업로드 실패 또는 데이터베이스 저장 실패 시 발생할 수 있습니다.
      */
     @Transactional
-    fun createNote(cmd: CreateNoteCommand): Note {
+    fun createNote(cmd: CreateNoteCommand): Long {
         val club = cmd.clubId?.let { id ->
             clubRepository.findById(id).orElseThrow { IllegalArgumentException("Club not found: $id") }
         }
@@ -83,7 +83,8 @@ class NoteService(
             }
             throw e
         }
-        return note
+
+        return note.id!!
     }
 
     /**

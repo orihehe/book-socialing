@@ -47,7 +47,7 @@ class NoteController(
                 imageFiles = imageFiles
             )
 
-        return noteService.createNote(command).id!!
+        return noteService.createNote(command)
     }
 
     @Operation(
