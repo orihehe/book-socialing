@@ -5,10 +5,7 @@ import com.side.book.socialing.domain.note.command.CreateNoteCommand
 import com.side.book.socialing.domain.note.entity.Note
 import com.side.book.socialing.domain.note.entity.NoteFile
 import com.side.book.socialing.domain.note.entity.NoteParticipant
-import com.side.book.socialing.domain.note.enum.ParticipantRole
-import com.side.book.socialing.domain.note.enum.ParticipantStatus
 import com.side.book.socialing.domain.note.event.NoteCreatedEvent
-import com.side.book.socialing.domain.note.event.NoteJoinedEvent
 import com.side.book.socialing.domain.note.repository.NoteFileRepository
 import com.side.book.socialing.domain.note.repository.NoteParticipantRepository
 import com.side.book.socialing.domain.note.repository.NoteRepository
@@ -19,7 +16,6 @@ import com.side.book.socialing.presentation.note.dto.ClubNotesPageResponse
 import com.side.book.socialing.presentation.note.dto.CommonNoteResponse
 import com.side.book.socialing.presentation.note.dto.OpenNoteResponse
 import com.side.book.socialing.presentation.note.dto.ParticipantInfoResponse
-import jakarta.persistence.EntityNotFoundException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.PageRequest
@@ -289,8 +285,8 @@ class NoteService(
                 clubName = note.club?.clubName,
                 bookName = note.bookName,
                 bookImageUrl = bookImageUrl,
-                startDateTime = note.startDate,
-                endDateTime = note.endDate
+                startAt = note.startAt,
+                endAt = note.endAt
             )
         }
     }
@@ -372,8 +368,8 @@ class NoteService(
             bookImageUrl = bookImageUrl,
             description = note.description.orEmpty(),
             participants = participants,
-            startAt = note.startDate,
-            endAt = note.endDate
+            startAt = note.startAt,
+            endAt = note.endAt
         )
     }
 
@@ -385,8 +381,8 @@ class NoteService(
             clubName = note.club?.clubName,
             bookName = note.bookName,
             bookImageUrl = bookImageUrl,
-            startDateTime = note.startDate,
-            endDateTime = note.endDate
+            startAt = note.startAt,
+            endAt = note.endAt
         )
     }
 }

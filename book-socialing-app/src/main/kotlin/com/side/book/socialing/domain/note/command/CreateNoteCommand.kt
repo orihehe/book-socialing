@@ -31,14 +31,14 @@ data class CreateNoteCommand(
         type = "string", format = "date-time",
         example = "2025-08-15T10:00:00"
     )
-    val startDate: LocalDateTime,
+    val startAt: LocalDateTime,
 
     @field:Schema(
         description = "탈고일(ISO-8601)",
         type = "string", format = "date-time",
         example = "2025-09-29T12:00:00"
     )
-    val endDate: LocalDateTime,
+    val endAt: LocalDateTime,
 
     @field:ArraySchema(schema = Schema(type = "string", format = "binary"))
     @field:Schema(description = "업로드 이미지 파일 목록")

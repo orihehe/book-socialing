@@ -42,8 +42,8 @@ class NoteController(
                 bookName = request.bookName,
                 bookAuthor = request.bookAuthor,
                 description = request.description,
-                startDate = request.startDate,
-                endDate = request.endDate,
+                startAt = request.startAt,
+                endAt = request.endAt,
                 imageFiles = imageFiles
             )
 
