@@ -51,14 +51,13 @@ export function MyNotes() {
   const [createdResult] = results
   const isLoading = createdResult.isLoading || pendingResult.isLoading
   const hasError = createdResult.error || pendingResult.error
-
   if (isLoading) return <div>Loading...</div>
   if (hasError) return <div>Error occurred</div>
 
   return (
     <>
-      <ToggleNotes title="생성한 노트" myNotes={createdResult.data} NoteComponent={CreatedNote} />
-      <ToggleNotes title="신청한 노트" myNotes={pendingResult.data} NoteComponent={AppliedNote} />
+      <ToggleNotes title="생성한 노트" result={createdResult.data} NoteComponent={CreatedNote} />
+      <ToggleNotes title="신청한 노트" result={pendingResult.data} NoteComponent={AppliedNote} />
     </>
   )
 }

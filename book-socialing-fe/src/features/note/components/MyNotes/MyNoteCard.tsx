@@ -1,21 +1,21 @@
 import { useNavigate } from 'react-router-dom'
 
 import { BaseButton } from '@/components/common/BaseButton'
-import type { ClubNotesGroup, Note } from '@/types/note'
+import type { ClubNotesGroup } from '@/types/note'
 
 import { DefaultNote } from '../shared/DefaultNote'
 
 export function CreatedNote({ notes, ...club }: ClubNotesGroup) {
   const navigate = useNavigate()
   return (
-    <div className="">
-      <div>{club.clubName}</div>
+    <div>
+      {club.clubId && <div>{club.clubName}</div>}
       {notes.map(note => (
         <DefaultNote {...note}>
-          <BaseButton className="flex-shrink-0" onClick={() => navigate(`/note/${props.id}/edit`)}>
+          <BaseButton className="flex-shrink-0" onClick={() => navigate(`/note/${note.id}/edit`)}>
             수정
           </BaseButton>
-          <BaseButton className="flex-shrink-0" onClick={() => navigate(`/note/${props.id}/guest`)}>
+          <BaseButton className="flex-shrink-0" onClick={() => navigate(`/note/${note.id}/guest`)}>
             관리
           </BaseButton>
         </DefaultNote>
@@ -24,10 +24,15 @@ export function CreatedNote({ notes, ...club }: ClubNotesGroup) {
   )
 }
 
-export function AppliedNote(props: Note) {
+export function AppliedNote({ notes, ...club }: ClubNotesGroup) {
   return (
-    <DefaultNote {...props}>
-      <BaseButton className="flex-shrink-0">신청취소</BaseButton>
-    </DefaultNote>
+    <div className="">
+      <div>{club.clubName}</div>
+      {notes.map(note => (
+        <DefaultNote {...note}>
+          <BaseButton className="flex-shrink-0">신청취소</BaseButton>
+        </DefaultNote>
+      ))}
+    </div>
   )
 }

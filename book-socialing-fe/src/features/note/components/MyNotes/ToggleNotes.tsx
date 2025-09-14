@@ -8,14 +8,14 @@ import type { ClubNotesGroup, ClubNotesPageResponse } from '@/types/note'
 
 interface MyNotesProps {
   title: string
-  result: ClubNotesPageResponse
+  result?: ClubNotesPageResponse
   NoteComponent: React.ComponentType<ClubNotesGroup>
 }
 
 export function ToggleNotes({ title, result, NoteComponent }: MyNotesProps) {
   const [open, setOpen] = useState(true)
   const { groups, totalCount } = result ?? { groups: [], totalCount: 0 }
-
+  console.log({ groups, totalCount })
   if (!groups.length) {
     return null
   }

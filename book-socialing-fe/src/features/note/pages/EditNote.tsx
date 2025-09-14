@@ -60,19 +60,15 @@ export default function EditNote({ mode }: EditNoteProps) {
       const { bookImages, ...request } = data
 
       const formData = new FormData()
+      const requestBlob = new Blob([JSON.stringify(request)], { type: 'application/json' })
 
       // request 데이터를 JSON으로 추가
-      formData.append('request', JSON.stringify(request))
-
-      // 이미지 파일들을 추가
+      formData.append('request', requestBlob)
       bookImages.forEach(file => {
-        formData.append('images', file) // 각 파일을 개별적으로 추가
+        formData.append('images', file, file.name) // 파일 자체 + filename
       })
 
-      const response = await fetch('/api/note/v1/create', {
-        method: 'POST',
-        body: formData,
-      })
+      const response = await fetch('/api/note/v1/create', { method: 'POST', body: formData }) // 헤더 수동 지정 X
 
       if (!response.ok) {
         throw new Error('Failed to create note')
