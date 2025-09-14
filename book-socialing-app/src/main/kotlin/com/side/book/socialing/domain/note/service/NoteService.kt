@@ -101,7 +101,7 @@ class NoteService(
         val pageable = PageRequest.of(
             pageIndex,
             pageSize,
-            Sort.by(Sort.Order.asc("endDate"), Sort.Order.desc("id"))
+            Sort.by(Sort.Order.asc("endAt"), Sort.Order.desc("id"))
         )
 
         val now = LocalDateTime.now()
@@ -160,7 +160,7 @@ class NoteService(
         val pageable = PageRequest.of(
             pageIndex,
             pageSize,
-            Sort.by(Sort.Order.asc("endDate"), Sort.Order.desc("id"))
+            Sort.by(Sort.Order.asc("endAt"), Sort.Order.desc("id"))
         )
 
         val now = LocalDateTime.now()
@@ -305,7 +305,7 @@ class NoteService(
         val pageable = PageRequest.of(
             pageIndex,
             pageSize,
-            Sort.by(Sort.Order.desc("endDate"), Sort.Order.desc("id"))
+            Sort.by(Sort.Order.desc("endAt"), Sort.Order.desc("id"))
         )
 
         val now = LocalDateTime.now()
