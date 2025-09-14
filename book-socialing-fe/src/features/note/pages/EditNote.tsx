@@ -1,11 +1,23 @@
 import { useForm } from '@tanstack/react-form'
+import { useMutation } from '@tanstack/react-query'
+import { ko } from 'date-fns/locale'
+import dayjs from 'dayjs'
 import { Camera, ChevronLeft, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { z } from 'zod'
 
 import { BottomButton } from '@/components/common/BottomButtonl'
 import { Calendar } from '@/components/ui/calendar'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
@@ -14,23 +26,27 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import { cn } from '@/lib/utils'
 import type { Club } from '@/types/note'
 
 // Mock data
 const mockClubs: Club[] = [
-  { id: '1', name: '독서클럽 A' },
-  { id: '2', name: '독서클럽 B' },
-  { id: '3', name: '독서클럽 C' },
+  { id: 1, name: '독서클럽 A' },
+  { id: 2, name: '독서클럽 B' },
+  { id: 3, name: '독서클럽 C' },
 ]
 
-// Validation schema
 const noteSchema = z.object({
-  title: z.string().min(1, '책이름을 입력해주세요').max(20, '20자 이하로 입력해주세요'),
-  author: z.string().min(1, '작가이름을 입력해주세요').max(20, '20자 이하로 입력해주세요'),
-  description: z.string().min(10, '10자 이상 입력해주세요'),
-  imageUrl: z.string().min(1, '이미지를 등록해주세요'),
-  startDateTime: z.string().min(1, '시작일을 선택해주세요'),
-  endDateTime: z.string().min(1, '종료일을 선택해주세요'),
+  bookName: z.string().min(1, '책이름을 입력해 주세요').max(20, '20자 이하로 입력해 주세요'),
+  bookAuthor: z.string().min(1, '작가이름을 입력해 주세요').max(20, '20자 이하로 입력해 주세요'),
+  description: z.string().min(10, '10자 이상 입력해 주세요'),
+  bookImages: z
+    .array(z.instanceof(File))
+    .min(1, '이미지는 최소 1장 이상 필요해요')
+    .max(5, '최대 5장까지만 등록할 수 있어요'),
+  startDateTime: z.string().min(1, '시작일을 선택해 주세요'),
+  endDateTime: z.string().min(1, '종료일을 선택해 주세요'),
+  clubId: z.union([z.number(), z.undefined()]),
 })
 
 interface EditNoteProps {
@@ -39,22 +55,63 @@ interface EditNoteProps {
 
 export default function EditNote({ mode }: EditNoteProps) {
   const navigate = useNavigate()
-  const { id } = useParams<{ id: string }>()
+  const [open, setOpen] = useState(false)
+  const [calendarType, setCalendarType] = useState('')
 
-  console.log({ id, mode })
+  const { id } = useParams<{ id: string }>()
+  type NoteFormData = z.infer<typeof noteSchema>
+
+  const mutation = useMutation({
+    mutationFn: async (data: NoteFormData) => {
+      const { bookImages, ...request } = data
+
+      const formData = new FormData()
+
+      // request 데이터를 JSON으로 추가
+      formData.append('request', JSON.stringify(request))
+
+      // 이미지 파일들을 추가
+      bookImages.forEach(file => {
+        formData.append('images', file) // 각 파일을 개별적으로 추가
+      })
+
+      const response = await fetch('http://localhost:8080/api/note/v1/create', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to create note')
+      }
+
+      return response.json()
+    },
+    onSuccess: data => {
+      console.log('Note created successfully:', data)
+      navigate('/notes')
+    },
+    onError: error => {
+      console.error('Error creating note:', error)
+    },
+  })
+
+  useEffect(() => {
+    // mode===edit, id 가 있으면 가져오기
+  }, [mode, id])
 
   const form = useForm({
     defaultValues: {
-      title: '',
-      author: '',
+      bookName: '',
+      bookAuthor: '',
       description: '',
-      imageUrl: '',
+      bookImages: [] as File[],
       startDateTime: '',
       endDateTime: '',
+      clubId: undefined as number | undefined,
     },
     onSubmit: async ({ value }) => {
-      // TODO: Implement form submission
-      console.log('Form submitted:', value)
+      console.log(value)
+      mutation.mutate(value)
     },
     validators: {
       onChange: noteSchema,
@@ -74,54 +131,81 @@ export default function EditNote({ mode }: EditNoteProps) {
       <div className="p-4 space-y-6">
         {/* Cover Images */}
         <form.Field
-          name="imageUrl"
-          children={field => (
-            <div>
-              <h2 className="text-base font-medium mb-3">표지</h2>
-              {field.state.value ? (
-                <div className="relative">
-                  <img
-                    src={field.state.value}
-                    alt="Book cover"
-                    className="w-full h-32 object-cover rounded-lg"
-                  />
-                  <button
-                    onClick={() => form.setFieldValue('imageUrl', '')}
-                    className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
-                  >
-                    <X size={16} />
-                  </button>
-                </div>
-              ) : (
-                <div
-                  className="w-full h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-gray-400"
-                  onClick={() =>
-                    field.handleChange('https://via.placeholder.com/300x200?text=Book+Cover')
-                  }
-                >
-                  <div className="flex flex-col items-center text-gray-500 hover:text-gray-700">
-                    <Camera size={24} className="mb-2" />
-                    <span className="text-sm">이미지 추가</span>
+          name="bookImages"
+          children={field => {
+            const handleFiles = (files: FileList | null) => {
+              console.log('hey')
+              if (!files) return
+              const newFiles = Array.from(files)
+              const updated = [...field.state.value, ...newFiles].slice(0, 5) // 최대 5개 유지
+              field.handleChange(updated)
+            }
+            return (
+              <div>
+                <Label htmlFor="picture" className="text-lg font-bold">
+                  표지
+                </Label>
+
+                <div className="flex gap-4 mt-2">
+                  {/* 업로드 버튼 */}
+                  <div className="relative w-24 h-24 rounded-md bg-main/10 flex items-center justify-center border-2 border-main hover:bg-main/20 transition">
+                    <Input
+                      id="picture"
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                      onChange={e => handleFiles(e.target.files)}
+                    />
+                    <Camera className="w-6 h-6 text-main pointer-events-none" />
                   </div>
+
+                  {/* 업로드된 이미지들 */}
+                  {field.state.value.map((file, i) => (
+                    <div key={i} className="relative w-24 h-24">
+                      <img
+                        src={URL.createObjectURL(file)}
+                        alt={`preview-${i}`}
+                        className="w-full h-full object-cover rounded-md"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const next = [...field.state.value]
+                          next.splice(i, 1)
+                          field.handleChange(next)
+                        }}
+                        className="absolute -top-2 -right-2 bg-main text-white rounded-full w-5 h-5 flex items-center justify-center shadow-md"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
                 </div>
-              )}
-            </div>
-          )}
+
+                {/* 에러 메시지 */}
+                {field.state.meta.isTouched && field.state.meta.errors && (
+                  <p className="text-red-500 text-sm mt-2">{field.state.meta.errors[0]?.message}</p>
+                )}
+              </div>
+            )
+          }}
         />
-        <p className="text-red-500 text-sm mt-2">이미지 1장은 필수등록입니다</p>
 
         {/* Book Name */}
         <form.Field
-          name="title"
+          name="bookName"
           children={field => (
             <div>
-              <h2 className="text-base font-medium mb-3">책이름</h2>
+              <Label className="text-lg font-bold">책이름</Label>
               <Input
-                placeholder="1~20자 특수문자 제외"
+                placeholder="책이름"
                 value={field.state.value}
                 onChange={e => field.handleChange(e.target.value)}
+                onBlur={() => field.handleBlur()}
+                className="w-full h-[35px] rounded-md mt-2 px-3 py-2.5 bg-[rgba(247,248,249,0.5)]"
               />
-              {field.state.meta.errors && (
+              {field.state.meta.isTouched && field.state.meta.errors && (
                 <p className="text-red-500 text-sm mt-2">{field.state.meta.errors[0]?.message}</p>
               )}
             </div>
@@ -130,17 +214,19 @@ export default function EditNote({ mode }: EditNoteProps) {
 
         {/* Author Name */}
         <form.Field
-          name="author"
+          name="bookAuthor"
           children={field => (
             <div>
-              <h2 className="text-base font-medium mb-3">작가이름</h2>
+              <Label className="text-lg font-bold">작가이름</Label>
               <Input
                 type="text"
-                placeholder="1~20자 특수문자 제외"
+                placeholder="작가이름"
                 value={field.state.value}
                 onChange={e => field.handleChange(e.target.value)}
+                onBlur={() => field.handleBlur()}
+                className="w-full h-[35px] rounded-md mt-2 px-3 py-2.5 bg-[rgba(247,248,249,0.5)]"
               />
-              {field.state.meta.errors && (
+              {field.state.meta.isTouched && field.state.meta.errors && (
                 <p className="text-red-500 text-sm mt-2">{field.state.meta.errors[0]?.message}</p>
               )}
             </div>
@@ -149,19 +235,41 @@ export default function EditNote({ mode }: EditNoteProps) {
 
         {/* Club Selection */}
         <div>
-          <h2 className="text-base font-medium mb-3">클럽 선택</h2>
-          <Select onValueChange={value => console.log('Club selected:', value)}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="클럽선택" />
-            </SelectTrigger>
-            <SelectContent>
-              {mockClubs.map(club => (
-                <SelectItem key={club.id} value={club.id}>
-                  {club.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <form.Field
+            name="clubId"
+            children={field => (
+              <div>
+                <Label className="text-lg font-bold">클럽</Label>
+                <Select
+                  value={field.state.value !== undefined ? String(field.state.value) : undefined}
+                  onValueChange={value =>
+                    field.handleChange(value !== undefined ? Number(value) : undefined)
+                  }
+                >
+                  <SelectTrigger
+                    className={cn(
+                      'w-full h-[35px] rounded-md px-3 py-2.5 mt-2 text-sm',
+                      'bg-[rgba(247,248,249,0.5)] border border-[rgb(209,213,219)] text-foreground'
+                    )}
+                  >
+                    <SelectValue placeholder="클럽 선택" className="text-[rgb(209,213,219)]" />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                    {mockClubs.map(club => (
+                      <SelectItem key={club.id} value={String(club.id)}>
+                        {club.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                {field.state.meta.isTouched && field.state.meta.errors?.[0] && (
+                  <p className="text-red-500 text-sm mt-2">{field.state.meta.errors[0].message}</p>
+                )}
+              </div>
+            )}
+          />
         </div>
 
         {/* Note Introduction */}
@@ -169,14 +277,15 @@ export default function EditNote({ mode }: EditNoteProps) {
           name="description"
           children={field => (
             <div>
-              <h2 className="text-base font-medium mb-3">노트소개</h2>
+              <Label className="text-lg font-bold">노트소개</Label>
               <Textarea
                 placeholder="10자 이상"
                 value={field.state.value}
                 onChange={e => field.handleChange(e.target.value)}
-                className="min-h-[100px]"
+                onBlur={() => field.handleBlur()}
+                className="w-full min-h-[100px] rounded-md mt-2 px-3 py-2.5 bg-[rgba(247,248,249,0.5)]"
               />
-              {field.state.meta.errors && (
+              {field.state.meta.isTouched && field.state.meta.errors && (
                 <p className="text-red-500 text-sm mt-2">{field.state.meta.errors[0]?.message}</p>
               )}
             </div>
@@ -184,35 +293,84 @@ export default function EditNote({ mode }: EditNoteProps) {
         />
 
         {/* Meeting Date Selection */}
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-base font-medium">모임일 선택</h2>
-            <p className="text-sm text-gray-500">노트 탈고일은 일주일 뒤를 권고합니다</p>
-          </div>
 
-          <div className="p-4 border border-gray-200 rounded-lg bg-gray-50">
-            <div className="text-center font-semibold mb-3">25.07.15(화) → 25.07.22(화)</div>
+        <form.Field name="startDateTime">
+          {startField => (
+            <form.Field name="endDateTime">
+              {endField => (
+                <>
+                  <Label className="text-lg font-bold">
+                    모임일 선택
+                    <span className="text-xs text-gray-400 ml-2">
+                      노트 탈고일은 일주일 뒤를 권고합니다.
+                    </span>
+                  </Label>
 
-            <Calendar
-              mode="multiple"
-              selected={[
-                new Date(2025, 6, 15), // 7월 15일 (0-based month)
-                new Date(2025, 6, 22), // 7월 22일
-              ]}
-              className="w-full rounded-md border-0 bg-transparent"
-              classNames={{
-                day_selected: 'bg-main text-white hover:bg-main/90 focus:bg-main',
-                day_today: 'bg-blue-100 text-blue-600',
-                head_cell: 'text-gray-500 font-medium',
-                table: 'w-full',
-                head_row: 'w-full',
-                row: 'w-full',
-                cell: 'w-full text-center p-0',
-                day: 'h-16 w-full text-base hover:bg-gray-200 rounded-md flex items-center justify-center',
-              }}
-            />
-          </div>
-        </div>
+                  <div className="flex w-full gap-10 my-2 mx-4">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCalendarType('start')
+                        setOpen(true)
+                      }}
+                      className="flex flex-col items-start gap-1"
+                    >
+                      <span className="text-lg font-bold">모임일</span>
+                      {startField.state.value
+                        ? dayjs(startField.state.value).format('YYYY.MM.DD')
+                        : '선택'}
+                    </button>
+
+                    <button
+                      type="button"
+                      className="flex flex-col items-start gap-1"
+                      onClick={() => {
+                        setCalendarType('end')
+                        setOpen(true)
+                      }}
+                    >
+                      <span className="text-lg font-bold">탈고일</span>
+                      {endField.state.value
+                        ? dayjs(endField.state.value).format('YYYY.MM.DD')
+                        : '선택'}
+                    </button>
+                  </div>
+
+                  {/* 모달은 하나만 */}
+                  <Dialog open={open} onOpenChange={setOpen}>
+                    <DialogContent className="w-[340px] rounded-xl px-0 py-7 border-none bg-white">
+                      <DialogHeader>
+                        <DialogTitle>
+                          {calendarType === 'start' ? '모임일 선택' : '탈고일 선택'}
+                        </DialogTitle>
+                      </DialogHeader>
+
+                      <div className="w-full px-3">
+                        <Calendar
+                          locale={ko}
+                          mode="single"
+                          className="w-full px-3"
+                          selected={
+                            calendarType === 'start'
+                              ? new Date(startField.state.value)
+                              : new Date(endField.state.value)
+                          }
+                          onSelect={date => {
+                            if (!date) return
+                            const iso = date.toISOString()
+                            if (calendarType === 'start') startField.handleChange(iso)
+                            else endField.handleChange(iso)
+                            setOpen(false)
+                          }}
+                        />
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </>
+              )}
+            </form.Field>
+          )}
+        </form.Field>
       </div>
 
       {/* Bottom Button */}

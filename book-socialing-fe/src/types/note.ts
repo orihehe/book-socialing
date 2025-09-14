@@ -2,7 +2,7 @@ export interface Note {
   id: number
   clubName?: string
   bookName: string
-  bookAuthor: string
+  bookAuthor?: string
   bookImageUrl?: string
   description?: string
   startDateTime: string
@@ -10,6 +10,6 @@ export interface Note {
 }
 
 export interface Club {
-  id: string
+  id: number
   name: string
 }
