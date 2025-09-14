@@ -77,7 +77,7 @@ export default function EditNote({ mode }: EditNoteProps) {
       return response.json()
     },
     onSuccess: () => {
-      navigate('/notes')
+      navigate('/note')
     },
     onError: error => {
       console.error('Error creating note:', error)
@@ -361,6 +361,9 @@ export default function EditNote({ mode }: EditNoteProps) {
       </div>
 
       {/* Bottom Button */}
+
+      <BottomButton onClick={() => form.handleSubmit()} children="노트 삭제하기" />
+
       <BottomButton onClick={() => form.handleSubmit()} children="노트 생성하기" />
     </div>
   )
