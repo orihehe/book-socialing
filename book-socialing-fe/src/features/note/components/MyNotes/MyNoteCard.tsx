@@ -1,26 +1,38 @@
-import dayjs from 'dayjs'
+import { useNavigate } from 'react-router-dom'
 
 import { BaseButton } from '@/components/common/BaseButton'
-import type { Note } from '@/types/note'
+import type { ClubNotesGroup } from '@/types/note'
 
-type MyNoteCardProps = Omit<Note, 'id'>
+import { DefaultNote } from '../shared/DefaultNote'
 
-export function MyNoteCard({ imageUrl, title, startDateTime }: MyNoteCardProps) {
+export function CreatedNote({ notes, ...club }: ClubNotesGroup) {
+  const navigate = useNavigate()
   return (
-    <div className="flex items-center gap-4 py-2 flex-wrap">
-      <img src={imageUrl} alt={title} className="w-14 h-14 rounded-md object-cover border" />
-      <div className="flex-1 min-w-0">
-        <div className="text-xs text-gray-400">{dayjs(startDateTime).format('YYYY.MM.DD')}</div>
-        <div className="font-semibold truncate">{title}</div>
-      </div>
-      <div className="flex flex-wrap gap-2 md:flex-nowrap">
-        <BaseButton size="sm" className="min-w-[5rem] flex-shrink-0">
-          수정
-        </BaseButton>
-        <BaseButton size="sm" className="min-w-[6rem] flex-shrink-0">
-          회원관리
-        </BaseButton>
-      </div>
+    <div>
+      {club.clubId && <div>{club.clubName}</div>}
+      {notes.map(note => (
+        <DefaultNote {...note}>
+          <BaseButton className="flex-shrink-0" onClick={() => navigate(`/note/${note.id}/edit`)}>
+            수정
+          </BaseButton>
+          <BaseButton className="flex-shrink-0" onClick={() => navigate(`/note/${note.id}/guest`)}>
+            관리
+          </BaseButton>
+        </DefaultNote>
+      ))}
+    </div>
+  )
+}
+
+export function AppliedNote({ notes, ...club }: ClubNotesGroup) {
+  return (
+    <div className="">
+      <div>{club.clubName}</div>
+      {notes.map(note => (
+        <DefaultNote {...note}>
+          <BaseButton className="flex-shrink-0">신청취소</BaseButton>
+        </DefaultNote>
+      ))}
     </div>
   )
 }

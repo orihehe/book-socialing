@@ -1,3 +1,5 @@
-import NoteView from '../../features/note/NoteView'
+import NoteView from '@/features/note/NoteView'
 
-export default NoteView
+export default function NotePage() {
+  return <NoteView />
+}

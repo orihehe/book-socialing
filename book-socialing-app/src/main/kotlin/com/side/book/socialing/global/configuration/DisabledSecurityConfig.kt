@@ -19,6 +19,9 @@ class DisabledSecurityConfig {
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
             .csrf { it.disable() }
+            .headers { headers ->
+                headers.frameOptions { it.sameOrigin() }
+            }
             .authorizeHttpRequests {
                 it.anyRequest().permitAll()
             }

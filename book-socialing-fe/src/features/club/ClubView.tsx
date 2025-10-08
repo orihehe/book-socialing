@@ -1,13 +1,10 @@
-import { CircleUserRound, Search } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 import { BottomButton } from '@/components/common/BottomButtonl'
-import LNB from '@/components/layout/LNB'
-import { PageHeader } from '@/components/layout/PageHeader'
-import { Button } from '@/components/ui/button'
 import type { ClubSection } from '@/types/club'
 
 import { ClubSection as ClubSectionComponent } from './components/ClubSection'
+import { MainLayout } from '../shared/MainLayout'
 
 // Mock data
 const mockClubSections: ClubSection[] = [
@@ -80,38 +77,8 @@ const mockClubSections: ClubSection[] = [
 export default function ClubView() {
   const navigate = useNavigate()
 
-  const lnbItems = [
-    {
-      name: '클럽',
-      key: 'club',
-      children: [],
-    },
-    {
-      name: '노트',
-      key: 'note',
-      children: [
-        { key: 'all', name: '전체' },
-        { key: 'open', name: '열린노트' },
-        { key: 'closed', name: '닫힌 노트' },
-      ],
-    },
-  ]
-
   return (
-    <>
-      <PageHeader title="SAISAI">
-        <div className="flex items-center">
-          <Button variant="ghost" size="icon">
-            <Search />
-          </Button>
-          <Button variant="ghost" className="-ml-1">
-            <CircleUserRound />
-          </Button>
-        </div>
-      </PageHeader>
-
-      <LNB items={lnbItems} />
-
+    <MainLayout>
       {/* Main Content */}
       <div className="flex flex-col p-4 mx-auto">
         {mockClubSections.map(section => (
@@ -120,6 +87,6 @@ export default function ClubView() {
       </div>
 
       <BottomButton onClick={() => navigate('/club/create')} children="클럽 생성하러가기" />
-    </>
+    </MainLayout>
   )
 }
