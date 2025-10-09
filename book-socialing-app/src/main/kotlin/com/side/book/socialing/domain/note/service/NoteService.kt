@@ -9,6 +9,7 @@ import com.side.book.socialing.domain.note.event.NoteCreatedEvent
 import com.side.book.socialing.domain.note.repository.NoteFileRepository
 import com.side.book.socialing.domain.note.repository.NoteParticipantRepository
 import com.side.book.socialing.domain.note.repository.NoteRepository
+import com.side.book.socialing.global.error.exception.ForbiddenException
 import com.side.book.socialing.global.file.FileUploader
 import com.side.book.socialing.global.file.StoredFile
 import com.side.book.socialing.presentation.note.dto.ClubNotesGroupResponse
@@ -17,7 +18,6 @@ import com.side.book.socialing.presentation.note.dto.CommonNoteResponse
 import com.side.book.socialing.presentation.note.dto.GetNoteResponse
 import com.side.book.socialing.presentation.note.dto.OpenNoteResponse
 import com.side.book.socialing.presentation.note.dto.ParticipantInfoResponse
-import jakarta.persistence.EntityNotFoundException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.PageRequest
@@ -400,7 +400,7 @@ class NoteService(
         // 권한 확인
         val hasAccess = checkNoteAccess(noteId, userId)
         if (!hasAccess) {
-            throw EntityNotFoundException("사용자 $userId 는 노트 $noteId 에 접근할 권한이 없거나 해당 노트를 찾을 수 없습니다.")
+            throw ForbiddenException("사용자 $userId 는 노트 $noteId 에 접근할 권한이 없거나 해당 노트를 찾을 수 없습니다.")
         }
 
         // 노트 조회
