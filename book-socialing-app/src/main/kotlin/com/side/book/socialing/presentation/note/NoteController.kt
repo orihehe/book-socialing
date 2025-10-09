@@ -6,6 +6,7 @@ import com.side.book.socialing.global.auth.UserPrincipalResolver
 import com.side.book.socialing.presentation.note.dto.ClubNotesPageResponse
 import com.side.book.socialing.presentation.note.dto.CommonNoteResponse
 import com.side.book.socialing.presentation.note.dto.CreateNoteRequest
+import com.side.book.socialing.presentation.note.dto.GetNoteResponse
 import com.side.book.socialing.presentation.note.dto.OpenNoteResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -183,6 +184,26 @@ class NoteController(
             System.err.println("Error fetching revised notes for user $userId: ${e.message}") // 에러 로깅
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ClubNotesPageResponse(totalCount = 0L, groups = emptyList()))
+        }
+    }
+
+    @GetMapping("/{noteId}")
+    @Operation(
+        summary = "특정 노트 조회",
+        description = "노트 ID를 통해 특정 노트의 상세 정보를 조회합니다."
+    )
+    @ResponseStatus(HttpStatus.OK) // 200 OK 반환
+    fun getNoteById(
+        @PathVariable noteId: Long // URL 경로에서 noteId를 받음
+    ): ResponseEntity<GetNoteResponse> {
+        val userId = userPrincipalResolver.getUserId()
+
+        return try {
+            val note = noteService.getNoteById(noteId, userId)
+            return ResponseEntity.ok(note)
+        } catch (e: Exception) {
+            System.err.println("Error fetching revised notes for user $userId: ${e.message}") // 에러 로깅
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
         }
     }
 }

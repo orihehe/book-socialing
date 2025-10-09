@@ -14,8 +14,10 @@ import com.side.book.socialing.global.file.StoredFile
 import com.side.book.socialing.presentation.note.dto.ClubNotesGroupResponse
 import com.side.book.socialing.presentation.note.dto.ClubNotesPageResponse
 import com.side.book.socialing.presentation.note.dto.CommonNoteResponse
+import com.side.book.socialing.presentation.note.dto.GetNoteResponse
 import com.side.book.socialing.presentation.note.dto.OpenNoteResponse
 import com.side.book.socialing.presentation.note.dto.ParticipantInfoResponse
+import jakarta.persistence.EntityNotFoundException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.PageRequest
@@ -385,5 +387,62 @@ class NoteService(
             startAt = note.startAt,
             endAt = note.endAt
         )
+    }
+
+    /**
+     * 특정 노트 정보를 반환합니다.
+     *
+     * @return 노트 정보가 담긴 `GetNoteResponse` DTO 리스트.
+     *         만약 노트가 없으면 null를 반환합니다.
+     */
+    @Transactional(readOnly = true) // 읽기 전용 트랜잭션
+    fun getNoteById(noteId: Long, userId: Long): GetNoteResponse {
+        // 권한 확인
+        val hasAccess = checkNoteAccess(noteId, userId)
+        if (!hasAccess) {
+            throw EntityNotFoundException("사용자 $userId 는 노트 $noteId 에 접근할 권한이 없거나 해당 노트를 찾을 수 없습니다.")
+        }
+
+        // 노트 조회
+        val note = noteRepository.findById(noteId)
+            .orElseThrow { IllegalArgumentException("Note with ID $noteId not found") }
+
+        // 참여자 목록 정제
+        val participants = note.participants.map {
+            ParticipantInfoResponse(
+                participantId = it.id!!,
+                userId = it.userId,
+                role = it.role.name,
+                status = it.status.name
+            )
+        }
+
+        // 이미지 URL 목록 정제
+        val imageUrls: List<String> = if (note.files.isNotEmpty()) {
+            note.files.map { it.filePath } // 파일 엔티티의 filePath를 String 리스트로 변환
+        } else {
+            listOf("/images/default_book_image.jpg") // 기본 이미지 1개를 추가하는 예시
+        }
+
+        return GetNoteResponse(
+            id = note.id!!,
+            clubId = note.club?.id,
+            clubName = note.club?.clubName,
+            bookName = note.bookName,
+            bookAuthor = note.bookAuthor,
+            description = note.description,
+            imageUrls = imageUrls,
+            participants = participants,
+            startAt = note.startAt,
+            endAt = note.endAt
+        )
+    }
+
+    /**
+     * 노트 접근 권한을 확인하는 헬퍼 메소드
+     */
+    private fun checkNoteAccess(noteId: Long, userId: Long): Boolean {
+        val isParticipant = noteParticipantRepository.findByNoteIdAndUserId(noteId, userId)
+        return isParticipant != null
     }
 }
