@@ -74,3 +74,37 @@ data class OpenNoteResponse(
     @field:Schema(description = "탈고일(ISO-8601)", type = "string", format = "date-time", example = "2025-06-28T12:00:00")
     val endAt: LocalDateTime
 )
+
+@Schema(description = "개별 노트 조회 DTO")
+data class GetNoteResponse(
+    @field:Schema(description = "노트 ID", example = "27")
+    val id: Long,
+
+    @field:Schema(description = "클럽 ID", example = "1", nullable = true)
+    val clubId: Long?,
+
+    @field:Schema(description = "클럽명", example = "클럽1", nullable = true)
+    val clubName: String?,
+
+    @field:Schema(description = "책 제목", example = "스프링 부트의 정석")
+    val bookName: String,
+
+    @field:Schema(description = "책 저자", example = "남궁성")
+    val bookAuthor: String,
+
+    @field:Schema(description = "노트 소개", example = "이것이 자바다 다음으로 볼 책", nullable = true)
+    val description: String?,
+
+    @field:ArraySchema(arraySchema = Schema(description = "이미지 URL 목록"), schema = Schema(format = "uri", example = "/note/27/cover1.png"))
+    val imageUrls: List<String>,
+
+    @field:ArraySchema(schema = Schema(implementation = ParticipantInfoResponse::class))
+    @field:Schema(description = "참여자 목록")
+    val participants: List<ParticipantInfoResponse>,
+
+    @field:Schema(description = "모임일", type = "string", format = "date-time", example = "2025-08-15T10:00:00")
+    val startAt: LocalDateTime,
+
+    @field:Schema(description = "탈고일", type = "string", format = "date-time", example = "2025-09-29T12:00:00")
+    val endAt: LocalDateTime
+)
