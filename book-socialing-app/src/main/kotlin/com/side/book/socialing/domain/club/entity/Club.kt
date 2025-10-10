@@ -3,6 +3,7 @@ package com.side.book.socialing.domain.club.entity
 import com.side.book.socialing.domain.club.command.CreateClubCommand
 import com.side.book.socialing.domain.common.BaseEntity
 import com.side.book.socialing.domain.note.entity.ClubReview
+import com.side.book.socialing.global.error.exception.ForbiddenException
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
@@ -11,9 +12,11 @@ import jakarta.persistence.Id
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 import org.hibernate.annotations.BatchSize
+import org.hibernate.annotations.SQLRestriction
 
 @Entity
 @Table(name = "club")
+@SQLRestriction("deleted = false")
 class Club(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,7 +38,11 @@ class Club(
 
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "club")
-    var reviews: MutableList<ClubReview> = mutableListOf()
+    var reviews: MutableList<ClubReview> = mutableListOf(),
+
+    @Column(name = "deleted", nullable = false, columnDefinition = "boolean default false")
+    var deleted: Boolean = false
+
 ) : BaseEntity() {
     companion object {
         fun create(cmd: CreateClubCommand): Club {
@@ -44,5 +51,16 @@ class Club(
                 description = cmd.description
             )
         }
+    }
+
+    fun delete(userId: Long) {
+        if (!isHost(userId)) {
+            throw ForbiddenException("User $userId doesn't have permission to delete this note.")
+        }
+        deleted = true
+    }
+
+    private fun isHost(userId: Long): Boolean {
+        return this.participants.any { it.userId == userId && it.isHost() }
     }
 }

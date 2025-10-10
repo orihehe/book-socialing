@@ -20,5 +20,4 @@ interface ClubRepository : JpaRepository<Club, Long> {
 
     @Query("SELECT c FROM Club c JOIN c.participants p WHERE p.userId = :userId AND p.status <> 'JOINED' ORDER BY RAND() LIMIT 2")
     fun findRecommendClubsByUserId(userId: Long): List<Club>
-
 }
