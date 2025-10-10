@@ -1,26 +1,44 @@
+import { useQuery } from '@tanstack/react-query'
 import { ChevronRight } from 'lucide-react'
 
 import { BaseCard } from '@/components/common/BaseCard'
 import { Button } from '@/components/ui/button'
 import { CardContent } from '@/components/ui/card'
-import type { Note } from '@/types/note'
+import type { ClubNotesPageResponse } from '@/types/note'
 
 import { RevisedNoteCard } from './RevisedNoteCard'
 
 interface RevisedNotesProps {
-  revisedNotes: Note[]
   moveToAll: () => void
 }
 
-export function Summary({ revisedNotes, moveToAll }: RevisedNotesProps) {
+export function Summary({ moveToAll }: RevisedNotesProps) {
+  const { data } = useQuery({
+    queryKey: ['revisedNoteSummary'],
+    queryFn: async (): Promise<ClubNotesPageResponse> => {
+      const response = await fetch('/api/note/v1/revised', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch open notes')
+      }
+
+      return response.json()
+    },
+  })
+
   return (
     <>
-      <BaseCard title={`닫힌 노트 (${revisedNotes.length})`}>
+      <BaseCard title={`닫힌 노트 (${data?.totalCount ?? 0})`}>
         <CardContent>
           <div className="grid grid-cols-3 gap-4">
-            {revisedNotes.map(note => (
-              <RevisedNoteCard key={note.id} note={note} />
-            ))}
+            {data?.groups
+              .flatMap(({ notes }) => notes)
+              .map(note => <RevisedNoteCard key={note.id} note={note} />)}
           </div>
         </CardContent>
       </BaseCard>

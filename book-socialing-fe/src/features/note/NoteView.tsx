@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
-import type { Note } from '@/types/note'
 
 import { Notes as CurrentNotes } from './components/CurrentNotes/Notes'
 import { Summary as CurrentSummary } from './components/CurrentNotes/Summary'
@@ -12,33 +11,6 @@ import { MainLayout } from '../shared/MainLayout'
 import { Notes as RevisedNotes } from './components/RevisedNotes/Notes'
 import { Summary as RevisedSummary } from './components/RevisedNotes/Summary'
 import { SuggestedNotes } from './components/shared/SuggestedNotes'
-
-const dummyCurrentNotes: Note[] = [
-  {
-    id: 1,
-    clubName: 'saisai',
-    bookName: '스프링 부트의 정석',
-    bookImageUrl: 'note\\1\\0d1d9143-b7db-4461-abc2-ef36db902917.png',
-    startAt: '2025-08-15T10:00:00',
-    endAt: '2025-09-29T12:00:00',
-  },
-  {
-    id: 2,
-    clubName: 'saisai',
-    bookName: '스프링 부트의 정석',
-    bookImageUrl: 'note\\1\\0d1d9143-b7db-4461-abc2-ef36db902917.png',
-    startAt: '2025-08-15T10:00:00',
-    endAt: '2025-09-29T12:00:00',
-  },
-  {
-    id: 3,
-    clubName: 'saisai',
-    bookName: '스프링 부트의 정석',
-    bookImageUrl: 'note\\1\\0d1d9143-b7db-4461-abc2-ef36db902917.png',
-    startAt: '2025-08-15T10:00:00',
-    endAt: '2025-09-29T12:00:00',
-  },
-]
 
 export default function NoteView() {
   const [activeTab, setActiveTab] = useState('all')
@@ -53,10 +25,7 @@ export default function NoteView() {
               <CurrentSummary moveToAll={() => setActiveTab('open')} />
               <MyNotes />
               <SuggestedNotes />
-              <RevisedSummary
-                revisedNotes={dummyCurrentNotes}
-                moveToAll={() => setActiveTab('closed')}
-              />
+              <RevisedSummary moveToAll={() => setActiveTab('closed')} />
             </>
           )}
           {activeTab === 'open' && <CurrentNotes />}
