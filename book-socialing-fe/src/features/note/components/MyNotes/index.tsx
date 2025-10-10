@@ -11,7 +11,7 @@ export function MyNotes() {
       {
         queryKey: ['createdNotes'],
         queryFn: async (): Promise<ClubNotesPageResponse> => {
-          const response = await fetch('/api/note/v1/created', {
+          const response = await fetch('/api/v1/note/created', {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
@@ -28,7 +28,7 @@ export function MyNotes() {
       // {
       //   queryKey: ['pendingNotes'],
       //   queryFn: async (): Promise<ClubNotesPageResponse> => {
-      //     const response = await fetch('/api/note/v1/pending', {
+      //     const response = await fetch('/api/v1/note/pending', {
       //       method: 'GET',
       //       headers: {
       //         'Content-Type': 'application/json',

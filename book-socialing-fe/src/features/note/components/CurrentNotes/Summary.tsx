@@ -27,7 +27,7 @@ export function Summary({ moveToAll }: Props) {
   } = useQuery({
     queryKey: ['openNotes'],
     queryFn: async (): Promise<ClubNotesPageResponse> => {
-      const response = await fetch('/api/note/v1/open', {
+      const response = await fetch('/api/v1/note/open', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -46,6 +46,7 @@ export function Summary({ moveToAll }: Props) {
       return data
     },
   })
+  console.log(currentNotesData)
 
   const currentNotes = currentNotesData?.groups.flatMap(({ notes }) => notes) || []
   useEffect(() => {

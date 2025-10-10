@@ -16,7 +16,7 @@ export function Summary({ moveToAll }: RevisedNotesProps) {
   const { data } = useQuery({
     queryKey: ['revisedNoteSummary'],
     queryFn: async (): Promise<ClubNotesPageResponse> => {
-      const response = await fetch('/api/note/v1/revised', {
+      const response = await fetch('/api/v1/note/revised', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

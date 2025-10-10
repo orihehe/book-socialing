@@ -33,7 +33,7 @@ export default function GuestManagementPage() {
   // 승인 뮤테이션
   const approveMutation = useMutation({
     mutationFn: async ({ noteId, userId }: { noteId: string; userId: string }) => {
-      const response = await fetch(`/api/note/v1/${noteId}/participants/${userId}/approve`, {
+      const response = await fetch(`/api/v1/note/${noteId}/participants/${userId}/approve`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -55,7 +55,7 @@ export default function GuestManagementPage() {
   // 거절 뮤테이션
   const rejectMutation = useMutation({
     mutationFn: async ({ noteId, userId }: { noteId: string; userId: string }) => {
-      const response = await fetch(`/api/note/v1/${noteId}/participants/${userId}/reject`, {
+      const response = await fetch(`/api/v1/note/${noteId}/participants/${userId}/reject`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -76,7 +76,7 @@ export default function GuestManagementPage() {
   // 강퇴 뮤테이션
   const kickMutation = useMutation({
     mutationFn: async ({ noteId, userId }: { noteId: string; userId: string }) => {
-      const response = await fetch(`/api/note/v1/${noteId}/participants/${userId}`, {
+      const response = await fetch(`/api/v1/note/${noteId}/participants/${userId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

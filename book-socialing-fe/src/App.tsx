@@ -6,6 +6,7 @@ import ChatView from './features/chat/ChatView'
 import ClubView from './features/club/ClubView'
 import CreateClub from './features/club/pages/CreateClub'
 import EditClub from './features/club/pages/EditClub'
+import CreateNote from './features/note/pages/CreateNote'
 import EditNote from './features/note/pages/EditNote'
 import GuestManagementPage from './features/note/pages/GuestManagement'
 import KakaoCallback from './features/user/KakaoCallback'
@@ -22,7 +23,7 @@ function App() {
 
         {/* note */}
         <Route path="/note" element={<NoteView />} />
-        <Route path="/note/create" element={<EditNote mode="create" />} />
+        <Route path="/note/create" element={<CreateNote />} />
         <Route path="/note/:id" element={<ChatView />} />
         <Route path="/note/:id/edit" element={<EditNote mode="edit" />} />
         <Route path="/note/:id/guest" element={<GuestManagementPage />} />

@@ -11,7 +11,7 @@ import {
 import { cn } from '@/lib/utils'
 
 type Option = {
-  value: string
+  value: string | undefined
   label: string
 }
 
@@ -19,19 +19,11 @@ type Props = {
   name: string
   label: string
   options: Option[]
-  placeholder?: string
   coerceNumber?: boolean // 선택값을 숫자로 변환할지 여부
   className?: string
 }
 
-export function SelectField({
-  name,
-  label,
-  options,
-  placeholder = '선택',
-  coerceNumber = false,
-  className,
-}: Props) {
+export function SelectField({ name, label, options, coerceNumber = false, className }: Props) {
   const {
     control,
     formState: { errors },
@@ -63,11 +55,11 @@ export function SelectField({
                 className
               )}
             >
-              <SelectValue placeholder={placeholder} />
+              <SelectValue />
             </SelectTrigger>
             <SelectContent>
               {options.map(opt => (
-                <SelectItem key={opt.value} value={opt.value}>
+                <SelectItem key={opt.value} value={opt.value!}>
                   {opt.label}
                 </SelectItem>
               ))}

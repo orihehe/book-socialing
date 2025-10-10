@@ -87,7 +87,7 @@ export default function ClubView() {
   } = useQuery({
     queryKey: ['club', 'recommended'],
     queryFn: async () => {
-      const res = await fetch('/api/club/v1/recommende')
+      const res = await fetch('/api/v1/club/recommende')
       if (!res.ok) throw new Error('추천 클럽 정보를 불러오지 못했습니다.')
       return res.json()
     },
@@ -101,7 +101,7 @@ export default function ClubView() {
   } = useQuery({
     queryKey: ['club', 'joined'],
     queryFn: async () => {
-      const res = await fetch('/api/club/v1/joined')
+      const res = await fetch('/api/v1/club/joined')
       if (!res.ok) throw new Error('가입한 클럽 정보를 불러오지 못했습니다.')
       return res.json()
     },
@@ -115,7 +115,7 @@ export default function ClubView() {
   } = useQuery({
     queryKey: ['club', 'created'],
     queryFn: async () => {
-      const res = await fetch('/api/club/v1/created')
+      const res = await fetch('/api/v1/club/created')
       if (!res.ok) throw new Error('생성한 클럽 정보를 불러오지 못했습니다.')
       return res.json()
     },
