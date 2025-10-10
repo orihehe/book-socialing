@@ -28,7 +28,7 @@ class ClubController(
 ) {
 
     @PostMapping("/create", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
-    fun createNote(
+    fun createClub(
         @RequestPart("request") request: CreateClubRequest,
         @RequestPart("images") imageFiles: List<MultipartFile>
     ): Long {

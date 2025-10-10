@@ -2,9 +2,11 @@ package com.side.book.socialing.domain.note.entity
 
 import com.side.book.socialing.domain.common.BaseEntity
 import jakarta.persistence.*
+import org.hibernate.annotations.SQLRestriction
 
 @Entity
 @Table(name = "note_file")
+@SQLRestriction("deleted = false")
 class NoteFile(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +26,10 @@ class NoteFile(
     var filePath: String,
 
     @Column(name = "file_size", nullable = false)
-    var fileSize: Long
+    var fileSize: Long,
+
+    @Column(name = "deleted", nullable = false, columnDefinition = "boolean default false")
+    var deleted: Boolean = false
 
 ) : BaseEntity() {
     companion object {
@@ -37,5 +42,9 @@ class NoteFile(
                 fileSize = fileSize
             )
         }
+    }
+
+    fun delete() {
+        deleted = true
     }
 }
