@@ -21,7 +21,7 @@ import org.springframework.web.multipart.MultipartFile
 
 @Tag(name = "클럽 API", description = "클럽 생성, 조회, 수정, 삭제 관련 API")
 @RestController
-@RequestMapping("/api/club/v1")
+@RequestMapping("/api/v1/club")
 class ClubController(
     private val clubService: ClubService,
     private val userPrincipalResolver: UserPrincipalResolver

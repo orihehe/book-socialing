@@ -29,7 +29,7 @@ import org.springframework.web.multipart.MultipartFile
 
 @Tag(name = "노트 API", description = "노트 조회, 생성, 참여, 퇴고 등 노트 관련 API")
 @RestController
-@RequestMapping("/api/note/v1")
+@RequestMapping("/api/v1/note")
 class NoteController(
     private val noteService: NoteService,
     private val userPrincipalResolver: UserPrincipalResolver

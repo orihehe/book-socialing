@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @Tag(name = "노트 참여 API", description = "노트 참여 관련 API")
 @RestController
-@RequestMapping("/api/note/v1")
+@RequestMapping("/api/v1/note")
 class NoteJoinController(
     private val noteJoinService: NoteJoinService,
     private val userPrincipalResolver: UserPrincipalResolver
