@@ -6,7 +6,7 @@ import jakarta.persistence.*
 
 @Entity
 @Table(name = "club_review")
-class ClubReview (
+class ClubReview(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
@@ -23,8 +23,7 @@ class ClubReview (
 
     @Column(name = "content", columnDefinition = "TEXT")
     var content: String? = null
-): BaseEntity() {
+) : BaseEntity() {
     companion object {
-
     }
 }

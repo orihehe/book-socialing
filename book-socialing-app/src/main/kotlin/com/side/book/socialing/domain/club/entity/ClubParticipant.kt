@@ -51,4 +51,39 @@ class ClubParticipant(
     fun isHost(): Boolean {
         return this.role == ParticipantRole.HOST
     }
+
+    fun joinRequest() {
+        if (this.status == ParticipantStatus.JOINED) {
+            throw IllegalStateException("Already joined")
+        }
+        this.status = ParticipantStatus.PENDING_APPROVAL
+    }
+
+    fun cancel() {
+        if (this.status == ParticipantStatus.JOINED) {
+            throw IllegalStateException("Cannot cancel a joined participant")
+        }
+        this.status = ParticipantStatus.CANCEL
+    }
+
+    fun approve() {
+        if (this.status == ParticipantStatus.JOINED) {
+            throw IllegalStateException("Already joined")
+        }
+        this.status = ParticipantStatus.JOINED
+    }
+
+    fun reject() {
+        if (this.status == ParticipantStatus.JOINED) {
+            throw IllegalStateException("Cannot reject a joined participant")
+        }
+        this.status = ParticipantStatus.REJECTED
+    }
+
+    fun kick() {
+        if (this.status != ParticipantStatus.JOINED) {
+            throw IllegalStateException("Cannot kick a non-joined participant")
+        }
+        this.status = ParticipantStatus.KICKED
+    }
 }
