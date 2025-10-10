@@ -14,9 +14,11 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
+import org.hibernate.annotations.SQLRestriction
 
 @Entity
 @Table(name = "club_participant")
+@SQLRestriction("deleted = false")
 class ClubParticipant(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,7 +37,10 @@ class ClubParticipant(
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 20, nullable = false)
-    var status: ParticipantStatus
+    var status: ParticipantStatus,
+
+    @Column(name = "deleted", nullable = false, columnDefinition = "boolean default false")
+    var deleted: Boolean = false
 ) : BaseEntity() {
     companion object {
         fun create(club: Club, userId: Long, role: ParticipantRole, status: ParticipantStatus): ClubParticipant {
@@ -50,5 +55,51 @@ class ClubParticipant(
 
     fun isHost(): Boolean {
         return this.role == ParticipantRole.HOST
+    }
+
+    fun joinRequest() {
+        if (isJoined()) {
+            throw IllegalStateException("Already joined")
+        }
+        this.status = ParticipantStatus.PENDING_APPROVAL
+    }
+
+    fun cancel() {
+        if (isJoined()) {
+            throw IllegalStateException("Cannot cancel a joined participant")
+        }
+        this.status = ParticipantStatus.CANCEL
+    }
+
+    fun approve() {
+        if (isJoined()) {
+            throw IllegalStateException("Already joined")
+        }
+        this.status = ParticipantStatus.JOINED
+    }
+
+    fun reject() {
+        if (isJoined()) {
+            throw IllegalStateException("Cannot reject a joined participant")
+        }
+        this.status = ParticipantStatus.REJECTED
+    }
+
+    fun kick() {
+        if (!isJoined()) {
+            throw IllegalStateException("Cannot kick a non-joined participant")
+        }
+        if (isHost()) {
+            throw IllegalStateException("Cannot kick a host")
+        }
+        this.status = ParticipantStatus.KICKED
+    }
+
+    fun delete() {
+        deleted = true
+    }
+
+    private fun isJoined(): Boolean {
+        return this.status == ParticipantStatus.JOINED
     }
 }

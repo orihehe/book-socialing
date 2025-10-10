@@ -10,9 +10,11 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
+import org.hibernate.annotations.SQLRestriction
 
 @Entity
 @Table(name = "club_file")
+@SQLRestriction("deleted = false")
 class ClubFile(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,7 +34,10 @@ class ClubFile(
     var filePath: String,
 
     @Column(name = "file_size", nullable = false)
-    var fileSize: Long
+    var fileSize: Long,
+
+    @Column(name = "deleted", nullable = false, columnDefinition = "boolean default false")
+    var deleted: Boolean = false
 
 ) : BaseEntity() {
     companion object {
@@ -45,5 +50,9 @@ class ClubFile(
                 fileSize = fileSize
             )
         }
+    }
+
+    fun delete() {
+        deleted = true
     }
 }
