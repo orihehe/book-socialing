@@ -1,5 +1,6 @@
 package com.side.book.socialing.domain.note.command
 
+import com.side.book.socialing.global.file.FileValidator
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
 import org.springframework.web.multipart.MultipartFile
@@ -28,14 +29,16 @@ data class CreateNoteCommand(
 
     @field:Schema(
         description = "모임일(ISO-8601)",
-        type = "string", format = "date-time",
+        type = "string",
+        format = "date-time",
         example = "2025-08-15T10:00:00"
     )
     val startAt: LocalDateTime,
 
     @field:Schema(
         description = "탈고일(ISO-8601)",
-        type = "string", format = "date-time",
+        type = "string",
+        format = "date-time",
         example = "2025-09-29T12:00:00"
     )
     val endAt: LocalDateTime,
@@ -43,4 +46,14 @@ data class CreateNoteCommand(
     @field:ArraySchema(schema = Schema(type = "string", format = "binary"))
     @field:Schema(description = "업로드 이미지 파일 목록")
     val imageFiles: List<MultipartFile>
-)
+) {
+    init {
+        if (imageFiles.size !in 1..3) {
+            throw IllegalArgumentException("Invalid number of image files. User must upload between 1 and 3 images.")
+        }
+
+        imageFiles.forEach {
+            FileValidator.validateImageFile(it)
+        }
+    }
+}
