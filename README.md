@@ -52,3 +52,6 @@ git config core.hooksPath hooks
 pnpm install
 pnpm dev
 ```
+
+### NODE version
+v20.12.2
