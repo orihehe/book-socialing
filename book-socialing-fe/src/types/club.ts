@@ -16,7 +16,7 @@ export interface ClubSection {
 }
 
 export interface CreateClubCommand {
-  name: string
+  clubName: string
   description: string
-  images: string[]
+  images: File[]
 }

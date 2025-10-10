@@ -1,26 +1,21 @@
-import { useForm } from '@tanstack/react-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
 import { ko } from 'date-fns/locale'
 import dayjs from 'dayjs'
-import { Camera, ChevronLeft, X } from 'lucide-react'
+import { ChevronLeft } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { useForm, FormProvider } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import { z } from 'zod'
 
 import { BottomButton } from '@/components/common/BottomButton'
 import { Calendar } from '@/components/ui/calendar'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
-import { cn } from '@/lib/utils'
+import { ImageUploadField } from '@/features/shared/components/form/ImageUploadField'
+import { InputField } from '@/features/shared/components/form/InputField'
+import { SelectField } from '@/features/shared/components/form/SelectField'
+import { TextareaField } from '@/features/shared/components/form/TextareaField'
 import type { Club } from '@/types/note'
 
 // Mock data
@@ -31,8 +26,18 @@ const mockClubs: Club[] = [
 ]
 
 const noteSchema = z.object({
-  bookName: z.string().min(1, '책이름을 입력해 주세요').max(20, '20자 이하로 입력해 주세요'),
-  bookAuthor: z.string().min(1, '작가이름을 입력해 주세요').max(20, '20자 이하로 입력해 주세요'),
+  bookName: z
+    .string()
+    .min(1, '책이름을 입력해 주세요')
+    .max(20, '20자 이하로 입력해 주세요')
+    .regex(/^[a-zA-Z0-9가-힣 ]+$/, '특수문자를 입력할 수 없습니다'),
+
+  bookAuthor: z
+    .string()
+    .min(1, '작가이름을 입력해 주세요')
+    .max(20, '20자 이하로 입력해 주세요')
+    .regex(/^[a-zA-Z0-9가-힣 ]+$/, '특수문자를 입력할 수 없습니다'),
+
   description: z.string().min(10, '10자 이상 입력해 주세요'),
   bookImages: z
     .array(z.instanceof(File))
@@ -43,6 +48,8 @@ const noteSchema = z.object({
   clubId: z.union([z.number(), z.undefined()]),
 })
 
+type NoteFormData = z.infer<typeof noteSchema>
+
 interface EditNoteProps {
   mode: 'create' | 'edit'
 }
@@ -50,10 +57,30 @@ interface EditNoteProps {
 export default function EditNote({ mode }: EditNoteProps) {
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
-  const [calendarType, setCalendarType] = useState('')
+  const [calendarType, setCalendarType] = useState<'start' | 'end' | ''>('')
 
   const { id } = useParams<{ id: string }>()
-  type NoteFormData = z.infer<typeof noteSchema>
+
+  const form = useForm<NoteFormData>({
+    defaultValues: {
+      bookName: '',
+      bookAuthor: '',
+      description: '',
+      bookImages: [],
+      startAt: '',
+      endAt: '',
+      clubId: undefined,
+    },
+    resolver: zodResolver(noteSchema),
+    mode: 'onChange',
+  })
+  const {
+    handleSubmit,
+    setValue,
+    getValues,
+    trigger,
+    formState: { errors, touchedFields },
+  } = form
 
   const mutation = useMutation({
     mutationFn: async (data: NoteFormData) => {
@@ -61,19 +88,15 @@ export default function EditNote({ mode }: EditNoteProps) {
 
       const formData = new FormData()
       const requestBlob = new Blob([JSON.stringify(request)], { type: 'application/json' })
-
-      // request 데이터를 JSON으로 추가
       formData.append('request', requestBlob)
       bookImages.forEach(file => {
-        formData.append('images', file, file.name) // 파일 자체 + filename
+        formData.append('images', file, file.name)
       })
 
-      const response = await fetch('/api/note/v1/create', { method: 'POST', body: formData }) // 헤더 수동 지정 X
-
+      const response = await fetch('/api/note/v1/create', { method: 'POST', body: formData })
       if (!response.ok) {
         throw new Error('Failed to create note')
       }
-
       return response.json()
     },
     onSuccess: () => {
@@ -88,23 +111,23 @@ export default function EditNote({ mode }: EditNoteProps) {
     // mode===edit, id 가 있으면 가져오기
   }, [mode, id])
 
-  const form = useForm({
-    defaultValues: {
-      bookName: '',
-      bookAuthor: '',
-      description: '',
-      bookImages: [] as File[],
-      startAt: '',
-      endAt: '',
-      clubId: undefined as number | undefined,
-    },
-    onSubmit: async ({ value }) => {
-      mutation.mutate(value)
-    },
-    validators: {
-      onChange: noteSchema,
-    },
-  })
+  // Calendar field helpers
+  const handleCalendarSelect = (date: Date | undefined) => {
+    if (!date) return
+    const iso = date.toISOString()
+    if (calendarType === 'start') {
+      setValue('startAt', iso, { shouldValidate: true, shouldDirty: true })
+      trigger('startAt')
+    } else if (calendarType === 'end') {
+      setValue('endAt', iso, { shouldValidate: true, shouldDirty: true })
+      trigger('endAt')
+    }
+    setOpen(false)
+  }
+
+  const onSubmit = (data: NoteFormData) => {
+    mutation.mutate(data)
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -116,255 +139,102 @@ export default function EditNote({ mode }: EditNoteProps) {
         <h1 className="text-lg font-semibold">노트 {mode === 'edit' ? '수정' : '생성'}</h1>
       </div>
 
-      <div className="p-4 space-y-6">
-        {/* Cover Images */}
-        <form.Field
-          name="bookImages"
-          children={field => {
-            const handleFiles = (files: FileList | null) => {
-              if (!files) return
-              const newFiles = Array.from(files)
-              const updated = [...field.state.value, ...newFiles].slice(0, 5) // 최대 5개 유지
-              field.handleChange(updated)
-            }
-            return (
-              <div>
-                <Label htmlFor="picture" className="text-lg font-bold">
-                  표지
-                </Label>
+      <FormProvider {...form}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="p-4 space-y-6">
+            <ImageUploadField name="bookImages" />
 
-                <div className="flex gap-4 mt-2">
-                  {/* 업로드 버튼 */}
-                  <div className="relative w-24 h-24 rounded-md bg-main/10 flex items-center justify-center border-2 border-main hover:bg-main/20 transition">
-                    <Input
-                      id="picture"
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                      onChange={e => handleFiles(e.target.files)}
-                    />
-                    <Camera className="w-6 h-6 text-main pointer-events-none" />
-                  </div>
+            {/* Book Name */}
+            <InputField name="bookName" label="책이름" placeholder="책이름" />
 
-                  {/* 업로드된 이미지들 */}
-                  {field.state.value.map((file, i) => (
-                    <div key={i} className="relative w-24 h-24">
-                      <img
-                        src={URL.createObjectURL(file)}
-                        alt={`preview-${i}`}
-                        className="w-full h-full object-cover rounded-md"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const next = [...field.state.value]
-                          next.splice(i, 1)
-                          field.handleChange(next)
-                        }}
-                        className="absolute -top-2 -right-2 bg-main text-white rounded-full w-5 h-5 flex items-center justify-center shadow-md"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
+            {/* Author Name */}
+            <InputField name="bookAuthor" label="작가이름" placeholder="작가이름" />
 
-                {/* 에러 메시지 */}
-                {field.state.meta.isTouched && field.state.meta.errors && (
-                  <p className="text-red-500 text-sm mt-2">{field.state.meta.errors[0]?.message}</p>
-                )}
-              </div>
-            )
-          }}
-        />
+            {/* Club Selection */}
+            <SelectField
+              name="clubId"
+              label="클럽"
+              options={mockClubs.map(club => ({ value: club.id.toString(), label: club.name }))}
+              coerceNumber
+            />
 
-        {/* Book Name */}
-        <form.Field
-          name="bookName"
-          children={field => (
+            {/* Note Introduction */}
+            <TextareaField name="description" label="노트소개" placeholder="10자 이상" />
+
+            {/* Meeting Date Selection */}
             <div>
-              <Label className="text-lg font-bold">책이름</Label>
-              <Input
-                placeholder="책이름"
-                value={field.state.value}
-                onChange={e => field.handleChange(e.target.value)}
-                onBlur={() => field.handleBlur()}
-                className="w-full h-[35px] rounded-md mt-2 px-3 py-2.5 bg-[rgba(247,248,249,0.5)]"
-              />
-              {field.state.meta.isTouched && field.state.meta.errors && (
-                <p className="text-red-500 text-sm mt-2">{field.state.meta.errors[0]?.message}</p>
-              )}
-            </div>
-          )}
-        />
-
-        {/* Author Name */}
-        <form.Field
-          name="bookAuthor"
-          children={field => (
-            <div>
-              <Label className="text-lg font-bold">작가이름</Label>
-              <Input
-                type="text"
-                placeholder="작가이름"
-                value={field.state.value}
-                onChange={e => field.handleChange(e.target.value)}
-                onBlur={() => field.handleBlur()}
-                className="w-full h-[35px] rounded-md mt-2 px-3 py-2.5 bg-[rgba(247,248,249,0.5)]"
-              />
-              {field.state.meta.isTouched && field.state.meta.errors && (
-                <p className="text-red-500 text-sm mt-2">{field.state.meta.errors[0]?.message}</p>
-              )}
-            </div>
-          )}
-        />
-
-        {/* Club Selection */}
-        <div>
-          <form.Field
-            name="clubId"
-            children={field => (
-              <div>
-                <Label className="text-lg font-bold">클럽</Label>
-                <Select
-                  value={field.state.value !== undefined ? String(field.state.value) : undefined}
-                  onValueChange={value =>
-                    field.handleChange(value !== undefined ? Number(value) : undefined)
-                  }
+              <Label className="text-lg font-bold">
+                모임일 선택
+                <span className="text-xs text-gray-400 ml-2">
+                  노트 탈고일은 일주일 뒤를 권고합니다.
+                </span>
+              </Label>
+              <div className="flex w-full gap-10 my-2 mx-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCalendarType('start')
+                    setOpen(true)
+                  }}
+                  className="flex flex-col items-start gap-1"
                 >
-                  <SelectTrigger
-                    className={cn(
-                      'w-full h-[35px] rounded-md px-3 py-2.5 mt-2 text-sm',
-                      'bg-[rgba(247,248,249,0.5)] border border-[rgb(209,213,219)] text-foreground'
-                    )}
-                  >
-                    <SelectValue placeholder="클럽 선택" className="text-[rgb(209,213,219)]" />
-                  </SelectTrigger>
+                  <span className="text-lg font-bold">모임일</span>
+                  {getValues('startAt') ? dayjs(getValues('startAt')).format('YYYY.MM.DD') : '선택'}
+                </button>
 
-                  <SelectContent>
-                    {mockClubs.map(club => (
-                      <SelectItem key={club.id} value={String(club.id)}>
-                        {club.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                {field.state.meta.isTouched && field.state.meta.errors?.[0] && (
-                  <p className="text-red-500 text-sm mt-2">{field.state.meta.errors[0].message}</p>
+                <button
+                  type="button"
+                  className="flex flex-col items-start gap-1"
+                  onClick={() => {
+                    setCalendarType('end')
+                    setOpen(true)
+                  }}
+                >
+                  <span className="text-lg font-bold">탈고일</span>
+                  {getValues('endAt') ? dayjs(getValues('endAt')).format('YYYY.MM.DD') : '선택'}
+                </button>
+              </div>
+              <Dialog open={open} onOpenChange={setOpen}>
+                <DialogContent className="w-[340px] rounded-xl px-0 py-7 border-none bg-white">
+                  <DialogHeader>
+                    <DialogTitle>
+                      {calendarType === 'start' ? '모임일 선택' : '탈고일 선택'}
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="w-full px-3">
+                    <Calendar
+                      locale={ko}
+                      mode="single"
+                      className="w-full px-3"
+                      selected={
+                        calendarType === 'start'
+                          ? getValues('startAt')
+                            ? new Date(getValues('startAt'))
+                            : undefined
+                          : getValues('endAt')
+                            ? new Date(getValues('endAt'))
+                            : undefined
+                      }
+                      onSelect={handleCalendarSelect}
+                    />
+                  </div>
+                </DialogContent>
+              </Dialog>
+              <div>
+                {touchedFields.startAt && errors.startAt && (
+                  <p className="text-red-500 text-sm mt-2">{errors.startAt.message}</p>
+                )}
+                {touchedFields.endAt && errors.endAt && (
+                  <p className="text-red-500 text-sm mt-2">{errors.endAt.message}</p>
                 )}
               </div>
-            )}
-          />
-        </div>
-
-        {/* Note Introduction */}
-        <form.Field
-          name="description"
-          children={field => (
-            <div>
-              <Label className="text-lg font-bold">노트소개</Label>
-              <Textarea
-                placeholder="10자 이상"
-                value={field.state.value}
-                onChange={e => field.handleChange(e.target.value)}
-                onBlur={() => field.handleBlur()}
-                className="w-full min-h-[100px] rounded-md mt-2 px-3 py-2.5 bg-[rgba(247,248,249,0.5)]"
-              />
-              {field.state.meta.isTouched && field.state.meta.errors && (
-                <p className="text-red-500 text-sm mt-2">{field.state.meta.errors[0]?.message}</p>
-              )}
             </div>
-          )}
-        />
-
-        {/* Meeting Date Selection */}
-
-        <form.Field name="startAt">
-          {startField => (
-            <form.Field name="endAt">
-              {endField => (
-                <>
-                  <Label className="text-lg font-bold">
-                    모임일 선택
-                    <span className="text-xs text-gray-400 ml-2">
-                      노트 탈고일은 일주일 뒤를 권고합니다.
-                    </span>
-                  </Label>
-
-                  <div className="flex w-full gap-10 my-2 mx-4">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setCalendarType('start')
-                        setOpen(true)
-                      }}
-                      className="flex flex-col items-start gap-1"
-                    >
-                      <span className="text-lg font-bold">모임일</span>
-                      {startField.state.value
-                        ? dayjs(startField.state.value).format('YYYY.MM.DD')
-                        : '선택'}
-                    </button>
-
-                    <button
-                      type="button"
-                      className="flex flex-col items-start gap-1"
-                      onClick={() => {
-                        setCalendarType('end')
-                        setOpen(true)
-                      }}
-                    >
-                      <span className="text-lg font-bold">탈고일</span>
-                      {endField.state.value
-                        ? dayjs(endField.state.value).format('YYYY.MM.DD')
-                        : '선택'}
-                    </button>
-                  </div>
-
-                  {/* 모달은 하나만 */}
-                  <Dialog open={open} onOpenChange={setOpen}>
-                    <DialogContent className="w-[340px] rounded-xl px-0 py-7 border-none bg-white">
-                      <DialogHeader>
-                        <DialogTitle>
-                          {calendarType === 'start' ? '모임일 선택' : '탈고일 선택'}
-                        </DialogTitle>
-                      </DialogHeader>
-
-                      <div className="w-full px-3">
-                        <Calendar
-                          locale={ko}
-                          mode="single"
-                          className="w-full px-3"
-                          selected={
-                            calendarType === 'start'
-                              ? new Date(startField.state.value)
-                              : new Date(endField.state.value)
-                          }
-                          onSelect={date => {
-                            if (!date) return
-                            const iso = date.toISOString()
-                            if (calendarType === 'start') startField.handleChange(iso)
-                            else endField.handleChange(iso)
-                            setOpen(false)
-                          }}
-                        />
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                </>
-              )}
-            </form.Field>
-          )}
-        </form.Field>
-      </div>
-
-      {/* Bottom Button */}
-
-      <BottomButton onClick={() => form.handleSubmit()} children="노트 삭제하기" />
-
-      <BottomButton onClick={() => form.handleSubmit()} children="노트 생성하기" />
+          </div>
+          {/* Bottom Button */}
+          <BottomButton onClick={() => {}} children="노트 삭제하기" />
+          <BottomButton type="submit" onClick={() => {}} children="노트 생성하기" />
+        </form>
+      </FormProvider>
     </div>
   )
 }

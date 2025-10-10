@@ -1,6 +1,6 @@
-import { useForm } from '@tanstack/react-form'
-import { zodValidator } from '@tanstack/zod-form-adapter'
-import { Mail, Lock, Search, UserRound, CircleUserRound } from 'lucide-react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Search, CircleUserRound } from 'lucide-react'
+import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 import { PageHeader } from '@/components/layout/PageHeader'
@@ -8,43 +8,45 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
 const loginSchema = z.object({
-  email: z.string().email('올바른 이메일 형식을 입력해주세요'),
-  password: z.string().min(6, '비밀번호는 6자 이상 입력해주세요'),
+  email: z.string().email('올바른 이메일 형식을 입력해 주세요'),
+  password: z.string().min(6, '비밀번호는 6자 이상 입력해 주세요'),
 })
 
+type LoginFormData = z.infer<typeof loginSchema>
+
 export default function Login() {
-  const form = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: '',
       password: '',
     },
-    validators: {
-      onChange: loginSchema,
-    },
-    onSubmit: async ({ value }) => {
-      console.log('Login data:', value)
-      // TODO: 로그인 API 호출
-    },
+    mode: 'onChange',
   })
 
+  const onSubmit = async (data: LoginFormData) => {
+    console.log('Login data:', data)
+    // TODO: 로그인 API 호출
+  }
+
   function requestKakaoLogin() {
-    const handleLogin = () => {
-      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
-      const frontendUrl = import.meta.env.VITE_FRONTEND_URL
-      const clientId = import.meta.env.VITE_KAKAO_CLIENT_ID
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
+    const frontendUrl = import.meta.env.VITE_FRONTEND_URL
+    const clientId = import.meta.env.VITE_KAKAO_CLIENT_ID
 
-      console.log({ apiBaseUrl, frontendUrl, clientId })
+    console.log({ apiBaseUrl, frontendUrl, clientId })
 
-      // 오타 수정: clident_id → client_id, redirect_url → redirect_uri
-      const requestTokenUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${clientId}&redirect_uri=${
-        frontendUrl + '/auth/kakao/callback'
-      }&response_type=code`
+    // 오타 수정: clident_id → client_id, redirect_url → redirect_uri
+    const requestTokenUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${clientId}&redirect_uri=${
+      frontendUrl + '/auth/kakao/callback'
+    }&response_type=code`
 
-      console.log('Redirecting to:', requestTokenUrl)
-      window.location.href = requestTokenUrl
-    }
-
-    return handleLogin()
+    console.log('Redirecting to:', requestTokenUrl)
+    window.location.href = requestTokenUrl
   }
   //team-beat.tistory.com/15 [BEAT Team Blog:티스토리]
 
@@ -72,68 +74,45 @@ export default function Login() {
         </div>
 
         {/* Login Form */}
-        <form
-          onSubmit={e => {
-            e.preventDefault()
-            e.stopPropagation()
-            form.handleSubmit()
-          }}
-          className="w-full space-y-4"
-        >
-          <form.Field
-            name="email"
-            children={field => (
-              <div>
-                <label htmlFor="email" className="text-sm font-semibold">
-                  이메일
-                </label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="yayaya@naver.com"
-                  className="mt-1 bg-[#F7F8F9] placeholder:text-gray-400"
-                  value={field.state.value}
-                  onChange={e => field.handleChange(e.target.value)}
-                  onBlur={field.handleBlur}
-                />
-                {field.state.meta.isTouched && field.state.meta.errors && (
-                  <p className="text-red-500 text-xs mt-1">{field.state.meta.errors[0]?.message}</p>
-                )}
-              </div>
-            )}
-          />
+        <form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-4">
+          <div>
+            <label htmlFor="email" className="text-sm font-semibold">
+              이메일
+            </label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="yayaya@naver.com"
+              className="mt-1 bg-[#F7F8F9] placeholder:text-gray-400"
+              {...register('email')}
+            />
+            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+          </div>
 
-          <form.Field
-            name="password"
-            children={field => (
-              <div>
-                <label htmlFor="password" className="text-sm font-semibold">
-                  비밀번호
-                </label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="비밀번호를 입력해주세요."
-                  className="mt-1 bg-[#F7F8F9] placeholder:text-gray-400"
-                  value={field.state.value}
-                  onChange={e => field.handleChange(e.target.value)}
-                  onBlur={field.handleBlur}
-                />
-                {field.state.meta.isTouched && field.state.meta.errors && (
-                  <p className="text-red-500 text-xs mt-1">{field.state.meta.errors[0]?.message}</p>
-                )}
-              </div>
+          <div>
+            <label htmlFor="password" className="text-sm font-semibold">
+              비밀번호
+            </label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="비밀번호를 입력해 주세요"
+              className="mt-1 bg-[#F7F8F9] placeholder:text-gray-400"
+              {...register('password')}
+            />
+            {errors.password && (
+              <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>
             )}
-          />
+          </div>
 
           <div className="text-right text-xs text-gray-400">계정을 잊으셨나요?</div>
 
           <Button
             type="submit"
             className="w-full bg-main text-white text-sm py-5 rounded-md hover:bg-green-900 transition"
-            disabled={form.state.isSubmitting}
+            disabled={isSubmitting}
           >
-            {form.state.isSubmitting ? '로그인 중...' : '로그인하기'}
+            {isSubmitting ? '로그인 중...' : '로그인하기'}
           </Button>
         </form>
 

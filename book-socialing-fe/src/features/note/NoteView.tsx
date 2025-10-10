@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
-import type { Note } from '@/types/note'
 
 import { Notes as CurrentNotes } from './components/CurrentNotes/Notes'
 import { Summary as CurrentSummary } from './components/CurrentNotes/Summary'
