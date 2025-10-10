@@ -7,7 +7,7 @@ export function Notes() {
   const { data } = useQuery({
     queryKey: ['opendNotes'],
     queryFn: async (): Promise<ClubNotesPageResponse> => {
-      const response = await fetch('/api/note/v1/open', {
+      const response = await fetch('/api/v1/note/open', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

@@ -1,37 +1,102 @@
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { useNavigate, useParams } from 'react-router-dom'
 
+import { BottomButton } from '@/components/common/BottomButton'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
+import { LoadingPage } from '@/features/shared/components/LoadingPage'
 import type { CreateClubCommand } from '@/types/club'
+import { getImageFile } from '@/util'
 
 import ClubForm from '../components/ClubForm'
-
 export default function EditClub() {
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
-  console.log(id)
 
-  // TODO: Fetch club data by ID
-  const mockClubData: Partial<CreateClubCommand> = {
-    name: '기존 클럽명',
-    description: '기존 클럽 소개입니다. 10자 이상의 텍스트가 들어갑니다.',
-    images: ['image1.jpg', 'image2.jpg'],
-  }
+  const { data: clubDetail, isLoading } = useQuery<Partial<CreateClubCommand>>({
+    queryKey: ['club', id],
+    queryFn: async (): Promise<Partial<CreateClubCommand>> => {
+      const res = await fetch(`/api/v1/club/${id}`)
+      if (!res.ok) throw new Error('클럽 정보를 불러오지 못했습니다.')
+      const club = await res.json()
 
-  const handleSubmit = async (data: CreateClubCommand) => {
+      const images = (
+        await Promise.all((club.clubImageUrls as string[]).map((url: string) => getImageFile(url)))
+      ).flatMap(image => image)
+
+      return { ...club, images }
+    },
+    enabled: !!id,
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch(`/api/v1/club/${id}`, { method: 'DELETE' })
+      if (!res.ok) {
+        throw new Error('클럽 삭제에 실패했습니다.')
+      }
+      if (res.status === 204) {
+        return null
+      }
+      return res.json()
+    },
+    onSuccess: () => {
+      navigate('/club')
+    },
+    onError: error => {
+      console.error('Error deleting club:', error)
+    },
+  })
+
+  async function handleSubmit(data: CreateClubCommand) {
     console.log('Updated club data:', data)
     // TODO: Implement club update logic
     navigate('/club')
   }
 
-  const handleCancel = () => {
+  function handleCancel() {
     navigate('/club')
   }
 
+  if (isLoading) {
+    return <LoadingPage />
+  }
+
   return (
-    <ClubForm
-      mode="edit"
-      initialData={mockClubData}
-      onSubmit={handleSubmit}
-      onCancel={handleCancel}
-    />
+    <>
+      {' '}
+      <ClubForm
+        mode="edit"
+        clubDetail={clubDetail}
+        onSubmit={handleSubmit}
+        onCancel={handleCancel}
+      />
+      <AlertDialog>
+        <AlertDialogTrigger>
+          <BottomButton children="클럽삭제" isSub />
+        </AlertDialogTrigger>
+        <AlertDialogContent className="bg-white border-none w-[80vw] rounded-lg">
+          <AlertDialogHeader>
+            <AlertDialogTitle>클럽삭제</AlertDialogTitle>
+            <AlertDialogDescription>
+              [{clubDetail?.clubName}]을 삭제하시겠습니까?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>아니요</AlertDialogCancel>
+            <AlertDialogAction onClick={() => deleteMutation.mutate()}>예</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   )
 }

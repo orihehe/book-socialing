@@ -11,8 +11,11 @@ export interface Note {
 }
 
 export interface Club {
+  clubImageUrl: string
+  clubName: string
+  description: string
   id: number
-  name: string
+  memberCount: number
 }
 
 export interface ClubNotesGroup {

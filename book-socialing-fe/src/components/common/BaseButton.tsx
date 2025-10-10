@@ -14,7 +14,7 @@ export function BaseButton({ children, className, isActive, ...buttonProps }: Ba
   return (
     <Button
       className={cn(
-        'h-7 p-3 text-sm rounded-full border-none min-w-0',
+        'h-7 p-3 text-sm rounded-full border-none min-w-0 cursor-pointer',
         isActive ? 'bg-main text-white' : 'bg-[#F7F8F9] text-main',
         className
       )}

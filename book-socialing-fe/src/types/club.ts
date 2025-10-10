@@ -1,17 +1,19 @@
 export interface Club {
-  id: string
-  name: string
+  id: number
+  clubName: string
   description: string
   memberCount: number
+  clubImageUrls: string[]
   isMyClub?: boolean
   isCreatedByMe?: boolean
 }
 
 export interface ClubSection {
   title: string
-  count: number
+  totalCount: number
   showViewAll?: boolean
   showActions?: boolean
+  refetch?: () => void
   clubs: Club[]
 }
 

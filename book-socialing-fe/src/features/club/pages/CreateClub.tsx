@@ -18,7 +18,7 @@ export default function CreateClub() {
         formData.append('images', file, file.name)
       })
 
-      const res = await fetch('/api/club/v1/create', {
+      const res = await fetch('/api/v1/club/create', {
         method: 'POST',
         body: formData,
       })
@@ -37,8 +37,7 @@ export default function CreateClub() {
     },
   })
 
-  const handleSubmit = async (data: CreateClubCommand) => {
-    console.log(data)
+  async function handleSubmit(data: CreateClubCommand) {
     mutation.mutate(data)
   }
 

@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 type BaseCardProps = {
   children: ReactNode
   className?: string
-  title?: string
+  title?: ReactNode
 }
 
 export function BaseCard({ children, className, title }: BaseCardProps) {
