@@ -8,6 +8,7 @@ import com.side.book.socialing.domain.user.repository.UserRepository
 import com.side.book.socialing.global.exception.PermissionDeniedException
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class NoteHostService(
@@ -17,8 +18,9 @@ class NoteHostService(
     private val clubService: ClubService
 ) {
 
+    @Transactional(readOnly = true)
     fun getGuests(userId: Long, noteId: Long): List<UserDto> {
-        val note = noteRepository.findById(noteId).orElseThrow { throw EntityNotFoundException("Note not found") }
+        val note = noteRepository.findById(noteId).orElseThrow { throw EntityNotFoundException("Note $noteId not found") }
 
         if (!note.isHost(userId)) {
             throw PermissionDeniedException("User is not the host of the note")
@@ -27,7 +29,7 @@ class NoteHostService(
         val noteParticipants = noteParticipantRepository.findAllByNoteId(noteId)
 
         val club = note.club ?: return noteParticipants.filter { !it.isHost() }.map {
-            val user = userRepository.findById(it.userId).orElseThrow { throw EntityNotFoundException("user not found") }
+            val user = userRepository.findById(it.userId).orElseThrow { throw EntityNotFoundException("User $userId not found") }
             UserDto.from(user)
         }
         val clubMemberUserIds = clubService.getClubMemberIds(club.id!!)
