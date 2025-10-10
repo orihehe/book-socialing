@@ -5,6 +5,8 @@ CREATE TABLE chat_rooms (
     room_name VARCHAR(255) NOT NULL,
     state VARCHAR(255)
     state VARCHAR(255),
+
+    deleted TINYINT NOT NULL DEFAULT FALSE,
     created_at DATETIME(6) NOT NULL,
     created_by VARCHAR(255) NOT NULL,
     modified_at DATETIME(6) NOT NULL,
@@ -20,6 +22,7 @@ CREATE TABLE chat_room_participants (
     user_id BIGINT NOT NULL,
     last_read_message_id BIGINT COMMENT '마지막으로 읽은 메시지 ID (읽음 처리용)',
 
+    deleted TINYINT NOT NULL DEFAULT FALSE,
     created_at DATETIME(6) NOT NULL,
     created_by VARCHAR(255) NOT NULL,
     modified_at DATETIME(6) NOT NULL,
@@ -38,6 +41,7 @@ CREATE TABLE chat_messages (
     content TEXT NOT NULL,
     message_type VARCHAR(20) NOT NULL DEFAULT 'GENERAL',
 
+    deleted TINYINT NOT NULL DEFAULT FALSE,
     created_at DATETIME(6) NOT NULL,
     created_by VARCHAR(255) NOT NULL,
     modified_at DATETIME(6) NOT NULL,
