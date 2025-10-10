@@ -272,12 +272,7 @@ class NoteController(
             imageFiles = imageFiles
         )
 
-        return try {
-            noteService.updateNote(command)
-            ResponseEntity.ok().build()
-        } catch (e: Exception) {
-            log.error("Error updating note $noteId for user $userId", e)
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
-        }
+        noteService.updateNote(command)
+        return ResponseEntity.ok().build()
     }
 }
