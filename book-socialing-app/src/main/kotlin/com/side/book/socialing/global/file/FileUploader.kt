@@ -1,6 +1,8 @@
 package com.side.book.socialing.global.file
 
+import org.springframework.core.io.Resource
 import org.springframework.web.multipart.MultipartFile
+import java.io.File
 
 // 파일 저장 후의 결과 정보를 담을 데이터 클래스
 data class StoredFile(
@@ -12,4 +14,6 @@ data class StoredFile(
 interface FileUploader {
     fun upload(file: MultipartFile, path: String): StoredFile
     fun delete(fullPath: String): Boolean
+    fun getFile(filePath: String): File
+    fun getFileAsResource(filePath: String): Resource
 }

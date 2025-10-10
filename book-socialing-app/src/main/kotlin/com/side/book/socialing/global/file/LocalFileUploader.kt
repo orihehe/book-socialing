@@ -3,8 +3,11 @@ package com.side.book.socialing.global.file
 import com.side.book.socialing.global.utils.FileUtils
 import com.side.book.socialing.global.utils.log
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.core.io.Resource
+import org.springframework.core.io.UrlResource
 import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile
+import java.io.File
 import java.io.IOException
 import java.nio.file.*
 
@@ -65,5 +68,15 @@ class LocalFileUploader(
             log.error("[ERROR] 파일 삭제에 필요한 권한이 없습니다: $fullPath", e)
             false
         }
+    }
+
+    override fun getFile(filePath: String): File {
+        val fullPath: Path = Paths.get(baseDir, filePath)
+        return fullPath.toFile()
+    }
+
+    override fun getFileAsResource(filePath: String): Resource {
+        val file = getFile(filePath)
+        return UrlResource(file.toURI())
     }
 }
