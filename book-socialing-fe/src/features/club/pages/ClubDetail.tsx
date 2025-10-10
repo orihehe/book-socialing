@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { LoadingPage } from '@/features/shared/components/LoadingPage'
 import { MainLayout } from '@/features/shared/MainLayout'
+import { UserDetail } from '@/types/user'
 
 import { ClubCarousel } from '../components/ClubCarousel'
 
@@ -27,11 +28,7 @@ export default function ClubDetail() {
     enabled: !!id,
   })
 
-  const {
-    data: clubMembers,
-    isLoading: isLoadingMembers,
-    isFetched: isFetchedMembers,
-  } = useQuery({
+  const { data: clubMembers = [] } = useQuery<UserDetail[]>({
     queryKey: ['club', id, 'members'],
     queryFn: async () => {
       const res = await fetch(`/api/v1/club/${id}/members`)
@@ -85,8 +82,8 @@ export default function ClubDetail() {
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             <div className="flex gap-3 w-max overflow-x-auto !scrollbar-hide touch-auto">
-              {Array.from({ length: 7 }).map((_, i) => (
-                <div key={i} className="w-15 h-15 rounded-full bg-gray-300 shrink-0" />
+              {clubMembers.map(member => (
+                <div key={member.user.id} className="w-15 h-15 rounded-full bg-gray-300 shrink-0" />
               ))}
             </div>
           </div>

@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useNavigate, useParams } from 'react-router-dom'
+import { toast } from 'sonner'
 
 import { BottomButton } from '@/components/common/BottomButton'
 import {
@@ -31,7 +32,7 @@ export default function EditNote() {
       }
       const note = await response.json()
 
-      return { ...note, bookImages: getImageFile(note.imageUrls?.[0]) }
+      return { ...note, bookImages: await getImageFile(note.imageUrls?.[0]) }
     },
     enabled: !!id,
   })
@@ -51,10 +52,11 @@ export default function EditNote() {
       if (!response.ok) {
         throw new Error('Failed to update note')
       }
-      return response.json()
+      return true
     },
     onSuccess: () => {
-      navigate('/note')
+      toast.success('수정되었습니다.', { position: 'top-center' })
+      // navigate('/note')
     },
     onError: error => {
       console.error('Error updating note:', error)

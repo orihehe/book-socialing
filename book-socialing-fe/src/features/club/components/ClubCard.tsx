@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 import type { Club } from '@/types/club'
 import { getImageUrl } from '@/util'
 
@@ -8,7 +10,10 @@ interface ClubCardProps {
 
 export function ClubCard({ club, showActions }: ClubCardProps) {
   return (
-    <div className="flex items-start space-x-3 py-3 px-1">
+    <Link
+      to={`/club/${club.id}`}
+      className="w-full flex items-start justify-start text-left space-x-3 py-3 px-1 hover:cursor-pointer"
+    >
       {/* Club Image */}
       <img
         className="w-16 h-16 bg-gray-200 rounded-lg flex-shrink-0"
@@ -31,14 +36,20 @@ export function ClubCard({ club, showActions }: ClubCardProps) {
       {/* Actions */}
       {showActions && (
         <div className="flex space-x-2 flex-shrink-0">
-          <button className="px-2 py-1 text-xs text-gray-500 bg-gray-100 rounded hover:bg-gray-200">
+          <Link
+            to={`/club/${club.id}/edit`}
+            className="px-2 py-1 text-xs text-gray-500 bg-gray-100 rounded hover:bg-gray-200"
+          >
             수정
-          </button>
-          <button className="px-2 py-1 text-xs text-gray-500 bg-gray-100 rounded hover:bg-gray-200">
+          </Link>
+          <Link
+            to={`/club/${club.id}/members`}
+            className="px-2 py-1 text-xs text-gray-500 bg-gray-100 rounded hover:bg-gray-200"
+          >
             관리
-          </button>
+          </Link>
         </div>
       )}
-    </div>
+    </Link>
   )
 }

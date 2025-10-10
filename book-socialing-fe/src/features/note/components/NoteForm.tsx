@@ -38,7 +38,7 @@ const noteSchema = z.object({
     .max(1, '최대 1장까지만 등록할 수 있어요'),
   startAt: z.string().min(1, '시작일을 선택해 주세요'),
   endAt: z.string().min(1, '종료일을 선택해 주세요'),
-  clubId: z.union([z.number(), z.undefined()]),
+  clubId: z.union([z.number(), z.undefined(), z.null()]),
 })
 
 export type NoteFormData = z.infer<typeof noteSchema>

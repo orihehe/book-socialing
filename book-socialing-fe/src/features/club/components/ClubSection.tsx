@@ -19,7 +19,7 @@ export function ClubSection({ section }: ClubSectionProps) {
           {section.refetch ? (
             <div className="releation top-4 right-4">
               <button
-                onClick={() => section.refetch()}
+                onClick={() => section.refetch!()}
                 className="p-2 hover:text-gray-700 cursor-pointer"
               >
                 <RefreshCw size={16} />
@@ -34,7 +34,7 @@ export function ClubSection({ section }: ClubSectionProps) {
       {/* Club Cards */}
       <div className="space-y-3">
         {section.clubs.slice(0, 2).map(club => (
-          <ClubCard key={club.id} club={club} />
+          <ClubCard key={club.id} club={club} showActions={section.showActions} />
         ))}
       </div>
 

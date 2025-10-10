@@ -12,6 +12,7 @@ export interface ClubSection {
   title: string
   totalCount: number
   showViewAll?: boolean
+  showActions?: boolean
   refetch?: () => void
   clubs: Club[]
 }
