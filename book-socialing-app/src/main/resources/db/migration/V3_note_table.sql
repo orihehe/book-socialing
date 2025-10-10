@@ -14,6 +14,7 @@ CREATE TABLE note (
     description VARCHAR(1000),
     start_date DATETIME NOT NULL,
     end_date DATETIME NOT NULL,
+    deleted TINYINT NOT NULL DEFAULT FALSE,
 
     created_at DATETIME NOT NULL,
     created_by BIGINT,
