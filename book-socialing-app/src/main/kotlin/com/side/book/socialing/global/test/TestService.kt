@@ -1,28 +1,32 @@
 package com.side.book.socialing.global.test
 
+import com.side.book.socialing.domain.club.repository.ClubParticipantRepository
 import com.side.book.socialing.domain.note.command.CreateNoteCommand
+import com.side.book.socialing.domain.note.repository.NoteParticipantRepository
 import com.side.book.socialing.domain.note.service.NoteJoinService
 import com.side.book.socialing.domain.note.service.NoteService
-import org.springframework.core.io.ClassPathResource
+import com.side.book.socialing.domain.user.command.CreateUserCommand
+import com.side.book.socialing.domain.user.entity.User
+import com.side.book.socialing.domain.user.repository.UserRepository
 import org.springframework.stereotype.Service
-import java.io.InputStream
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 // TODO: remove after integrate services
 @Service
 class TestService(
     private val noteService: NoteService,
-    private val noteJoinService: NoteJoinService
+    private val noteJoinService: NoteJoinService,
+    private val userRepository: UserRepository,
+    private val noteParticipantRepository: NoteParticipantRepository,
+    private val clubParticipantRepository: ClubParticipantRepository
 ) {
     companion object {
         private const val HOST_ID_1 = 1L
         private const val HOST_ID_2 = 2L
     }
 
-    fun createTestData() {
-        val imageResource = ClassPathResource("static/images/default_book_image.jpg")
-        val imageStream: InputStream = imageResource.inputStream
-
+    fun createNoteData() {
         val noteId = noteService.createNote(
             CreateNoteCommand(
                 userId = HOST_ID_1,
@@ -44,7 +48,7 @@ class TestService(
         noteJoinService.approve(HOST_ID_1, noteId, 22L)
         noteJoinService.approve(HOST_ID_1, noteId, 33L)
 
-        val noteId2 = noteService.createNote(
+        noteService.createNote(
             CreateNoteCommand(
                 userId = HOST_ID_2,
                 clubId = null,
@@ -56,5 +60,31 @@ class TestService(
                 imageFiles = listOf()
             )
         )
+    }
+
+    @Transactional
+    fun createUserData() {
+        userRepository.deleteAll()
+        userRepository.flush()
+
+        val existUserIds = (
+            noteParticipantRepository.findAll().map { it.userId } +
+                clubParticipantRepository.findAll().map { it.userId }
+            ).toSet()
+
+        val users = existUserIds.mapIndexed { index, it ->
+            User.create(
+                CreateUserCommand(
+                    provider = "KAKAO",
+                    providerId = index.toString(),
+                    email = "test$index@email.com",
+                    nickName = "testName$index",
+                    role = "ROLE_USER"
+                ),
+                it
+            )
+        }
+
+        userRepository.saveAll(users)
     }
 }

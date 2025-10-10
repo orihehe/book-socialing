@@ -13,6 +13,11 @@ class TestController(
 
     @GetMapping
     fun test() {
-        testService.createTestData()
+        testService.createNoteData()
+    }
+
+    @GetMapping("/user")
+    fun userData() {
+        testService.createUserData()
     }
 }

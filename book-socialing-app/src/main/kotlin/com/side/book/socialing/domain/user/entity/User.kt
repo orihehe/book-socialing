@@ -34,8 +34,9 @@ class User(
 ) : BaseEntity() {
 
     companion object {
-        fun create(cmd: CreateUserCommand): User {
+        fun create(cmd: CreateUserCommand, id: Long? = null): User {
             return User(
+                id = id,
                 provider = cmd.provider,
                 providerId = cmd.providerId,
                 email = cmd.email,
