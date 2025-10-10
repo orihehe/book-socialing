@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 
-import { BottomButton } from '@/components/common/BottomButtonl'
+import { BottomButton } from '@/components/common/BottomButton'
 import type { ClubSection } from '@/types/club'
 
 import { ClubSection as ClubSectionComponent } from './components/ClubSection'

@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import type { Note } from '@/types/note'
+import { getImageUrl } from '@/util'
 
 type Props = Omit<Note, 'startAt'>
 
@@ -22,12 +23,11 @@ export function CurrentNoteCard({
 
   const visible = participants.slice(0, 3)
   const remaining = participants.length - visible.length
-  console.log({ participants, bookImageUrl, bookName, bookAuthor, description, endAt, id })
   return (
     <>
       <div className="flex gap-4 mt-5">
         <img
-          src={bookImageUrl}
+          src={getImageUrl(bookImageUrl)}
           alt={bookName}
           className="w-30 h-54 object-cover rounded-md border"
         />

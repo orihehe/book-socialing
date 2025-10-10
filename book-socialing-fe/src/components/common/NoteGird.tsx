@@ -1,7 +1,11 @@
 import { ArrowDownUp } from 'lucide-react' // 새로고침 아이콘
 
+import type { Note } from '@/types/note'
+import { getImageUrl } from '@/util'
+
 interface Props {
-  notes: object[]
+  notes: Note[]
+  totalCount: number
   children?: React.ReactNode
 }
 
@@ -16,9 +20,13 @@ export function NoteGrid({ notes, children }: Props) {
         {children}
       </div>
       <div className="grid grid-cols-3 gap-3 p-4">
-        {notes.map((_, index) => (
+        {notes.map((note, index) => (
           <div key={index} className="bg-gray-200 rounded-lg h-32 w-full">
-            {/* 실제 노트 내용이 들어갈 곳 */}
+            <img
+              src={getImageUrl(note.bookImageUrl ?? '')}
+              alt={note.bookName}
+              className="w-full h-full rounded-md object-cover border"
+            />
           </div>
         ))}
       </div>

@@ -3,7 +3,7 @@ import { Camera, ArrowLeft } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { z } from 'zod'
 
-import { BottomButton } from '@/components/common/BottomButtonl'
+import { BottomButton } from '@/components/common/BottomButton'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import type { CreateClubCommand } from '@/types/club'

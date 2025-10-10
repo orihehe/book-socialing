@@ -15,7 +15,7 @@ interface MyNotesProps {
 export function ToggleNotes({ title, result, NoteComponent }: MyNotesProps) {
   const [open, setOpen] = useState(true)
   const { groups, totalCount } = result ?? { groups: [], totalCount: 0 }
-  console.log({ groups, totalCount })
+
   if (!groups.length) {
     return null
   }

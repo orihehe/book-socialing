@@ -3,6 +3,7 @@ import { Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import type { Note } from '@/types/note'
+import { getImageUrl } from '@/util'
 
 type RevisedNoteCardProps = {
   note: Note
@@ -16,7 +17,7 @@ export function RevisedNoteCard({ note }: RevisedNoteCardProps) {
         <div className="aspect-[3/4] bg-gray-200 rounded-md">
           {bookImageUrl && (
             <img
-              src={bookImageUrl}
+              src={getImageUrl(bookImageUrl)}
               alt={bookName}
               className="w-full h-full object-cover rounded-md"
             />

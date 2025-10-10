@@ -1,12 +1,31 @@
+import { useQuery } from '@tanstack/react-query'
+
 import { NoteGrid } from '@/components/common/NoteGird'
-import { Note } from '@/types/note'
+import { ClubNotesPageResponse } from '@/types/note'
 
 export function Notes() {
-  const notes: Note[] = []
+  const { data } = useQuery({
+    queryKey: ['revisedNotes'],
+    queryFn: async (): Promise<ClubNotesPageResponse> => {
+      const response = await fetch('/api/note/v1/revised', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
 
+      if (!response.ok) {
+        throw new Error('Failed to fetch open notes')
+      }
+
+      return response.json()
+    },
+  })
+
+  const notes = data?.groups.flatMap(({ notes }) => notes) ?? []
   return (
     <>
-      <NoteGrid notes={notes} />
+      <NoteGrid notes={notes} totalCount={data?.totalCount ?? 0} />
     </>
   )
 }
