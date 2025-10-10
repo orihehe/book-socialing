@@ -1,5 +1,6 @@
 package com.side.book.socialing.global.error
 
+import com.side.book.socialing.global.error.exception.ForbiddenException
 import com.side.book.socialing.global.error.exception.ResourceNotFoundException
 import com.side.book.socialing.global.security.exception.JwtAuthenticationException
 import com.side.book.socialing.global.utils.log
@@ -50,6 +51,14 @@ class GlobalExceptionHandler {
         log.error("Entity not found", e)
         return ResponseEntity
             .status(HttpStatus.NOT_FOUND)
+            .body(ErrorResponse(e.message))
+    }
+
+    @ExceptionHandler(ForbiddenException::class)
+    fun handleForbiddenException(e: ForbiddenException): ResponseEntity<ErrorResponse> {
+        log.error("Forbidden", e)
+        return ResponseEntity
+            .status(HttpStatus.FORBIDDEN)
             .body(ErrorResponse(e.message))
     }
 }

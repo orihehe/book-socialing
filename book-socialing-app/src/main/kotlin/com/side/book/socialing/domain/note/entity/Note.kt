@@ -46,7 +46,7 @@ class Note(
     @Column(name = "end_at")
     var endAt: LocalDateTime,
 
-    @Column(name = "deleted", nullable = false)
+    @Column(name = "deleted", nullable = false, columnDefinition = "boolean default false")
     var deleted: Boolean = false,
 
     @BatchSize(size = 100)
