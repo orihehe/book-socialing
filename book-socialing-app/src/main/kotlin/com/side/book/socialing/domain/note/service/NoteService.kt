@@ -2,6 +2,7 @@ package com.side.book.socialing.domain.note.service
 
 import com.side.book.socialing.domain.club.repository.ClubRepository
 import com.side.book.socialing.domain.note.command.CreateNoteCommand
+import com.side.book.socialing.domain.note.command.UpdateNoteCommand
 import com.side.book.socialing.domain.note.entity.Note
 import com.side.book.socialing.domain.note.entity.NoteFile
 import com.side.book.socialing.domain.note.entity.NoteParticipant
@@ -453,5 +454,47 @@ class NoteService(
             .orElseThrow { EntityNotFoundException("Note with ID $noteId not found") }
 
         note.delete(userId)
+    }
+
+    /**
+     * 노트를 수정하고 관련된 파일 정보를 업데이트합니다.
+     *
+     * @param cmd 노트 수정에 필요한 모든 정보(노트 ID, 작성자 ID, 노트 내용, 이미지 파일)가 담긴 커맨드 객체.
+     * @throws EntityNotFoundException 해당 ID의 노트를 찾을 수 없을 때 발생합니다.
+     * @throws ForbiddenException 사용자가 노트의 호스트가 아닐 경우 발생합니다.
+     */
+    @Transactional
+    fun updateNote(cmd: UpdateNoteCommand) {
+        val note = noteRepository.findById(cmd.noteId)
+            .orElseThrow { EntityNotFoundException("Note with ID ${cmd.noteId} not found") }
+
+        note.update(cmd)
+
+        val noteFilePath = Paths.get(filePath, note.id!!.toString()).toString()
+        note.files.forEach {
+            it.delete()
+        }
+
+        val uploadedFiles = mutableListOf<StoredFile>()
+        try {
+            for (file in cmd.imageFiles) {
+                val storedFile = fileUploader.upload(file, noteFilePath)
+                uploadedFiles.add(storedFile)
+
+                val noteFile = NoteFile.create(
+                    note = note,
+                    originalFileName = storedFile.originalFileName,
+                    storedFileName = storedFile.storedFileName,
+                    filePath = storedFile.filePath,
+                    fileSize = file.size
+                )
+                noteFileRepository.save(noteFile)
+            }
+        } catch (e: Exception) {
+            for (file in uploadedFiles) {
+                fileUploader.delete(file.filePath)
+            }
+            throw e
+        }
     }
 }

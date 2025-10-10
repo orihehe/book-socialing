@@ -1,6 +1,7 @@
 package com.side.book.socialing.presentation.note
 
 import com.side.book.socialing.domain.note.command.CreateNoteCommand
+import com.side.book.socialing.domain.note.command.UpdateNoteCommand
 import com.side.book.socialing.domain.note.service.NoteService
 import com.side.book.socialing.global.auth.UserPrincipalResolver
 import com.side.book.socialing.global.utils.log
@@ -9,6 +10,7 @@ import com.side.book.socialing.presentation.note.dto.CommonNoteResponse
 import com.side.book.socialing.presentation.note.dto.CreateNoteRequest
 import com.side.book.socialing.presentation.note.dto.GetNoteResponse
 import com.side.book.socialing.presentation.note.dto.OpenNoteResponse
+import com.side.book.socialing.presentation.note.dto.UpdateNoteRequest
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RequestPart
@@ -238,6 +241,42 @@ class NoteController(
             ResponseEntity.noContent().build()
         } catch (e: Exception) {
             log.error("Error deleting note $noteId for user $userId", e)
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
+        }
+    }
+
+    @PutMapping("/{noteId}", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    @Operation(
+        summary = "노트 수정",
+        description = "노트 ID를 통해 특정 노트를 수정합니다. 호스트만 수정할 수 있습니다."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "노트 수정 성공")
+        ]
+    )
+    fun updateNote(
+        @PathVariable noteId: Long,
+        @RequestPart("request") request: UpdateNoteRequest,
+        @RequestPart("images") imageFiles: List<MultipartFile>
+    ): ResponseEntity<Void> {
+        val userId = userPrincipalResolver.getUserId()
+        val command = UpdateNoteCommand(
+            noteId = noteId,
+            userId = userId,
+            bookName = request.bookName,
+            bookAuthor = request.bookAuthor,
+            description = request.description,
+            startAt = request.startAt,
+            endAt = request.endAt,
+            imageFiles = imageFiles
+        )
+
+        return try {
+            noteService.updateNote(command)
+            ResponseEntity.ok().build()
+        } catch (e: Exception) {
+            log.error("Error updating note $noteId for user $userId", e)
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
         }
     }

@@ -3,6 +3,7 @@ package com.side.book.socialing.domain.note.entity
 import com.side.book.socialing.domain.club.entity.Club
 import com.side.book.socialing.domain.common.BaseEntity
 import com.side.book.socialing.domain.note.command.CreateNoteCommand
+import com.side.book.socialing.domain.note.command.UpdateNoteCommand
 import com.side.book.socialing.global.error.exception.ForbiddenException
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -78,5 +79,17 @@ class Note(
             throw ForbiddenException("User $userId doesn't have permission to delete this note.")
         }
         deleted = true
+    }
+
+    fun update(cmd: UpdateNoteCommand) {
+        if (!isHost(cmd.userId)) {
+            throw ForbiddenException("User ${cmd.userId} is not the host of note $id.")
+        }
+
+        this.bookName = cmd.bookName
+        this.bookAuthor = cmd.bookAuthor
+        this.description = cmd.description
+        this.startAt = cmd.startAt
+        this.endAt = cmd.endAt
     }
 }
