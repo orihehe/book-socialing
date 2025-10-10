@@ -10,6 +10,7 @@ CREATE TABLE club (
 
     club_name VARCHAR(200) NOT NULL,
     description VARCHAR(1000),
+    deleted TINYINT NOT NULL DEFAULT FALSE,
 
     created_at DATETIME NOT NULL,
     created_by BIGINT,
@@ -55,6 +56,7 @@ CREATE TABLE club_participant (
     role VARCHAR(20) NOT NULL, -- 참여자 역할 (HOST, MEMBER)
     status VARCHAR(20) NOT NULL, -- 참여자 상태 (JOINED, PENDING_APPROVAL, CANCEL, REJECTED, LEFT, KICKED)
 
+    deleted TINYINT NOT NULL DEFAULT FALSE,
     created_at DATETIME NOT NULL,
     created_by BIGINT,
     modified_at DATETIME NOT NULL,

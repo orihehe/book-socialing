@@ -18,6 +18,7 @@ import com.side.book.socialing.presentation.note.dto.CommonNoteResponse
 import com.side.book.socialing.presentation.note.dto.GetNoteResponse
 import com.side.book.socialing.presentation.note.dto.OpenNoteResponse
 import com.side.book.socialing.presentation.note.dto.ParticipantInfoResponse
+import jakarta.persistence.EntityNotFoundException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.PageRequest
@@ -444,5 +445,13 @@ class NoteService(
     private fun checkNoteAccess(noteId: Long, userId: Long): Boolean {
         val isParticipant = noteParticipantRepository.findByNoteIdAndUserId(noteId, userId)
         return isParticipant != null
+    }
+
+    @Transactional
+    fun deleteNote(noteId: Long, userId: Long) {
+        val note = noteRepository.findById(noteId)
+            .orElseThrow { EntityNotFoundException("Note with ID $noteId not found") }
+
+        note.delete(userId)
     }
 }
