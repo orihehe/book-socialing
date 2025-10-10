@@ -40,7 +40,7 @@ class Club(
     @OneToMany(mappedBy = "club")
     var reviews: List<ClubReview> = listOf(),
 
-    @Column(name = "deleted", nullable = false, columnDefinition = "boolean default false")
+    @Column(name = "deleted", nullable = false)
     var deleted: Boolean = false
 
 ) : BaseEntity() {

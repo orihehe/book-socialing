@@ -39,7 +39,7 @@ class NoteParticipant(
     @Column(name = "status", nullable = false, length = 20)
     var status: ParticipantStatus = ParticipantStatus.JOINED,
 
-    @Column(name = "deleted", nullable = false, columnDefinition = "boolean default false")
+    @Column(name = "deleted", nullable = false)
     var deleted: Boolean = false
 
 ) : BaseEntity() {

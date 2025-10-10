@@ -28,7 +28,7 @@ class NoteFile(
     @Column(name = "file_size", nullable = false)
     var fileSize: Long,
 
-    @Column(name = "deleted", nullable = false, columnDefinition = "boolean default false")
+    @Column(name = "deleted", nullable = false)
     var deleted: Boolean = false
 
 ) : BaseEntity() {
