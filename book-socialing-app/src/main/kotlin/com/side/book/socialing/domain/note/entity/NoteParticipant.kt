@@ -3,10 +3,22 @@ package com.side.book.socialing.domain.note.entity
 import com.side.book.socialing.domain.common.BaseEntity
 import com.side.book.socialing.domain.note.enum.ParticipantRole
 import com.side.book.socialing.domain.note.enum.ParticipantStatus
-import jakarta.persistence.*
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import jakarta.persistence.FetchType
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
+import jakarta.persistence.Table
+import org.hibernate.annotations.SQLRestriction
 
 @Entity
 @Table(name = "note_participant")
+@SQLRestriction("deleted = false")
 class NoteParticipant(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +37,11 @@ class NoteParticipant(
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
-    var status: ParticipantStatus = ParticipantStatus.JOINED
+    var status: ParticipantStatus = ParticipantStatus.JOINED,
+
+    @Column(name = "deleted", nullable = false, columnDefinition = "boolean default false")
+    var deleted: Boolean = false
+
 ) : BaseEntity() {
     companion object {
 
@@ -80,6 +96,9 @@ class NoteParticipant(
         if (!isJoined()) {
             throw IllegalStateException("Only joined participant can be kicked. Current status: ${this.status}")
         }
+        if (isHost()) {
+            throw IllegalStateException("Cannot kick a host")
+        }
         this.status = ParticipantStatus.KICKED
     }
 
@@ -92,6 +111,10 @@ class NoteParticipant(
 
     fun isHost(): Boolean {
         return this.role == ParticipantRole.HOST
+    }
+
+    fun delete() {
+        deleted = true
     }
 
     private fun canRequestJoin(): Boolean {

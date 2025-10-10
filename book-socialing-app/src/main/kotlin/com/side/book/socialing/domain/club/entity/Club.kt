@@ -30,15 +30,15 @@ class Club(
 
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "club")
-    var participants: MutableList<ClubParticipant> = mutableListOf(),
+    var participants: List<ClubParticipant> = listOf(),
 
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "club")
-    var files: MutableList<ClubFile> = mutableListOf(),
+    var files: List<ClubFile> = listOf(),
 
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "club")
-    var reviews: MutableList<ClubReview> = mutableListOf(),
+    var reviews: List<ClubReview> = listOf(),
 
     @Column(name = "deleted", nullable = false, columnDefinition = "boolean default false")
     var deleted: Boolean = false

@@ -3,9 +3,11 @@ package com.side.book.socialing.domain.note.entity
 import com.side.book.socialing.domain.club.entity.Club
 import com.side.book.socialing.domain.common.BaseEntity
 import jakarta.persistence.*
+import org.hibernate.annotations.SQLRestriction
 
 @Entity
 @Table(name = "club_review")
+@SQLRestriction("deleted = false")
 class ClubReview(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,8 +24,13 @@ class ClubReview(
     var rating: Int, // TINYINT는 Int 또는 Short로 매핑
 
     @Column(name = "content", columnDefinition = "TEXT")
-    var content: String? = null
+    var content: String? = null,
+
+    @Column(name = "deleted", nullable = false, columnDefinition = "boolean default false")
+    var deleted: Boolean = false
 ) : BaseEntity() {
-    companion object {
+
+    fun delete() {
+        deleted = true
     }
 }
