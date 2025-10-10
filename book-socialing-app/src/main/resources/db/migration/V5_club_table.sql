@@ -10,8 +10,8 @@ CREATE TABLE club (
 
     club_name VARCHAR(200) NOT NULL,
     description VARCHAR(1000),
-    deleted TINYINT NOT NULL DEFAULT FALSE,
 
+    deleted TINYINT NOT NULL DEFAULT FALSE,
     created_at DATETIME NOT NULL,
     created_by BIGINT,
     modified_at DATETIME NOT NULL,
@@ -31,6 +31,7 @@ CREATE TABLE club_file (
     file_path VARCHAR(500) NOT NULL, -- 파일 저장 경로 또는 URL
     file_size BIGINT NOT NULL, -- 파일 크기 (바이트 단위)
 
+    deleted TINYINT NOT NULL DEFAULT FALSE,
     created_at DATETIME NOT NULL,
     created_by BIGINT,
     modified_at DATETIME NOT NULL,
@@ -82,6 +83,7 @@ CREATE TABLE club_review (
     rating TINYINT NOT NULL, -- 평점 (예: 1~5점)
     content TEXT, -- 후기 내용
 
+    deleted TINYINT NOT NULL DEFAULT FALSE,
     created_at DATETIME NOT NULL,
     created_by BIGINT,
     modified_at DATETIME NOT NULL,

@@ -9,6 +9,7 @@ CREATE TABLE users (
     nickname VARCHAR(100),
     role VARCHAR(50),
 
+    deleted TINYINT NOT NULL DEFAULT FALSE,
     created_at DATETIME NOT NULL,
     created_by VARCHAR(255) NOT NULL,
     modified_at DATETIME NOT NULL,
