@@ -454,6 +454,8 @@ class NoteService(
             .orElseThrow { EntityNotFoundException("Note with ID $noteId not found") }
 
         note.delete(userId)
+        note.participants.forEach { it.delete() }
+        note.files.forEach { it.delete() }
     }
 
     /**
