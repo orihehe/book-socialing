@@ -5,6 +5,7 @@ import { PageHeader } from '@/components/layout/PageHeader'
 import { Button } from '@/components/ui/button'
 
 interface Props {
+  pageHeader?: React.ReactNode
   children: React.ReactNode
   activeTab?: string
   onTabChange?: (key: string) => void
@@ -27,19 +28,21 @@ const lnbItems = [
   },
 ]
 
-export function MainLayout({ children, activeTab, onTabChange }: Props) {
+export function MainLayout({ pageHeader, children, activeTab, onTabChange }: Props) {
   return (
     <>
-      <PageHeader title="SAISAI">
-        <div className="flex items-center">
-          <Button variant="ghost" size="icon">
-            <Search />
-          </Button>
-          <Button variant="ghost" className="-ml-1">
-            <CircleUserRound />
-          </Button>
-        </div>
-      </PageHeader>
+      {pageHeader ?? (
+        <PageHeader title="SAISAI">
+          <div className="flex items-center">
+            <Button variant="ghost" size="icon">
+              <Search />
+            </Button>
+            <Button variant="ghost" className="-ml-1">
+              <CircleUserRound />
+            </Button>
+          </div>
+        </PageHeader>
+      )}
 
       <LNB items={lnbItems} activeTab={activeTab} onTabChange={onTabChange} />
 

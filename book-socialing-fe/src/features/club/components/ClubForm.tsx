@@ -96,16 +96,6 @@ export default function ClubForm({ mode, clubDetail, onSubmit, onCancel }: ClubF
               children={getButtonText()}
             />
           ) : (
-            // <div className="fixed bottom-6 left-4 right-4 space-y-3">
-            //   <button
-            //     type="button"
-            //     onClick={handleCancel}
-            //     className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-4 text-base font-medium rounded-lg"
-            //   >
-            //     삭제하기
-            //   </button>
-
-            // </div>
             <BottomButton type="submit" disabled={!form.formState.isValid}>
               {getButtonText()}
             </BottomButton>

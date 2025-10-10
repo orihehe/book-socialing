@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
-import { ArrowUp, Pencil, UsersRound } from 'lucide-react'
+import { ArrowUp, Pencil, UsersRound, Share2 } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
 
+import { PageHeader } from '@/components/layout/PageHeader'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { LoadingPage } from '@/features/shared/components/LoadingPage'
@@ -26,7 +27,21 @@ export default function ClubDetail() {
     enabled: !!id,
   })
 
-  console.log(clubDetail)
+  const {
+    data: clubMembers,
+    isLoading: isLoadingMembers,
+    isFetched: isFetchedMembers,
+  } = useQuery({
+    queryKey: ['club', id, 'members'],
+    queryFn: async () => {
+      const res = await fetch(`/api/v1/club/${id}/members`)
+      if (!res.ok) throw new Error('클럽 멤버 정보를 불러오지 못했습니다.')
+      return res.json()
+    },
+    enabled: !!id,
+  })
+
+  console.log(clubDetail, clubMembers)
 
   if (isLoading) {
     return <LoadingPage />
@@ -45,7 +60,12 @@ export default function ClubDetail() {
   }
 
   return (
-    <MainLayout>
+    <>
+      <PageHeader title={clubDetail.clubName} showBack>
+        <Button variant="ghost" size="icon">
+          <Share2 />
+        </Button>
+      </PageHeader>
       {/* 이미지 */}
       <ClubCarousel images={clubDetail.clubImageUrls} />
       <div className="mx-4">
@@ -114,6 +134,6 @@ export default function ClubDetail() {
           <ArrowUp />
         </Button>
       </div>
-    </MainLayout>
+    </>
   )
 }

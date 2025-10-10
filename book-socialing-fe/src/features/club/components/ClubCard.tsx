@@ -1,4 +1,5 @@
 import type { Club } from '@/types/club'
+import { getImageUrl } from '@/util'
 
 interface ClubCardProps {
   club: Club
@@ -7,13 +8,16 @@ interface ClubCardProps {
 
 export function ClubCard({ club, showActions }: ClubCardProps) {
   return (
-    <div className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+    <div className="flex items-start space-x-3 py-3 px-1">
       {/* Club Image */}
-      <div className="w-16 h-16 bg-gray-200 rounded-lg flex-shrink-0" />
+      <img
+        className="w-16 h-16 bg-gray-200 rounded-lg flex-shrink-0"
+        src={getImageUrl(club.clubImageUrls?.[0])}
+      />
 
       {/* Club Info */}
       <div className="flex-1 min-w-0">
-        <h3 className="font-semibold text-gray-900 text-sm mb-1 truncate">{club.name}</h3>
+        <h3 className="font-semibold text-gray-900 text-sm mb-1 truncate">{club.clubName}</h3>
 
         {club.description && (
           <p className="text-gray-500 text-xs leading-relaxed mb-2 line-clamp-2">
