@@ -3,6 +3,7 @@ package com.side.book.socialing.presentation.club
 import com.side.book.socialing.domain.club.command.CreateClubCommand
 import com.side.book.socialing.domain.club.service.ClubService
 import com.side.book.socialing.global.auth.UserPrincipalResolver
+import com.side.book.socialing.global.utils.log
 import com.side.book.socialing.presentation.club.dto.CommonClubResponse
 import com.side.book.socialing.presentation.club.dto.CreateClubRequest
 import io.swagger.v3.oas.annotations.Operation
@@ -12,10 +13,13 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestPart
+import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 
@@ -28,7 +32,7 @@ class ClubController(
 ) {
 
     @PostMapping("/create", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
-    fun createNote(
+    fun createClub(
         @RequestPart("request") request: CreateClubRequest,
         @RequestPart("images") imageFiles: List<MultipartFile>
     ): Long {
@@ -43,6 +47,43 @@ class ClubController(
             )
 
         return clubService.createClub(command).id!!
+    }
+
+    @Operation(
+        summary = "클럽 단건 조회",
+        description = "클럽 ID로 클럽 정보를 단건 조회합니다."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "성공적으로 클럽 정보를 조회함"),
+            ApiResponse(responseCode = "404", description = "클럽을 찾을 수 없음"),
+            ApiResponse(responseCode = "500", description = "서버 내부 오류")
+        ]
+    )
+    @GetMapping("/{clubId}")
+    fun getClubById(@PathVariable clubId: Long): ResponseEntity<CommonClubResponse> {
+        val club = clubService.getClubById(clubId)
+        return ResponseEntity.ok(club)
+    }
+
+    @DeleteMapping("/{clubId}")
+    @Operation(
+        summary = "클럽 삭제",
+        description = "클럽 ID를 통해 특정 노트를 삭제합니다. 호스트만 삭제할 수 있습니다."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "204", description = "클럽 삭제 성공")
+        ]
+    )
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deleteNote(
+        @PathVariable clubId: Long
+    ): ResponseEntity<Void> {
+        val userId = userPrincipalResolver.getUserId()
+        clubService.deleteClub(clubId, userId)
+
+        return ResponseEntity.noContent().build()
     }
 
     @Operation(
@@ -63,8 +104,8 @@ class ClubController(
             val joinedClubs = clubService.getJoinedClubs(userId)
             ResponseEntity.ok(joinedClubs)
         } catch (e: Exception) {
-            System.err.println("Error fetching joined clubs for user $userId: ${e.message}") // 에러 로깅
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR) // 500 Internal Server Error
+            log.error("Error fetching joined clubs for user $userId", e)
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(emptyList()) // 빈 리스트 반환 또는 에러 DTO 반환
         }
     }
@@ -87,8 +128,8 @@ class ClubController(
             val createdClubs = clubService.getCreatedClubs(userId)
             ResponseEntity.ok(createdClubs)
         } catch (e: Exception) {
-            System.err.println("Error fetching created clubs for user $userId: ${e.message}") // 에러 로깅
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR) // 500 Internal Server Error
+            log.error("Error fetching created clubs for user $userId", e)
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(emptyList()) // 빈 리스트 반환 또는 에러 DTO 반환
         }
     }
@@ -111,8 +152,8 @@ class ClubController(
             val recommendClubs = clubService.getRecommendClubs(userId)
             ResponseEntity.ok(recommendClubs)
         } catch (e: Exception) {
-            System.err.println("Error fetching recommend clubs for user $userId: ${e.message}") // 에러 로깅
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR) // 500 Internal Server Error
+            log.error("Error fetching recommend clubs for user $userId", e)
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(emptyList()) // 빈 리스트 반환 또는 에러 DTO 반환
         }
     }

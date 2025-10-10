@@ -7,13 +7,13 @@ data class CreateClubRequest(
 
     @field:Schema(
         description = "클럽 이름",
-        example = "스프링 스터디 클럽",
+        example = "스프링 스터디 클럽"
     )
     val clubName: String,
 
     @field:Schema(
         description = "클럽 소개(선택)",
-        example = "스프링/코틀린 북스터디를 진행합니다.",
+        example = "스프링/코틀린 북스터디를 진행합니다."
     )
     val description: String?
 )

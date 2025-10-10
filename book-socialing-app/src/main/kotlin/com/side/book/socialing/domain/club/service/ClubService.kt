@@ -12,6 +12,7 @@ import com.side.book.socialing.domain.club.repository.ClubRepository
 import com.side.book.socialing.global.file.FileUploader
 import com.side.book.socialing.global.file.StoredFile
 import com.side.book.socialing.presentation.club.dto.CommonClubResponse
+import jakarta.persistence.EntityNotFoundException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -84,13 +85,10 @@ class ClubService(
         val clubs = clubRepository.findJoinedClubByUserId(userId)
 
         return clubs.map { club ->
-            // 대표 이미지 경로
-            val clubImageUrl = club.files.firstOrNull()?.filePath ?: "/images/default_book_image.jpg"
-
             CommonClubResponse(
                 id = club.id!!,
                 clubName = club.clubName,
-                clubImageUrl = clubImageUrl,
+                clubImageUrls = club.files.map { it.filePath },
                 description = club.description ?: "",
                 memberCount = club.participants.size
             )
@@ -110,13 +108,10 @@ class ClubService(
         val clubs = clubRepository.findCreatedClubsByUserId(userId)
 
         return clubs.map { club ->
-            // 대표 이미지 경로
-            val clubImageUrl = club.files.firstOrNull()?.filePath ?: "/images/default_book_image.jpg"
-
             CommonClubResponse(
                 id = club.id!!,
                 clubName = club.clubName,
-                clubImageUrl = clubImageUrl,
+                clubImageUrls = club.files.map { it.filePath },
                 description = club.description ?: "",
                 memberCount = club.participants.size
             )
@@ -136,13 +131,10 @@ class ClubService(
         val clubs = clubRepository.findPendingClubsByUserId(userId)
 
         return clubs.map { club ->
-            // 대표 이미지 경로
-            val clubImageUrl = club.files.firstOrNull()?.filePath ?: "/images/default_book_image.jpg"
-
             CommonClubResponse(
                 id = club.id!!,
                 clubName = club.clubName,
-                clubImageUrl = clubImageUrl,
+                clubImageUrls = club.files.map { it.filePath },
                 description = club.description ?: "",
                 memberCount = club.participants.size
             )
@@ -166,16 +158,35 @@ class ClubService(
         val clubs = clubRepository.findRecommendClubsByUserId(userId)
 
         return clubs.map { club ->
-            // 대표 이미지 경로
-            val clubImageUrl = club.files.firstOrNull()?.filePath ?: "/images/default_book_image.jpg"
-
             CommonClubResponse(
                 id = club.id!!,
                 clubName = club.clubName,
-                clubImageUrl = clubImageUrl,
+                clubImageUrls = club.files.map { it.filePath },
                 description = club.description ?: "",
                 memberCount = club.participants.size
             )
         }
+    }
+
+    @Transactional(readOnly = true)
+    fun getClubById(clubId: Long): CommonClubResponse {
+        val club = clubRepository.findById(clubId)
+            .orElseThrow { EntityNotFoundException("Club not found with ID: $clubId") }
+
+        return CommonClubResponse(
+            id = club.id!!,
+            clubName = club.clubName,
+            clubImageUrls = club.files.map { it.filePath },
+            description = club.description ?: "",
+            memberCount = club.participants.size
+        )
+    }
+
+    @Transactional
+    fun deleteClub(clubId: Long, userId: Long) {
+        val club = clubRepository.findById(clubId)
+            .orElseThrow { EntityNotFoundException("Club with ID $clubId not found") }
+
+        club.delete(userId)
     }
 }

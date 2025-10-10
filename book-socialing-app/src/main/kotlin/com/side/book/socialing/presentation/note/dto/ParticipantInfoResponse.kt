@@ -24,4 +24,3 @@ data class ParticipantInfoResponse(
     )
     val status: String
 )
-
