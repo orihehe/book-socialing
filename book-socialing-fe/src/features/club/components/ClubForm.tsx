@@ -27,18 +27,18 @@ type ClubFormData = z.infer<typeof createClubSchema>
 
 interface ClubFormProps {
   mode: 'create' | 'edit'
-  initialData?: Partial<CreateClubCommand>
+  clubDetail?: Partial<CreateClubCommand>
   onSubmit: (data: CreateClubCommand) => void | Promise<void>
   onCancel?: () => void
 }
 
-export default function ClubForm({ mode, initialData, onSubmit, onCancel }: ClubFormProps) {
+export default function ClubForm({ mode, clubDetail, onSubmit, onCancel }: ClubFormProps) {
   const navigate = useNavigate()
 
   const form = useForm<ClubFormData>({
-    defaultValues: {
-      clubName: initialData?.clubName || '',
-      description: initialData?.description || '',
+    defaultValues: clubDetail ?? {
+      clubName: '',
+      description: '',
       images: [],
     },
     resolver: zodResolver(createClubSchema),
@@ -96,22 +96,19 @@ export default function ClubForm({ mode, initialData, onSubmit, onCancel }: Club
               children={getButtonText()}
             />
           ) : (
-            <div className="fixed bottom-6 left-4 right-4 space-y-3">
-              <button
-                type="button"
-                onClick={handleCancel}
-                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-4 text-base font-medium rounded-lg"
-              >
-                삭제하기
-              </button>
-              <button
-                type="submit"
-                className="w-full bg-main hover:bg-main/90 text-white py-4 text-base font-medium rounded-lg"
-                disabled={!form.formState.isValid}
-              >
-                {getButtonText()}
-              </button>
-            </div>
+            // <div className="fixed bottom-6 left-4 right-4 space-y-3">
+            //   <button
+            //     type="button"
+            //     onClick={handleCancel}
+            //     className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-4 text-base font-medium rounded-lg"
+            //   >
+            //     삭제하기
+            //   </button>
+
+            // </div>
+            <BottomButton type="submit" disabled={!form.formState.isValid}>
+              {getButtonText()}
+            </BottomButton>
           )}
 
           {/* 하단 여백 - 고정 버튼 높이만큼 */}

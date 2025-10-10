@@ -4,6 +4,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 
 import ChatView from './features/chat/ChatView'
 import ClubView from './features/club/ClubView'
+import ClubDetail from './features/club/pages/ClubDetail'
 import CreateClub from './features/club/pages/CreateClub'
 import EditClub from './features/club/pages/EditClub'
 import CreateNote from './features/note/pages/CreateNote'
@@ -25,12 +26,13 @@ function App() {
         <Route path="/note" element={<NoteView />} />
         <Route path="/note/create" element={<CreateNote />} />
         <Route path="/note/:id" element={<ChatView />} />
-        <Route path="/note/:id/edit" element={<EditNote mode="edit" />} />
+        <Route path="/note/:id/edit" element={<EditNote />} />
         <Route path="/note/:id/guest" element={<GuestManagementPage />} />
 
         {/* club */}
         <Route path="/club" element={<ClubView />} />
         <Route path="/club/create" element={<CreateClub />} />
+        <Route path="/club/:id" element={<ClubDetail />} />
         <Route path="/club/:id/edit" element={<EditClub />} />
         {/* <Route path="/about" element={<AboutPage />} /> */}
 

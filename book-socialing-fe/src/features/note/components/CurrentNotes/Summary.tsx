@@ -46,7 +46,6 @@ export function Summary({ moveToAll }: Props) {
       return data
     },
   })
-  console.log(currentNotesData)
 
   const currentNotes = currentNotesData?.groups.flatMap(({ notes }) => notes) || []
   useEffect(() => {

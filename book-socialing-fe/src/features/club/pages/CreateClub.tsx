@@ -37,8 +37,7 @@ export default function CreateClub() {
     },
   })
 
-  const handleSubmit = async (data: CreateClubCommand) => {
-    console.log(data)
+  async function handleSubmit(data: CreateClubCommand) {
     mutation.mutate(data)
   }
 

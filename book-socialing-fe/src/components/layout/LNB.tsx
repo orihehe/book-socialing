@@ -18,7 +18,7 @@ const TAB_WIDTH = 41
 export default function LNB({ items, activeTab, onTabChange }: LNBProps) {
   const { pathname } = useLocation()
 
-  const activeFirstLevel = pathname.slice(1)
+  const activeFirstLevel = pathname.slice(1).split('/')[0]
 
   const activeItemIndex = items.findIndex(item => item.key === activeFirstLevel)
   const activeItem = activeItemIndex !== -1 ? items[activeItemIndex] : items[0]

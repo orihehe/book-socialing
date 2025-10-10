@@ -47,9 +47,9 @@ export default function EditNote() {
         formData.append('images', file, file.name)
       })
 
-      const response = await fetch('/api/v1/note/create', { method: 'POST', body: formData })
+      const response = await fetch(`/api/v1/note/${id}`, { method: 'PUT', body: formData })
       if (!response.ok) {
-        throw new Error('Failed to create note')
+        throw new Error('Failed to update note')
       }
       return response.json()
     },
@@ -57,7 +57,7 @@ export default function EditNote() {
       navigate('/note')
     },
     onError: error => {
-      console.error('Error creating note:', error)
+      console.error('Error updating note:', error)
     },
   })
   const deleteMutation = useMutation({
