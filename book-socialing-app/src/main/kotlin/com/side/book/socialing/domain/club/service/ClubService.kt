@@ -24,8 +24,7 @@ class ClubService(
     private val fileUploader: FileUploader,
 
     @Value("\${file.club-dir}") private val filePath: String
-)
-{
+) {
     /**
      * 새로운 클럽을 생성하고 관련된 파일 및 참여자 정보를 함께 저장합니다.
      *
@@ -148,6 +147,11 @@ class ClubService(
                 memberCount = club.participants.size
             )
         }
+    }
+
+    @Transactional(readOnly = true)
+    fun getClubMemberIds(clubId: Long): Set<Long> {
+        return clubParticipantRepository.findAllByClubId(clubId).map { it.userId }.toSet()
     }
 
     /**
