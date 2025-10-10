@@ -3,6 +3,7 @@ package com.side.book.socialing.presentation.note
 import com.side.book.socialing.domain.note.command.CreateNoteCommand
 import com.side.book.socialing.domain.note.service.NoteService
 import com.side.book.socialing.global.auth.UserPrincipalResolver
+import com.side.book.socialing.global.utils.log
 import com.side.book.socialing.presentation.note.dto.ClubNotesPageResponse
 import com.side.book.socialing.presentation.note.dto.CommonNoteResponse
 import com.side.book.socialing.presentation.note.dto.CreateNoteRequest
@@ -12,7 +13,6 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
-import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -34,7 +34,6 @@ class NoteController(
     private val noteService: NoteService,
     private val userPrincipalResolver: UserPrincipalResolver
 ) {
-    private val log = LoggerFactory.getLogger(javaClass)
 
     @PostMapping("/create", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     @Operation(
@@ -84,7 +83,7 @@ class NoteController(
             val openNotes = noteService.getOpenNotes(userId, pageSize, offset)
             ResponseEntity.ok(openNotes)
         } catch (e: Exception) {
-            log.error("Error fetching open notes for user $userId: ${e.message}")
+            log.error("Error fetching open notes for user $userId", e)
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ClubNotesPageResponse(totalCount = 0L, groups = emptyList()))
         }
@@ -112,7 +111,7 @@ class NoteController(
             val createdNotes = noteService.getCreatedNotes(userId, pageSize, offset)
             ResponseEntity.ok(createdNotes)
         } catch (e: Exception) {
-            log.error("Error fetching created notes for user $userId: ${e.message}")
+            log.error("Error fetching created notes for user $userId", e)
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ClubNotesPageResponse(totalCount = 0L, groups = emptyList()))
         }
@@ -140,7 +139,7 @@ class NoteController(
             val pendingNotes = noteService.getPendingNotes(userId, pageSize, offset)
             ResponseEntity.ok(pendingNotes)
         } catch (e: Exception) {
-            log.error("Error fetching pending notes for user $userId: ${e.message}")
+            log.error("Error fetching pending notes for user $userId", e)
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ClubNotesPageResponse(totalCount = 0L, groups = emptyList()))
         }
@@ -164,7 +163,7 @@ class NoteController(
             val recommendNotes = noteService.getRecommendNotes(userId)
             ResponseEntity.ok(recommendNotes)
         } catch (e: Exception) {
-            log.error("Error fetching recommend notes for user $userId: ${e.message}")
+            log.error("Error fetching recommend notes for user $userId", e)
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(emptyList())
         }
@@ -192,7 +191,7 @@ class NoteController(
             val revisedNotes = noteService.getRevisedNotes(userId, pageSize, offset)
             ResponseEntity.ok(revisedNotes)
         } catch (e: Exception) {
-            log.error("Error fetching revised notes for user $userId: ${e.message}")
+            log.error("Error fetching revised notes for user $userId", e)
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ClubNotesPageResponse(totalCount = 0L, groups = emptyList()))
         }
@@ -213,7 +212,7 @@ class NoteController(
             val note = noteService.getNoteById(noteId, userId)
             return ResponseEntity.ok(note)
         } catch (e: Exception) {
-            log.error("Error fetching revised notes for user $userId: ${e.message}")
+            log.error("Error fetching revised notes for user $userId", e)
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
         }
     }
@@ -238,7 +237,7 @@ class NoteController(
             noteService.deleteNote(noteId, userId)
             ResponseEntity.noContent().build()
         } catch (e: Exception) {
-            log.error("Error deleting note $noteId for user $userId: ${e.message}")
+            log.error("Error deleting note $noteId for user $userId", e)
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
         }
     }
