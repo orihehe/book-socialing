@@ -17,7 +17,7 @@ import jakarta.persistence.Table
 
 @Entity
 @Table(name = "club_participant")
-class ClubParticipant (
+class ClubParticipant(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
@@ -36,7 +36,7 @@ class ClubParticipant (
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 20, nullable = false)
     var status: ParticipantStatus
-): BaseEntity() {
+) : BaseEntity() {
     companion object {
         fun create(club: Club, userId: Long, role: ParticipantRole, status: ParticipantStatus): ClubParticipant {
             return ClubParticipant(
@@ -46,5 +46,9 @@ class ClubParticipant (
                 status = status
             )
         }
+    }
+
+    fun isHost(): Boolean {
+        return this.role == ParticipantRole.HOST
     }
 }

@@ -13,7 +13,7 @@ import jakarta.persistence.Table
 
 @Entity
 @Table(name = "club_file")
-class ClubFile (
+class ClubFile(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
@@ -34,9 +34,9 @@ class ClubFile (
     @Column(name = "file_size", nullable = false)
     var fileSize: Long
 
-): BaseEntity() {
+) : BaseEntity() {
     companion object {
-        fun create(club: Club, originalFileName: String, storedFileName: String, filePath: String, fileSize: Long ): ClubFile {
+        fun create(club: Club, originalFileName: String, storedFileName: String, filePath: String, fileSize: Long): ClubFile {
             return ClubFile(
                 club = club,
                 originalFileName = originalFileName,
