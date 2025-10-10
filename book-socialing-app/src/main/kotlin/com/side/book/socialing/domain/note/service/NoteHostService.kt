@@ -4,7 +4,7 @@ import com.side.book.socialing.domain.club.service.ClubService
 import com.side.book.socialing.domain.note.repository.NoteParticipantRepository
 import com.side.book.socialing.domain.note.repository.NoteRepository
 import com.side.book.socialing.domain.user.dto.UserDto
-import com.side.book.socialing.domain.user.repository.UserRepository
+import com.side.book.socialing.domain.user.service.UserService
 import com.side.book.socialing.global.error.exception.PermissionDeniedException
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.stereotype.Service
@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional
 class NoteHostService(
     private val noteRepository: NoteRepository,
     private val noteParticipantRepository: NoteParticipantRepository,
-    private val userRepository: UserRepository,
+    private val userService: UserService,
     private val clubService: ClubService
 ) {
 
@@ -29,16 +29,16 @@ class NoteHostService(
         val noteParticipants = noteParticipantRepository.findAllByNoteId(noteId)
 
         val club = note.club ?: return noteParticipants.filter { !it.isHost() }.map {
-            val user = userRepository.findById(it.userId).orElseThrow { throw EntityNotFoundException("User $userId not found") }
-            UserDto.from(user)
+            userService.getUser(it.userId)
+                ?: throw EntityNotFoundException("User $userId not found")
         }
         val clubMemberUserIds = clubService.getClubMemberIds(club.id!!)
 
-        val guestIds = noteParticipants.filter { it.userId !in clubMemberUserIds }.map { it.userId }
-        val users = userRepository.findAllById(guestIds).associateBy { it.id }
+        val guestIds = noteParticipants.filter { it.userId !in clubMemberUserIds }.map { it.userId }.toSet()
+        val users = userService.getUserMap(guestIds)
 
         return noteParticipants.mapNotNull {
-            users[it.userId]?.let { user -> UserDto.from(user) }
+            users[it.userId]
         }
     }
 }

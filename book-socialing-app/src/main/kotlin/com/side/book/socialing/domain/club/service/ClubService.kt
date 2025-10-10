@@ -188,5 +188,8 @@ class ClubService(
             .orElseThrow { EntityNotFoundException("Club with ID $clubId not found") }
 
         club.delete(userId)
+        club.participants.forEach { it.delete() }
+        club.files.forEach { it.delete() }
+        club.reviews.forEach { it.delete() }
     }
 }

@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController
 @Tag(name = "클럽 참여 API", description = "클럽 참여 관련 API")
 @RestController
 @RequestMapping("/api/v1/club")
-class ClubJoinController(
+class ClubMemberController(
     private val clubJoinService: ClubJoinService,
     private val userPrincipalResolver: UserPrincipalResolver
 ) {
@@ -105,5 +106,21 @@ class ClubJoinController(
     fun kick(@PathVariable clubId: Long, @PathVariable kickedUserId: Long) {
         val userId = userPrincipalResolver.getUserId()
         clubJoinService.kick(userId, clubId, kickedUserId)
+    }
+
+    @Operation(
+        summary = "클럽 멤버 목록 조회",
+        description = "특정 클럽에 속한 멤버 목록을 조회합니다."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "성공적으로 클럽 멤버 목록을 조회함"),
+            ApiResponse(responseCode = "404", description = "해당 클럽을 찾을 수 없음")
+        ]
+    )
+    @GetMapping("/{clubId}/members")
+    @ResponseStatus(HttpStatus.OK)
+    fun getClubMembers(@PathVariable clubId: Long): List<ClubMemberResponse> {
+        return clubJoinService.getClubMembers(clubId)
     }
 }
