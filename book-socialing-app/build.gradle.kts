@@ -42,6 +42,8 @@ dependencies {
 
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9")
 
+    runtimeOnly("mysql:mysql-connector-java:8.1.0")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("io.mockk:mockk:1.13.10")
