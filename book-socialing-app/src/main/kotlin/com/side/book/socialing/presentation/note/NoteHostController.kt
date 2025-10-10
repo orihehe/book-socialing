@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @Tag(name = "노트 관리자 API", description = "노트 관리를 위한 API")
 @RestController
-@RequestMapping("/api/note/v1")
+@RequestMapping("/api/v1/note")
 class NoteHostController(
     private val noteHostService: NoteHostService,
     private val userPrincipalResolver: UserPrincipalResolver
