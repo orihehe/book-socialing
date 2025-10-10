@@ -5,7 +5,7 @@ import com.side.book.socialing.domain.note.repository.NoteParticipantRepository
 import com.side.book.socialing.domain.note.repository.NoteRepository
 import com.side.book.socialing.domain.user.dto.UserDto
 import com.side.book.socialing.domain.user.repository.UserRepository
-import com.side.book.socialing.global.exception.PermissionDeniedException
+import com.side.book.socialing.global.error.exception.PermissionDeniedException
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
