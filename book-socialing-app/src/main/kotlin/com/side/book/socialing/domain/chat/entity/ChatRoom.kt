@@ -9,10 +9,14 @@ class ChatRoom(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
+
     @Column(nullable = false)
     var noteId: Long,
+
     @Column(nullable = false)
     val roomName: String,
+
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     var state: ChatRoomState
 ) : BaseEntity() {
