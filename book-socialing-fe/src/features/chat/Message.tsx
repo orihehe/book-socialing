@@ -1,7 +1,6 @@
 import dayjs from 'dayjs'
 import { UserRound } from 'lucide-react'
 
-import { DialogTrigger } from '@/components/ui/dialog'
 import { ChatMessageResponse, MessageType } from '@/types/chat'
 
 import { MESSAGE_TYPE_LABELS } from './const'
@@ -15,14 +14,19 @@ import { MESSAGE_TYPE_LABELS } from './const'
 //   kiss: '😘',
 //   wow: '😲',
 //   love: '😍',
-export function Message({ senderNickname, content, type, sentAt }: ChatMessageResponse) {
+
+interface Props extends ChatMessageResponse {
+  onUserClick: (senderNickname: string) => void
+}
+export function Message({ onUserClick, senderNickname, content, type, sentAt }: Props) {
   return (
     <div className="flex gap-2">
-      <DialogTrigger asChild>
-        <button className="w-8 h-8 rounded-full" onClick={() => {}}>
-          <UserRound className="w-8 h-8 rounded-full" />
-        </button>
-      </DialogTrigger>
+      <button
+        className="w-8 h-8 rounded-full cursor-pointer"
+        onClick={() => onUserClick(senderNickname)}
+      >
+        <UserRound className="w-8 h-8 rounded-full" />
+      </button>
 
       <div className="flex flex-col gap-1">
         <div className="text-sm font-semibold">{senderNickname}</div>

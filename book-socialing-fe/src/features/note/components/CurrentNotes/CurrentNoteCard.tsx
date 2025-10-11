@@ -1,9 +1,9 @@
 import dayjs from 'dayjs'
 import { useNavigate } from 'react-router-dom'
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { UserImage } from '@/features/shared/components/UserImage'
 import type { Note } from '@/types/note'
 import { getImageUrl } from '@/util'
 
@@ -29,24 +29,21 @@ export function CurrentNoteCard({
         <img
           src={getImageUrl(bookImageUrl)}
           alt={bookName}
-          className="w-30 h-54 object-cover rounded-md border"
+          className="w-30 h-54 object-cover rounded-md border-none"
         />
         <div className="flex flex-col justify-between flex-1">
           <div>
             <div className="font-bold text-lg">{bookName}</div>
             <div className="text-sm text-muted-foreground">{bookAuthor}</div>
-            <div className="text-xs text-gray-400 mt-1">{description}</div>
+            <div className="text-xs text-gray-400 mt-1 line-clamp-6">{description}</div>
           </div>
           <div className="flex items-center">
             <div className="flex -space-x-2">
               {visible.map(p => (
-                <Avatar key={p.participantId} className="w-6 h-6 border border-white shadow-sm">
-                  {/* 나중에 user image 넣을 수 있음 */}
-                  <AvatarImage src={/* getUserImage(p.userId) */ undefined} />
-                  <AvatarFallback className="text-xs bg-red-400 text-white">
-                    {p.userId.toString().slice(-2)} {/* fallback: userId 끝자리 */}
-                  </AvatarFallback>
-                </Avatar>
+                <UserImage
+                  user={{ nickname: `${p.userId}`, id: p.userId, email: 'test' }}
+                  size={8}
+                />
               ))}
             </div>
             {remaining > 0 && (

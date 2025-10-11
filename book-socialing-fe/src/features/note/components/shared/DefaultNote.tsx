@@ -14,7 +14,7 @@ export function DefaultNote({ bookImageUrl, endAt, bookName, children }: Props) 
       <img
         src={getImageUrl(bookImageUrl ?? '')}
         alt={bookName}
-        className="w-14 h-14 rounded-md object-cover border"
+        className="w-14 h-14 rounded-md object-cover border-none"
       />
       <div className="flex-1 min-w-0">
         <div className="text-xs text-gray-400">{dayjs(endAt).format('YYYY.MM.DD')}</div>

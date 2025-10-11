@@ -1,5 +1,6 @@
 import { useQueries } from '@tanstack/react-query'
 
+import { LoadingPage } from '@/features/shared/components/LoadingPage'
 import { ClubNotesPageResponse } from '@/types/note'
 
 import { AppliedNote, CreatedNote } from './MyNoteCard'
@@ -51,7 +52,8 @@ export function MyNotes() {
   const [createdResult] = results
   const isLoading = createdResult.isLoading || pendingResult.isLoading
   const hasError = createdResult.error || pendingResult.error
-  if (isLoading) return <div>Loading...</div>
+
+  if (isLoading) return <LoadingPage className="h-30" />
   if (hasError) return <div>Error occurred</div>
 
   return (
