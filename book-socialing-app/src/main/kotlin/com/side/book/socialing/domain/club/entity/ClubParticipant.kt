@@ -39,7 +39,7 @@ class ClubParticipant(
     @Column(name = "status", length = 20, nullable = false)
     var status: ParticipantStatus,
 
-    @Column(name = "deleted", nullable = false, columnDefinition = "boolean default false")
+    @Column(name = "deleted", nullable = false)
     var deleted: Boolean = false
 ) : BaseEntity() {
     companion object {

@@ -3,6 +3,7 @@ package com.side.book.socialing.global.security.handler
 import com.side.book.socialing.global.security.provider.JwtTokenProvider
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.security.oauth2.core.user.OAuth2User
@@ -12,7 +13,8 @@ import org.springframework.web.util.UriComponentsBuilder
 
 @Component
 class OAuth2SuccessHandler(
-    private val jwtTokenProvider: JwtTokenProvider
+    private val jwtTokenProvider: JwtTokenProvider,
+    @Value("\${app.server-url}") private val serverUrl: String
 ) : AuthenticationSuccessHandler {
 
     override fun onAuthenticationSuccess(
@@ -33,7 +35,7 @@ class OAuth2SuccessHandler(
         val accessToken = jwtTokenProvider.createAccessToken(email)
         val refreshToken = jwtTokenProvider.createRefreshToken()
 
-        val targetUrl = UriComponentsBuilder.fromUriString("http://localhost:3000/oauth/callback")
+        val targetUrl = UriComponentsBuilder.fromUriString("http://$serverUrl/oauth/callback")
             .queryParam("accessToken", accessToken)
             .queryParam("refreshToken", refreshToken)
             .build()

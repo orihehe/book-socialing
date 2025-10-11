@@ -26,7 +26,7 @@ class ClubReview(
     @Column(name = "content", columnDefinition = "TEXT")
     var content: String? = null,
 
-    @Column(name = "deleted", nullable = false, columnDefinition = "boolean default false")
+    @Column(name = "deleted", nullable = false)
     var deleted: Boolean = false
 ) : BaseEntity() {
 

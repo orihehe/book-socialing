@@ -3,7 +3,6 @@ CREATE TABLE chat_rooms (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     note_id BIGINT NOT NULL,
     room_name VARCHAR(255) NOT NULL,
-    state VARCHAR(255)
     state VARCHAR(255),
 
     deleted TINYINT NOT NULL DEFAULT FALSE,
