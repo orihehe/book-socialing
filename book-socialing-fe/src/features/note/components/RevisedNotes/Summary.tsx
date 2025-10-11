@@ -5,6 +5,7 @@ import { BaseCard } from '@/components/common/BaseCard'
 import { Button } from '@/components/ui/button'
 import { CardContent } from '@/components/ui/card'
 import { LoadingPage } from '@/features/shared/components/LoadingPage'
+import { apiFetch } from '@/lib/api'
 import type { ClubNotesPageResponse } from '@/types/note'
 
 import { RevisedNoteCard } from './RevisedNoteCard'
@@ -17,7 +18,7 @@ export function Summary({ moveToAll }: RevisedNotesProps) {
   const { data, isLoading } = useQuery({
     queryKey: ['revisedNoteSummary'],
     queryFn: async (): Promise<ClubNotesPageResponse> => {
-      const response = await fetch('/api/v1/note/revised', {
+      const response = await apiFetch('/v1/note/revised', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

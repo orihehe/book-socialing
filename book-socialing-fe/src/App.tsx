@@ -43,7 +43,7 @@ function App() {
 
         {/* user */}
         <Route path="/sign-in" element={<SignIn />} />
-        <Route path="/auth/kakao/callback" element={<KakaoCallback />} />
+        <Route path="/oauth/callback" element={<KakaoCallback />} />
       </Routes>
     </QueryClientProvider>
   )

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { Label } from '@/components/ui/label'
+import { apiFetch } from '@/lib/api'
 import type { ClubNotesGroup, Note } from '@/types/note'
 import { getImageUrl } from '@/util'
 
@@ -15,7 +16,7 @@ export default function NoteSelector() {
     queryKey: ['club', id, 'notes'],
     queryFn: async () => {
       // TODO: club 조회로 바꾸기
-      const res = await fetch(`/api/v1/note/open`)
+      const res = await apiFetch(`/v1/note/open`)
       if (!res.ok) throw new Error('클럽 멤버 정보를 불러오지 못했습니다.')
       const result = await res.json()
 

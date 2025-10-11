@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 
+import { apiFetch } from '@/lib/api'
 import type { CreateClubCommand } from '@/types/club'
 
 import ClubForm from '../components/ClubForm'
@@ -18,7 +19,7 @@ export default function CreateClub() {
         formData.append('images', file, file.name)
       })
 
-      const res = await fetch('/api/v1/club/create', {
+      const res = await apiFetch('/v1/club/create', {
         method: 'POST',
         body: formData,
       })

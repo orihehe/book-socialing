@@ -14,6 +14,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { LoadingPage } from '@/features/shared/components/LoadingPage'
+import { apiFetch } from '@/lib/api'
 import type { CreateClubCommand } from '@/types/club'
 import { getImageFile } from '@/util'
 
@@ -25,7 +26,7 @@ export default function EditClub() {
   const { data: clubDetail, isLoading } = useQuery<Partial<CreateClubCommand>>({
     queryKey: ['club', id],
     queryFn: async (): Promise<Partial<CreateClubCommand>> => {
-      const res = await fetch(`/api/v1/club/${id}`)
+      const res = await apiFetch(`/v1/club/${id}`)
       if (!res.ok) throw new Error('클럽 정보를 불러오지 못했습니다.')
       const club = await res.json()
 
@@ -40,7 +41,7 @@ export default function EditClub() {
 
   const deleteMutation = useMutation({
     mutationFn: async () => {
-      const res = await fetch(`/api/v1/club/${id}`, { method: 'DELETE' })
+      const res = await apiFetch(`/v1/club/${id}`, { method: 'DELETE' })
       if (!res.ok) {
         throw new Error('클럽 삭제에 실패했습니다.')
       }

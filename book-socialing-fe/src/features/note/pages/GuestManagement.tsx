@@ -6,6 +6,7 @@ import { BaseButton } from '@/components/common/BaseButton'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { UserImage } from '@/features/shared/components/UserImage'
+import { apiFetch } from '@/lib/api'
 import { User } from '@/types/user'
 
 const GuestListItem = ({ user, action }: { user: User; action: React.ReactNode }) => (
@@ -27,7 +28,7 @@ export default function GuestManagementPage() {
   const { data: guestsData = [] } = useQuery<User[]>({
     queryKey: ['noteGuests', id],
     queryFn: async () => {
-      const response = await fetch(`/api/v1/note/guests?noteId=${id}`, {
+      const response = await apiFetch(`/v1/note/guests?noteId=${id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -43,7 +44,7 @@ export default function GuestManagementPage() {
   // 승인 뮤테이션
   const approveMutation = useMutation({
     mutationFn: async ({ noteId, userId }: { noteId: string; userId: string }) => {
-      const response = await fetch(`/api/v1/note/${noteId}/participants/${userId}/approve`, {
+      const response = await apiFetch(`/v1/note/${noteId}/participants/${userId}/approve`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -65,7 +66,7 @@ export default function GuestManagementPage() {
   // 거절 뮤테이션
   const rejectMutation = useMutation({
     mutationFn: async ({ noteId, userId }: { noteId: string; userId: string }) => {
-      const response = await fetch(`/api/v1/note/${noteId}/participants/${userId}/reject`, {
+      const response = await apiFetch(`/v1/note/${noteId}/participants/${userId}/reject`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

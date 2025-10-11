@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { LoadingPage } from '@/features/shared/components/LoadingPage'
 import { MainLayout } from '@/features/shared/MainLayout'
+import { apiFetch } from '@/lib/api'
 
 import { ClubCarousel } from '../components/ClubCarousel'
 import NoteSelector from '../components/NoteSelector'
@@ -22,7 +23,7 @@ export default function ClubDetail() {
   } = useQuery({
     queryKey: ['club', id],
     queryFn: async () => {
-      const res = await fetch(`/api/v1/club/${id}`)
+      const res = await apiFetch(`/v1/club/${id}`)
       if (!res.ok) throw new Error('클럽 정보를 불러오지 못했습니다.')
       return res.json()
     },
