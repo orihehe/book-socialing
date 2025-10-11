@@ -12,6 +12,13 @@ class JwtAuthenticationFilter(
     private val authService: AuthService
 ) : OncePerRequestFilter() {
 
+    override fun shouldNotFilter(request: HttpServletRequest): Boolean {
+        val path = request.requestURI
+        return path == "/" ||
+            path.startsWith("/oauth2/") ||
+            path.startsWith("/login/oauth2/code/")
+    }
+
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
