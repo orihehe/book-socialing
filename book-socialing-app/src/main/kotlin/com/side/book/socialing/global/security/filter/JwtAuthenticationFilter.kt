@@ -30,7 +30,7 @@ class JwtAuthenticationFilter(
             try {
                 val authentication = authService.getAuthentication(token)
                 SecurityContextHolder.getContext().authentication = authentication
-                log.debug("JWT 인증 성공 - URI: ${request.requestURI}")
+                log.info("JWT 인증 성공 - URI: ${request.requestURI}")
             } catch (e: Exception) {
                 log.error("JWT 인증 실패 - URI: ${request.requestURI}, Method: ${request.method}, Token: ${token.take(20)}...", e)
             }
