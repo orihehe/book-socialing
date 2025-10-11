@@ -8,14 +8,12 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.core.io.Resource
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @Tag(name = "파일 API", description = "파일 관련 API")
-@CrossOrigin(origins = ["http://localhost:3000"])
 @RestController
 @RequestMapping("/api/v1/file")
 class FileController(private val fileUploader: FileUploader) {
