@@ -1,6 +1,7 @@
 package com.side.book.socialing.domain.club.entity
 
 import com.side.book.socialing.domain.club.command.CreateClubCommand
+import com.side.book.socialing.domain.club.command.UpdateClubCommand
 import com.side.book.socialing.domain.common.BaseEntity
 import com.side.book.socialing.domain.note.entity.ClubReview
 import com.side.book.socialing.global.error.exception.ForbiddenException
@@ -62,5 +63,14 @@ class Club(
 
     fun isHost(userId: Long): Boolean {
         return this.participants.any { it.userId == userId && it.isHost() }
+    }
+
+    fun update(cmd: UpdateClubCommand) {
+        if (!isHost(cmd.userId)) {
+            throw ForbiddenException("User ${cmd.userId} is not the host of note $id.")
+        }
+
+        this.clubName = cmd.clubName
+        this.description = cmd.description
     }
 }
