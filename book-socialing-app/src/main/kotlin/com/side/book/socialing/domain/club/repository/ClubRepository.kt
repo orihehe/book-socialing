@@ -40,4 +40,26 @@ interface ClubRepository : JpaRepository<Club, Long> {
 
     @Query("SELECT c FROM Club c JOIN c.participants p WHERE p.userId = :userId AND p.status <> 'JOINED' ORDER BY RAND() LIMIT 2")
     fun findRecommendClubsByUserId(userId: Long): List<Club>
+
+    @Query(
+        """
+        SELECT COUNT(DISTINCT c.id) FROM Club c 
+        WHERE c.clubName LIKE %:keyword% OR c.description LIKE %:keyword%
+    """
+    )
+    fun countSearchClubByClubName(
+        @Param("keyword") keyword: String
+    ): Long
+
+    @Query(
+        """
+        SELECT DISTINCT c FROM Club c 
+        WHERE c.clubName LIKE %:keyword% OR c.description LIKE %:keyword%
+        ORDER BY c.createdAt DESC
+    """
+    )
+    fun findSearchClubByClubName(
+        @Param("keyword") keyword: String,
+        pageable: Pageable
+    ): List<Club>
 }

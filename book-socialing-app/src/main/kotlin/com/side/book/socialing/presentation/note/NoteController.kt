@@ -9,6 +9,7 @@ import com.side.book.socialing.presentation.note.dto.ClubNotesPageResponse
 import com.side.book.socialing.presentation.note.dto.CommonNoteResponse
 import com.side.book.socialing.presentation.note.dto.CreateNoteRequest
 import com.side.book.socialing.presentation.note.dto.GetNoteResponse
+import com.side.book.socialing.presentation.note.dto.NotesPageResponse
 import com.side.book.socialing.presentation.note.dto.OpenNoteResponse
 import com.side.book.socialing.presentation.note.dto.UpdateNoteRequest
 import io.swagger.v3.oas.annotations.Operation
@@ -274,5 +275,33 @@ class NoteController(
 
         noteService.updateNote(command)
         return ResponseEntity.ok().build()
+    }
+
+    @Operation(
+        summary = "노트 검색",
+        description = "노트 이름 또는 설명으로 노트을 검색합니다."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "성공적으로 노트 목록을 조회함"),
+            ApiResponse(responseCode = "500", description = "서버 내부 오류")
+        ]
+    )
+    @GetMapping("/search")
+    fun searchNote(
+        @RequestParam query: String, // 검색어
+        @RequestParam(defaultValue = "10") pageSize: Int,
+        @RequestParam(defaultValue = "1") pageNum: Int
+    ): ResponseEntity<NotesPageResponse<CommonNoteResponse>> {
+        val offset = (pageNum - 1) * pageSize
+
+        return try {
+            val searchResults = noteService.searchNote(query, pageSize, offset)
+            ResponseEntity.ok(searchResults)
+        } catch (e: Exception) {
+            log.error("Error searching notes with query: $query", e)
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(NotesPageResponse(totalCount = 0L, groups = emptyList()))
+        }
     }
 }

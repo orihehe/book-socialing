@@ -17,6 +17,7 @@ import com.side.book.socialing.presentation.note.dto.ClubNotesGroupResponse
 import com.side.book.socialing.presentation.note.dto.ClubNotesPageResponse
 import com.side.book.socialing.presentation.note.dto.CommonNoteResponse
 import com.side.book.socialing.presentation.note.dto.GetNoteResponse
+import com.side.book.socialing.presentation.note.dto.NotesPageResponse
 import com.side.book.socialing.presentation.note.dto.OpenNoteResponse
 import com.side.book.socialing.presentation.note.dto.ParticipantInfoResponse
 import jakarta.persistence.EntityNotFoundException
@@ -498,5 +499,50 @@ class NoteService(
             }
             throw e
         }
+    }
+
+    /**
+     * 노트 이름(bookName)으로 노트를 검색하고 페이징 처리된 결과를 반환합니다.
+     *
+     * @param query 검색어. 노트의 책 이름 포함된 문자열로 검색됩니다.
+     * @param pageSize 한 페이지에 보여줄 노트의 수.
+     * @param offset 페이징을 위한 오프셋 (페이지 번호에 기반하여 계산됨).
+     * @return 검색 결과에 해당하는 노트 정보가 담긴 `NotesPageResponse` DTO.
+     *         검색 결과가 없으면 빈 리스트를 반환합니다.
+     */
+    @Transactional(readOnly = true)
+    fun searchNote(query: String, pageSize: Int, offset: Int): NotesPageResponse<CommonNoteResponse> {
+        val pageIndex = offset / pageSize
+
+        val pageable = PageRequest.of(
+            pageIndex,
+            pageSize,
+            Sort.by(Sort.Order.desc("createdAt")) // 최신순 정렬
+        )
+
+        val totalCount = noteRepository.countNoteByBookName(query)
+
+        // 만약 검색 결과가 없다면, 빈 결과 반환
+        if (totalCount == 0L) {
+            return NotesPageResponse(totalCount = 0L, groups = emptyList())
+        }
+
+        val notes = noteRepository.findNoteByBookName(query, pageable)
+
+        val groups = notes.map { note ->
+            // 대표 이미지 경로
+            val bookImageUrl = note.files.firstOrNull()?.filePath ?: "/images/default_book_image.jpg"
+
+            CommonNoteResponse(
+                id = note.id!!,
+                clubName = note.club?.clubName,
+                bookName = note.bookName,
+                bookImageUrl = bookImageUrl,
+                startAt = note.startAt,
+                endAt = note.endAt
+            )
+        }
+
+        return NotesPageResponse(totalCount = totalCount, groups = groups)
     }
 }
