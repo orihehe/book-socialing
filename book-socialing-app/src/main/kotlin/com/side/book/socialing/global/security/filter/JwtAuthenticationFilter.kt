@@ -1,6 +1,7 @@
 package com.side.book.socialing.global.security.filter
 
 import com.side.book.socialing.global.security.service.AuthService
+import com.side.book.socialing.global.utils.log
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -18,9 +19,16 @@ class JwtAuthenticationFilter(
     ) {
         val token = resolveToken(request)
 
-        token?.let {
-            val authentication = authService.getAuthentication(it)
-            SecurityContextHolder.getContext().authentication = authentication
+        if (token != null) {
+            try {
+                val authentication = authService.getAuthentication(token)
+                SecurityContextHolder.getContext().authentication = authentication
+                log.debug("JWT 인증 성공 - URI: ${request.requestURI}")
+            } catch (e: Exception) {
+                log.error("JWT 인증 실패 - URI: ${request.requestURI}, Method: ${request.method}, Token: ${token.take(20)}...", e)
+            }
+        } else {
+            log.warn("토큰 없음 - URI: ${request.requestURI}, Method: ${request.method}, Authorization Header: ${request.getHeader("Authorization")}")
         }
 
         filterChain.doFilter(request, response)
