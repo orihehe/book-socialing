@@ -1,6 +1,17 @@
 package com.side.book.socialing.presentation.club.dto
 
+import com.side.book.socialing.presentation.note.dto.ClubNotesGroupResponse
 import io.swagger.v3.oas.annotations.media.Schema
+
+@Schema(description = "클럽 페이지 응답(제네릭)")
+data class ClubPageResponse<T>(
+    @field:Schema(description = "전체 클럽 수(페이징)", example = "26")
+    val totalCount: Long,
+
+    // 제네릭(T) 특성상 구체 타입은 컨트롤러 반환 타입에서 결정됨
+    @field:Schema(description = "클럽 리스트")
+    val groups: List<T>
+)
 
 @Schema(name = "CommonClubResponse", description = "일반 클럽 DTO")
 data class CommonClubResponse(
