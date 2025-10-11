@@ -1,13 +1,14 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { NoteGrid } from '@/components/common/NoteGird'
+import { apiFetch } from '@/lib/api'
 import { ClubNotesPageResponse } from '@/types/note'
 
 export function Notes() {
   const { data } = useQuery({
     queryKey: ['opendNotes'],
     queryFn: async (): Promise<ClubNotesPageResponse> => {
-      const response = await fetch('/api/v1/note/open', {
+      const response = await apiFetch('/v1/note/open', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

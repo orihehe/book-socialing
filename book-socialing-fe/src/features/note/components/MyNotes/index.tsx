@@ -1,6 +1,7 @@
 import { useQueries } from '@tanstack/react-query'
 
 import { LoadingPage } from '@/features/shared/components/LoadingPage'
+import { apiFetch } from '@/lib/api'
 import { ClubNotesPageResponse } from '@/types/note'
 
 import { AppliedNote, CreatedNote } from './MyNoteCard'
@@ -12,7 +13,7 @@ export function MyNotes() {
       {
         queryKey: ['createdNotes'],
         queryFn: async (): Promise<ClubNotesPageResponse> => {
-          const response = await fetch('/api/v1/note/created', {
+          const response = await apiFetch('/v1/note/created', {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
@@ -29,7 +30,7 @@ export function MyNotes() {
       // {
       //   queryKey: ['pendingNotes'],
       //   queryFn: async (): Promise<ClubNotesPageResponse> => {
-      //     const response = await fetch('/api/v1/note/pending', {
+      //     const response = await apiFetch('/v1/note/pending', {
       //       method: 'GET',
       //       headers: {
       //         'Content-Type': 'application/json',

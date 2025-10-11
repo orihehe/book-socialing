@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 
 import { BottomButton } from '@/components/common/BottomButton'
+import { apiFetch } from '@/lib/api'
 
 import { ClubSection as ClubSectionComponent } from './components/ClubSection'
 import { MainLayout } from '../shared/MainLayout'
@@ -13,7 +14,7 @@ export default function ClubView() {
   const { data: recommendedClubs, refetch: refetchRecommended } = useQuery({
     queryKey: ['club', 'recommended'],
     queryFn: async () => {
-      const res = await fetch('/api/v1/club/recommend')
+      const res = await apiFetch('/v1/club/recommend')
       if (!res.ok) throw new Error('추천 클럽 정보를 불러오지 못했습니다.')
 
       const result = await res.json()
@@ -25,7 +26,7 @@ export default function ClubView() {
   const { data: joinedClubs } = useQuery({
     queryKey: ['club', 'joined'],
     queryFn: async () => {
-      const res = await fetch('/api/v1/club/joined')
+      const res = await apiFetch('/v1/club/joined')
       if (!res.ok) throw new Error('가입한 클럽 정보를 불러오지 못했습니다.')
       const result = await res.json()
 
@@ -36,7 +37,7 @@ export default function ClubView() {
   const { data: creaetdClubs } = useQuery({
     queryKey: ['club', 'created'],
     queryFn: async () => {
-      const res = await fetch('/api/v1/club/created')
+      const res = await apiFetch('/v1/club/created')
       if (!res.ok) throw new Error('생성한 클럽 정보를 불러오지 못했습니다.')
       const result = await res.json()
 

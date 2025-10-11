@@ -1,6 +1,8 @@
 import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 
+import { apiFetch } from '@/lib/api'
+
 import { NoteForm, type NoteFormData } from '../components/NoteForm'
 
 export default function CreateNote() {
@@ -17,7 +19,7 @@ export default function CreateNote() {
         formData.append('images', file, file.name)
       })
 
-      const response = await fetch('/api/v1/note/create', { method: 'POST', body: formData })
+      const response = await apiFetch('/v1/note/create', { method: 'POST', body: formData })
       if (!response.ok) {
         throw new Error('Failed to create note')
       }

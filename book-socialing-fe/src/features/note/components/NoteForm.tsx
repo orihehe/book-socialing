@@ -16,6 +16,7 @@ import { ImageUploadField } from '@/features/shared/components/form/ImageUploadF
 import { InputField } from '@/features/shared/components/form/InputField'
 import { SelectField } from '@/features/shared/components/form/SelectField'
 import { TextareaField } from '@/features/shared/components/form/TextareaField'
+import { apiFetch } from '@/lib/api'
 import type { Club, Note } from '@/types/note'
 
 const noteSchema = z.object({
@@ -57,7 +58,7 @@ export function NoteForm({ mode, note, onSubmit }: Props) {
   const { data: clubs } = useQuery<Club[], Error>({
     queryKey: ['clubs', 'created'],
     queryFn: async () => {
-      const res = await fetch('/api/v1/club/created')
+      const res = await apiFetch('/v1/club/created')
       if (!res.ok) throw new Error('Failed to fetch clubs')
       return res.json()
     },

@@ -7,6 +7,7 @@ import { BottomButton } from '@/components/common/BottomButton'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { UserImage } from '@/features/shared/components/UserImage'
+import { apiFetch } from '@/lib/api'
 import { User } from '@/types/user'
 
 const MemberListItem = ({ user, action }: { user: User; action: React.ReactNode }) => (
@@ -39,7 +40,7 @@ export default function MemberManagement() {
 
   const rejectMutation = useMutation({
     mutationFn: async ({ noteId, userId }: { noteId: string; userId: string }) => {
-      const response = await fetch(`/api/v1/note/${noteId}/participants/${userId}/reject`, {
+      const response = await apiFetch(`/v1/note/${noteId}/participants/${userId}/reject`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
       })
@@ -51,7 +52,7 @@ export default function MemberManagement() {
 
   const kickMutation = useMutation({
     mutationFn: async ({ noteId, userId }: { noteId: string; userId: string }) => {
-      const response = await fetch(`/api/v1/note/${noteId}/participants/${userId}`, {
+      const response = await apiFetch(`/v1/note/${noteId}/participants/${userId}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
       })

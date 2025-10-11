@@ -15,6 +15,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { LoadingPage } from '@/features/shared/components/LoadingPage'
+import { apiFetch } from '@/lib/api'
 import { getImageFile } from '@/util'
 
 import { NoteForm, type NoteFormData } from '../components/NoteForm'
@@ -26,7 +27,7 @@ export default function EditNote() {
   const { data: noteData, isLoading } = useQuery({
     queryKey: ['note', id],
     queryFn: async () => {
-      const response = await fetch(`/api/v1/note/${id}`)
+      const response = await apiFetch(`/v1/note/${id}`)
       if (!response.ok) {
         throw new Error('Failed to fetch note data')
       }
@@ -48,7 +49,7 @@ export default function EditNote() {
         formData.append('images', file, file.name)
       })
 
-      const response = await fetch(`/api/v1/note/${id}`, { method: 'PUT', body: formData })
+      const response = await apiFetch(`/v1/note/${id}`, { method: 'PUT', body: formData })
       if (!response.ok) {
         throw new Error('Failed to update note')
       }
@@ -64,7 +65,7 @@ export default function EditNote() {
   })
   const deleteMutation = useMutation({
     mutationFn: async () => {
-      const response = await fetch(`/api/v1/note/${id}`, { method: 'DELETE' })
+      const response = await apiFetch(`/v1/note/${id}`, { method: 'DELETE' })
       if (!response.ok) {
         throw new Error('Failed to delete note')
       }
