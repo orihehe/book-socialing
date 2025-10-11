@@ -4,6 +4,7 @@ import com.side.book.socialing.domain.auth.service.CustomOAuth2UserService
 import com.side.book.socialing.global.security.filter.JwtAuthenticationFilter
 import com.side.book.socialing.global.security.handler.OAuth2SuccessHandler
 import com.side.book.socialing.global.security.service.JwtAuthService
+import com.side.book.socialing.global.utils.log
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
@@ -48,7 +49,8 @@ class SecurityConfig(
                     .userInfoEndpoint { it.userService(customOAuth2UserService) }
             }
             .exceptionHandling { exceptions ->
-                exceptions.authenticationEntryPoint { _, response, _ ->
+                exceptions.authenticationEntryPoint { request, response, authException ->
+                    log.error("인증 실패 - URI: ${request.requestURI}, 예외: ${authException.message}", authException)
                     response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")
                 }
             }
