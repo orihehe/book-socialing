@@ -51,7 +51,8 @@ class JwtTokenProvider(
     fun validateToken(token: String): Boolean {
         log.info("validateToken 호출됨")
         try {
-            getClaims(token)
+            val claims = getClaims(token)
+            log.info("sub: ${claims.subject}, exp: ${claims.expiration}, roles: ${claims["roles"]}")
             return true
         } catch (e: Exception) {
             log.error("jwt error", e)
