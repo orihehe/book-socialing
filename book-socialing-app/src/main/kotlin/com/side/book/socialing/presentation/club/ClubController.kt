@@ -4,6 +4,7 @@ import com.side.book.socialing.domain.club.command.CreateClubCommand
 import com.side.book.socialing.domain.club.service.ClubService
 import com.side.book.socialing.global.auth.UserPrincipalResolver
 import com.side.book.socialing.global.utils.log
+import com.side.book.socialing.presentation.club.dto.ClubPageResponse
 import com.side.book.socialing.presentation.club.dto.CommonClubResponse
 import com.side.book.socialing.presentation.club.dto.CreateClubRequest
 import io.swagger.v3.oas.annotations.Operation
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
@@ -97,16 +99,20 @@ class ClubController(
         ]
     )
     @GetMapping("/joined")
-    fun getJoinedClubs(): ResponseEntity<List<CommonClubResponse>> {
+    fun getJoinedClubs(
+        @RequestParam(defaultValue = "10") pageSize: Int,
+        @RequestParam(defaultValue = "1") pageNum: Int
+    ): ResponseEntity<ClubPageResponse<CommonClubResponse>> {
         val userId = userPrincipalResolver.getUserId()
+        val offset = (pageNum - 1) * pageSize
 
         return try {
-            val joinedClubs = clubService.getJoinedClubs(userId)
+            val joinedClubs = clubService.getJoinedClubs(userId, pageSize, offset)
             ResponseEntity.ok(joinedClubs)
         } catch (e: Exception) {
             log.error("Error fetching joined clubs for user $userId", e)
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(emptyList()) // 빈 리스트 반환 또는 에러 DTO 반환
+                .body(ClubPageResponse(totalCount = 0L, groups = emptyList())) // 빈 리스트 반환 또는 에러 DTO 반환
         }
     }
 
@@ -121,16 +127,20 @@ class ClubController(
         ]
     )
     @GetMapping("/created")
-    fun getCreatedClubs(): ResponseEntity<List<CommonClubResponse>> {
+    fun getCreatedClubs(
+        @RequestParam(defaultValue = "10") pageSize: Int,
+        @RequestParam(defaultValue = "1") pageNum: Int
+    ): ResponseEntity<ClubPageResponse<CommonClubResponse>> {
         val userId = userPrincipalResolver.getUserId()
+        val offset = (pageNum - 1) * pageSize
 
         return try {
-            val createdClubs = clubService.getCreatedClubs(userId)
+            val createdClubs = clubService.getCreatedClubs(userId, pageSize, offset)
             ResponseEntity.ok(createdClubs)
         } catch (e: Exception) {
             log.error("Error fetching created clubs for user $userId", e)
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(emptyList()) // 빈 리스트 반환 또는 에러 DTO 반환
+                .body(ClubPageResponse(totalCount = 0L, groups = emptyList())) // 빈 리스트 반환 또는 에러 DTO 반환
         }
     }
 
