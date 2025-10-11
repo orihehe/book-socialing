@@ -4,6 +4,7 @@ import { ChevronRight } from 'lucide-react'
 import { BaseCard } from '@/components/common/BaseCard'
 import { Button } from '@/components/ui/button'
 import { CardContent } from '@/components/ui/card'
+import { LoadingPage } from '@/features/shared/components/LoadingPage'
 import type { ClubNotesPageResponse } from '@/types/note'
 
 import { RevisedNoteCard } from './RevisedNoteCard'
@@ -13,7 +14,7 @@ interface RevisedNotesProps {
 }
 
 export function Summary({ moveToAll }: RevisedNotesProps) {
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['revisedNoteSummary'],
     queryFn: async (): Promise<ClubNotesPageResponse> => {
       const response = await fetch('/api/v1/note/revised', {
@@ -31,6 +32,8 @@ export function Summary({ moveToAll }: RevisedNotesProps) {
     },
   })
 
+  if (isLoading) return <LoadingPage className="h-30" />
+
   return (
     <>
       <BaseCard title={`닫힌 노트 (${data?.totalCount ?? 0})`}>
@@ -45,7 +48,7 @@ export function Summary({ moveToAll }: RevisedNotesProps) {
       <div className="px-4 mb-8">
         <Button
           variant="ghost"
-          className="w-full justify-center items-center gap-1 text-muted-foreground text-sm px-6 py-6 rounded-5 border"
+          className="w-full justify-center items-center gap-1 text-muted-foreground text-sm px-6 py-6 rounded-5 border cursor-pointer"
           style={{
             borderColor: '#E7ECEC',
             color: '#7D7D7D',

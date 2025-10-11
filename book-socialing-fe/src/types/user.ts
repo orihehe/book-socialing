@@ -5,6 +5,13 @@ export interface User {
 }
 
 export type UserRole = 'HOST' | 'GUEST'
+export type UserNoteStatus =
+  | 'JOINED'
+  | 'PENDING_APPROVAL'
+  | 'CANCEL'
+  | 'REJECTED'
+  | 'LEFT'
+  | 'KICKED'
 
 export interface UserDetail {
   role: UserRole

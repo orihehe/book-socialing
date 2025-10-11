@@ -1,23 +1,18 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { X } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import { BaseButton } from '@/components/common/BaseButton'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { UserImage } from '@/features/shared/components/UserImage'
+import { User } from '@/types/user'
 
-const GuestListItem = ({ name, action }: { name: string; action: React.ReactNode }) => (
+const GuestListItem = ({ user, action }: { user: User; action: React.ReactNode }) => (
   <div className="flex items-center justify-between px-4 py-3">
     <div className="flex items-center gap-3">
-      <Avatar key={name} className="w-6 h-6 border border-white shadow-sm">
-        {/* 나중에 user image 넣을 수 있음 */}
-        <AvatarImage src={/* getUserImage(p.userId) */ undefined} />
-        <AvatarFallback className="text-xs bg-red-400 text-white">
-          {name[0]} {/* fallback: userId 끝자리 */}
-        </AvatarFallback>
-      </Avatar>
-      <span className="text-sm font-bold">{name}</span>
+      <UserImage user={user} />
+      <span className="text-sm font-bold">{user.nickname}</span>
     </div>
     {action}
   </div>
@@ -25,10 +20,25 @@ const GuestListItem = ({ name, action }: { name: string; action: React.ReactNode
 
 export default function GuestManagementPage() {
   const navigate = useNavigate()
-  const pendingGuests = ['닉네임', '닉네임', '닉네임']
-  const approvedGuests = ['닉네임', '닉네임', '닉네임']
+  const { id } = useParams()
 
   const queryClient = useQueryClient()
+
+  const { data: guestsData = [] } = useQuery<User[]>({
+    queryKey: ['noteGuests', id],
+    queryFn: async () => {
+      const response = await fetch(`/api/v1/note/guests?noteId=${id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      if (!response.ok) {
+        throw new Error('Failed to fetch note guests')
+      }
+      return response.json()
+    },
+  })
 
   // 승인 뮤테이션
   const approveMutation = useMutation({
@@ -73,27 +83,6 @@ export default function GuestManagementPage() {
     },
   })
 
-  // 강퇴 뮤테이션
-  const kickMutation = useMutation({
-    mutationFn: async ({ noteId, userId }: { noteId: string; userId: string }) => {
-      const response = await fetch(`/api/v1/note/${noteId}/participants/${userId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to kick participant')
-      }
-
-      return response.json()
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['noteParticipants'] })
-    },
-  })
-
   const handleApprove = (userId: string) => {
     const noteId = 'your-note-id' // 실제 noteId 가져오기
     approveMutation.mutate({ noteId, userId })
@@ -102,11 +91,6 @@ export default function GuestManagementPage() {
   const handleReject = (userId: string) => {
     const noteId = 'your-note-id' // 실제 noteId 가져오기
     rejectMutation.mutate({ noteId, userId })
-  }
-
-  const handleKick = (userId: string) => {
-    const noteId = 'your-note-id' // 실제 noteId 가져오기
-    kickMutation.mutate({ noteId, userId })
   }
 
   return (
@@ -128,10 +112,10 @@ export default function GuestManagementPage() {
         {/* Pending Section */}
         <section className="rounded-2xl bg-[#FBFBFB]">
           <h2 className="text-mx font-bold px-4 pt-4">대기</h2>
-          {pendingGuests.map((name, idx) => (
+          {guestsData.map(user => (
             <GuestListItem
-              key={`pending-${idx}`}
-              name={name}
+              key={user.id}
+              user={user}
               action={
                 <div className="flex gap-2">
                   <BaseButton
@@ -156,7 +140,7 @@ export default function GuestManagementPage() {
         {/* Approved Section */}
         <section className="rounded-2xl bg-[#FBFBFB] mt-8">
           <h2 className="text-mx font-bold px-4 pt-4">승인</h2>
-          {approvedGuests.map((name, idx) => (
+          {/* {user.map((user, idx) => (
             <GuestListItem
               key={`approved-${idx}`}
               name={name}
@@ -166,7 +150,7 @@ export default function GuestManagementPage() {
                 </BaseButton>
               }
             />
-          ))}
+          ))} */}
         </section>
       </ScrollArea>
 

@@ -7,9 +7,10 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { LoadingPage } from '@/features/shared/components/LoadingPage'
 import { MainLayout } from '@/features/shared/MainLayout'
-import { UserDetail } from '@/types/user'
 
 import { ClubCarousel } from '../components/ClubCarousel'
+import NoteSelector from '../components/NoteSelector'
+import UserScroll from '../components/UserScroll'
 
 export default function ClubDetail() {
   const navigate = useNavigate()
@@ -27,18 +28,6 @@ export default function ClubDetail() {
     },
     enabled: !!id,
   })
-
-  const { data: clubMembers = [] } = useQuery<UserDetail[]>({
-    queryKey: ['club', id, 'members'],
-    queryFn: async () => {
-      const res = await fetch(`/api/v1/club/${id}/members`)
-      if (!res.ok) throw new Error('클럽 멤버 정보를 불러오지 못했습니다.')
-      return res.json()
-    },
-    enabled: !!id,
-  })
-
-  console.log(clubDetail, clubMembers)
 
   if (isLoading) {
     return <LoadingPage />
@@ -75,43 +64,17 @@ export default function ClubDetail() {
         </div>
 
         {/* 멤버 */}
-        <div className="space-y-2 my-7">
-          <Label className="text-base font-bold">멤버 7</Label>
-          <div
-            className="overflow-x-auto mt-2"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-          >
-            <div className="flex gap-3 w-max overflow-x-auto !scrollbar-hide touch-auto">
-              {clubMembers.map(member => (
-                <div key={member.user.id} className="w-15 h-15 rounded-full bg-gray-300 shrink-0" />
-              ))}
-            </div>
-          </div>
-        </div>
+        <UserScroll />
 
         {/* 클럽 내역 */}
-        <div className="space-y-2 my-7">
-          <Label className="text-base font-bold">클럽 내역</Label>
-          <div
-            className="overflow-x-auto mt-2"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-          >
-            <div className="flex gap-3 w-max">
-              {Array.from({ length: 7 }).map((_, i) => (
-                <button key={i} className="w-15 h-15 rounded-lg bg-gray-300 shrink-0" />
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* 노트 상세보기 */}
+        <NoteSelector />
       </div>
 
       <div className="fixed bottom-10 right-2 flex flex-col gap-1">
         <Button
           className="rounded-full w-10 h-10 shadow-lg opacity-80"
           size="icon"
-          onClick={() => navigate(`/club/${id}/users`)}
+          onClick={() => navigate(`/club/${id}/members`)}
         >
           <UsersRound />
         </Button>

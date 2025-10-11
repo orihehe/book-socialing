@@ -1,12 +1,18 @@
-export function getImageUrl(imagePath: string = '/images/default_book_image.jpg') {
+const API_URL = import.meta.env.VITE_API_BASE_URL
+
+export function getImageUrl(imagePath: string = '') {
+  // 윈도우 환경에서 경로에 \ 가 포함되어 있을 경우, /로 변환하여 사용
+  imagePath = imagePath?.replace(/\\/g, '/')
+
   if (imagePath.startsWith('http')) {
     return imagePath // 이미 전체 URL인 경우
   }
 
-  // 윈도우 환경에서 경로에 \ 가 포함되어 있을 경우, /로 변환하여 사용
-  imagePath = imagePath.replace(/\\/g, '/')
+  if (!imagePath) {
+    return `${API_URL}/images/default_book_image.jpg`
+  }
 
-  return `http://localhost:8080/api/v1/file?filePath=${imagePath}`
+  return `${API_URL}/api/v1/file?filePath=${imagePath}`
 }
 
 export async function getImageFile(imageUrl?: string) {

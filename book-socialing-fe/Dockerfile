@@ -2,8 +2,9 @@ FROM node:20 AS build
 WORKDIR /app
 COPY book-socialing-fe/package.json .
 COPY book-socialing-fe/pnpm-lock.yaml .
-RUN npm install -g pnpm && pnpm install
+RUN npm install -g pnpm && pnpm install --frozen-lockfile
 COPY book-socialing-fe .
+
 RUN pnpm build
 
 FROM nginx:latest

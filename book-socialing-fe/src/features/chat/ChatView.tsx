@@ -43,8 +43,14 @@ const dummyMessages: ChatMessageResponse[] = [
 ]
 
 export default function ChatPage() {
+  const [openUserDialog, setOpenUserDialog] = useState(false)
   const [activeFilter, setActiveFilter] = useState<FilterType>()
   const navigate = useNavigate()
+
+  function handleUserClick(senderNickname: string) {
+    console.log(openUserDialog, senderNickname)
+    setOpenUserDialog(true)
+  }
 
   return (
     <div className="flex flex-col h-screen bg-[#FAFAFA]">
@@ -66,10 +72,10 @@ export default function ChatPage() {
 
       <main className="flex-1 overflow-y-auto px-4 py-2 space-y-4">
         <Filter activeFilter={activeFilter} setActiveFilter={setActiveFilter} />
+        {dummyMessages.map(message => (
+          <Message key={message.messageId} onUserClick={handleUserClick} {...message} />
+        ))}
         <Dialog>
-          {dummyMessages.map(message => (
-            <Message key={message.messageId} {...message} />
-          ))}
           {/* 프로필 정보 */}
           <DialogContent className="rounded-2xl p-6 w-[360px] bg-white border-none">
             <div className="flex flex-col items-center space-y-6">

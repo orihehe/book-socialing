@@ -6,6 +6,7 @@ import { BaseCard } from '@/components/common/BaseCard'
 import { Button } from '@/components/ui/button'
 import { CardContent } from '@/components/ui/card'
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/components/ui/carousel'
+import { LoadingPage } from '@/features/shared/components/LoadingPage'
 import { dummy } from '@/features/shared/dummy'
 import { cn } from '@/lib/utils'
 import type { ClubNotesPageResponse } from '@/types/note'
@@ -59,7 +60,7 @@ export function Summary({ moveToAll }: Props) {
     })
   }, [api])
 
-  if (isLoading) return <div>Loading...</div>
+  if (isLoading) return <LoadingPage className="h-30" />
   if (error) return <div>Error loading notes</div>
 
   return (

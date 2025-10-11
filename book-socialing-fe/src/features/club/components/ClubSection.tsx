@@ -11,6 +11,8 @@ interface ClubSectionProps {
 }
 
 export function ClubSection({ section }: ClubSectionProps) {
+  if (!section.clubs.length) return null
+
   return (
     <BaseCard
       title={

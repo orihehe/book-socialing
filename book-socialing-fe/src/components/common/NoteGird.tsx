@@ -1,4 +1,5 @@
 import { ArrowDownUp } from 'lucide-react' // 새로고침 아이콘
+import { Link } from 'react-router-dom'
 
 import type { Note } from '@/types/note'
 import { getImageUrl } from '@/util'
@@ -21,13 +22,13 @@ export function NoteGrid({ notes, children }: Props) {
       </div>
       <div className="grid grid-cols-3 gap-3 p-4">
         {notes.map((note, index) => (
-          <div key={index} className="bg-gray-200 rounded-lg h-32 w-full">
+          <Link to={`/note/${note.id}`} key={index} className="bg-gray-200 rounded-lg h-50 w-full">
             <img
               src={getImageUrl(note.bookImageUrl ?? '')}
               alt={note.bookName}
-              className="w-full h-full rounded-md object-cover border"
+              className="w-full h-full rounded-md object-cover border-none"
             />
-          </div>
+          </Link>
         ))}
       </div>
     </div>
