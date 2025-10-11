@@ -39,7 +39,7 @@ class SecurityConfig(
             }
             .authorizeHttpRequests { auth ->
                 auth
-                    .requestMatchers("/", "/oauth2/**", "/login/oauth2/code/**").permitAll()
+                    .requestMatchers("/", "/oauth2/**", "/login/oauth2/code/**", "/error").permitAll()
                     .requestMatchers("/api/**").hasRole("USER")
                     .anyRequest().authenticated()
             }
