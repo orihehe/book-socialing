@@ -14,6 +14,7 @@ import CreateNote from './features/note/pages/CreateNote'
 import EditNote from './features/note/pages/EditNote'
 import GuestManagement from './features/note/pages/GuestManagement'
 import KakaoCallback from './features/user/KakaoCallback'
+import My from './features/user/My'
 import SignIn from './features/user/SignIn'
 import NotFound from './pages/NotFound'
 
@@ -43,6 +44,7 @@ function App() {
         {/* <Route path="/about" element={<AboutPage />} /> */}
 
         {/* user */}
+        <Route path="/my" element={<My />} />
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/oauth/callback" element={<KakaoCallback />} />
 

@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 import { cn } from '@/lib/utils'
 
@@ -42,7 +42,11 @@ export function PageHeader({ title, showBack, className, children }: PageHeaderP
     <header className={cn('flex items-center h-14 px-4 w-full', className)}>
       <div className="flex items-center gap-2 mr-auto">
         {showBack && <HeaderBackButton />}
-        {title && <h1 className="text-lg font-semibold">{title}</h1>}
+        {title && (
+          <Link to="/">
+            <h1 className="text-lg font-semibold">{title}</h1>
+          </Link>
+        )}
       </div>
       {children && <div className="ml-auto flex items-center">{children}</div>}
     </header>

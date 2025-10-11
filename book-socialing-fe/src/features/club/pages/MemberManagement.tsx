@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { X } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import { BaseButton } from '@/components/common/BaseButton'
 import { BottomButton } from '@/components/common/BottomButton'
@@ -8,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { UserImage } from '@/features/shared/components/UserImage'
 import { apiFetch } from '@/lib/api'
-import { User } from '@/types/user'
+import { User, UserDetail } from '@/types/user'
 
 const MemberListItem = ({ user, action }: { user: User; action: React.ReactNode }) => (
   <div
@@ -24,6 +25,7 @@ const MemberListItem = ({ user, action }: { user: User; action: React.ReactNode 
 )
 
 export default function MemberManagement() {
+  const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const pendingMembers = [
     { id: 1, nickname: '닉네임', email: '이메일' },
@@ -36,6 +38,15 @@ export default function MemberManagement() {
     { id: 3, nickname: '닉네임', email: '이메일' },
   ]
 
+  const { data: clubMembers } = useQuery<UserDetail[]>({
+    queryKey: ['clubMembers', id],
+    queryFn: async () => {
+      const res = await apiFetch(`/v1/club/${id}/members`)
+      if (!res.ok) throw new Error('Failed to fetch club members')
+      return res.json()
+    },
+  })
+  console.log(clubMembers)
   const queryClient = useQueryClient()
 
   const rejectMutation = useMutation({
