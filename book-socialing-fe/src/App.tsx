@@ -9,12 +9,14 @@ import ClubDetail from './features/club/pages/ClubDetail'
 import CreateClub from './features/club/pages/CreateClub'
 import EditClub from './features/club/pages/EditClub'
 import MemberManagement from './features/club/pages/MemberManagement'
+import NoteView from './features/note/NoteView'
 import CreateNote from './features/note/pages/CreateNote'
 import EditNote from './features/note/pages/EditNote'
 import GuestManagement from './features/note/pages/GuestManagement'
 import KakaoCallback from './features/user/KakaoCallback'
+import My from './features/user/My'
 import SignIn from './features/user/SignIn'
-import NoteView from './pages/note'
+import NotFound from './pages/NotFound'
 
 const queryClient = new QueryClient()
 
@@ -42,8 +44,12 @@ function App() {
         {/* <Route path="/about" element={<AboutPage />} /> */}
 
         {/* user */}
+        <Route path="/my" element={<My />} />
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/oauth/callback" element={<KakaoCallback />} />
+
+        {/* not found */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </QueryClientProvider>
   )

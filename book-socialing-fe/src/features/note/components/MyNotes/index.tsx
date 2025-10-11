@@ -52,10 +52,8 @@ export function MyNotes() {
   // const [createdResult, pendingResult] = results
   const [createdResult] = results
   const isLoading = createdResult.isLoading || pendingResult.isLoading
-  const hasError = createdResult.error || pendingResult.error
 
   if (isLoading) return <LoadingPage className="h-30" />
-  if (hasError) return <div>Error occurred</div>
 
   return (
     <>

@@ -1,7 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
-import { useNavigate } from 'react-router-dom'
+import { ArrowUpRightIcon } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
 
 import { BottomButton } from '@/components/common/BottomButton'
+import { Button } from '@/components/ui/button'
+import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty'
 import { apiFetch } from '@/lib/api'
 
 import { ClubSection as ClubSectionComponent } from './components/ClubSection'
@@ -19,7 +22,7 @@ export default function ClubView() {
 
       const result = await res.json()
 
-      return { title: '추천 클럽', totalCount: 3, clubs: result }
+      return { title: '추천 클럽', totalCount: result.totalCount ?? 0, clubs: result.groups ?? [] }
     },
   })
 
@@ -30,7 +33,7 @@ export default function ClubView() {
       if (!res.ok) throw new Error('가입한 클럽 정보를 불러오지 못했습니다.')
       const result = await res.json()
 
-      return { title: '내 클럽', totalCount: 3, clubs: result }
+      return { title: '내 클럽', totalCount: result.totalCount ?? 0, clubs: result.groups ?? [] }
     },
   })
 
@@ -41,20 +44,45 @@ export default function ClubView() {
       if (!res.ok) throw new Error('생성한 클럽 정보를 불러오지 못했습니다.')
       const result = await res.json()
 
-      return { title: '생성한 클럽', totalCount: 3, showActions: true, clubs: result }
+      return {
+        title: '생성한 클럽',
+        totalCount: result.totalCount ?? 0,
+        clubs: result.groups ?? [],
+        showActions: true,
+      }
     },
   })
+
+  const noClubs =
+    (!joinedClubs?.clubs || joinedClubs.clubs.length === 0) &&
+    (!creaetdClubs?.clubs || creaetdClubs.clubs.length === 0) &&
+    (!recommendedClubs?.clubs || recommendedClubs.clubs.length === 0)
 
   return (
     <MainLayout>
       {/* Main Content */}
-      <div className="flex flex-col p-4 mx-auto">
-        {joinedClubs && <ClubSectionComponent section={joinedClubs} />}
-        {creaetdClubs && <ClubSectionComponent section={creaetdClubs} />}
-        {recommendedClubs && (
-          <ClubSectionComponent section={{ ...recommendedClubs, refetch: refetchRecommended }} />
-        )}
-      </div>
+      {noClubs ? (
+        <Empty>
+          <EmptyHeader>
+            <EmptyTitle>아직 가입한 클럽이 없어요</EmptyTitle>
+            <EmptyDescription>마음에 드는 클럽을 찾아 함께 시작해볼까요?</EmptyDescription>
+          </EmptyHeader>
+
+          <Button variant="link" asChild className="text-muted-foreground" size="sm">
+            <Link to="search">
+              클럽 찾으러 가기 <ArrowUpRightIcon />
+            </Link>
+          </Button>
+        </Empty>
+      ) : (
+        <div className="flex flex-col p-4 mx-auto">
+          {joinedClubs && <ClubSectionComponent section={joinedClubs} />}
+          {creaetdClubs && <ClubSectionComponent section={creaetdClubs} />}
+          {recommendedClubs && (
+            <ClubSectionComponent section={{ ...recommendedClubs, refetch: refetchRecommended }} />
+          )}
+        </div>
+      )}
 
       <BottomButton onClick={() => navigate('/club/create')} children="클럽 생성하러가기" />
     </MainLayout>

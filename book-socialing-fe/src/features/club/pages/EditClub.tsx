@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useNavigate, useParams } from 'react-router-dom'
+import { toast } from 'sonner'
 
 import { BottomButton } from '@/components/common/BottomButton'
 import {
@@ -51,18 +52,38 @@ export default function EditClub() {
       return res.json()
     },
     onSuccess: () => {
+      toast.success('삭제되었습니다.')
       navigate('/club')
     },
     onError: error => {
+      toast.error('일시적인 에러가 발생하였습니다. 다시 시도해 주세요.')
       console.error('Error deleting club:', error)
     },
   })
 
-  async function handleSubmit(data: CreateClubCommand) {
-    console.log('Updated club data:', data)
-    // TODO: Implement club update logic
-    navigate('/club')
-  }
+  const updateMutation = useMutation({
+    mutationFn: async (clubData: CreateClubCommand) => {
+      const res = await apiFetch(`/v1/club/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(clubData),
+      })
+      if (!res.ok) {
+        throw new Error('클럽 수정에 실패했습니다.')
+      }
+      return res.json()
+    },
+    onSuccess: () => {
+      toast.success('클럽 정보가 수정되었습니다.')
+      navigate('/club')
+    },
+    onError: error => {
+      toast.error('클럽 수정에 실패했습니다. 다시 시도해 주세요.')
+      console.error('Error updating club:', error)
+    },
+  })
 
   function handleCancel() {
     navigate('/club')
@@ -74,11 +95,10 @@ export default function EditClub() {
 
   return (
     <>
-      {' '}
       <ClubForm
         mode="edit"
         clubDetail={clubDetail}
-        onSubmit={handleSubmit}
+        onSubmit={updateMutation.mutate}
         onCancel={handleCancel}
       />
       <AlertDialog>
