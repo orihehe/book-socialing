@@ -38,7 +38,7 @@ class SecurityConfig(
             }
             .authorizeHttpRequests { auth ->
                 auth
-                    .requestMatchers("/", "/oauth2/**", "/login/oauth2/code/**").permitAll()
+                    .requestMatchers("/", "/oauth2/**", "/login/oauth2/code/**", "/error").permitAll()
                     .requestMatchers("/api/**").hasRole("USER")
                     .anyRequest().authenticated()
             }
@@ -49,7 +49,10 @@ class SecurityConfig(
             }
             .exceptionHandling { exceptions ->
                 exceptions.authenticationEntryPoint { _, response, _ ->
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")
+                    response.status = HttpServletResponse.SC_UNAUTHORIZED
+                    response.contentType = "application/json"
+                    response.characterEncoding = "UTF-8"
+                    response.writer.write("""{"error": "Unauthorized", "message": "인증이 필요합니다"}""")
                 }
             }
             .addFilterBefore(
