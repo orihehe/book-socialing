@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
 
 export default function KakaoCallback() {
   const navigate = useNavigate()
@@ -9,7 +10,7 @@ export default function KakaoCallback() {
   useEffect(() => {
     if (!code) {
       // code가 없으면 에러 처리
-      alert('카카오 인증 코드가 없습니다.')
+      toast.error('카카오 인증 코드가 없습니다.')
       return
     }
 
