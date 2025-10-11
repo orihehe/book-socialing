@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Search, CircleUserRound } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -40,16 +39,7 @@ export default function Login() {
 
   return (
     <>
-      <PageHeader title="SAISAI">
-        <div className="flex items-center">
-          <Button variant="ghost" size="icon">
-            <Search />
-          </Button>
-          <Button variant="ghost" className="-ml-1">
-            <CircleUserRound />
-          </Button>
-        </div>
-      </PageHeader>
+      <PageHeader title="SAISAI" />
       <div className="min-h-screen flex flex-col items-center justify-start px-6 pt-10 bg-white">
         {/* Header */}
 

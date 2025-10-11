@@ -22,11 +22,7 @@ export function Summary({ moveToAll }: Props) {
   const [api, setApi] = useState<CarouselApi>()
   const [current, setCurrent] = useState(0)
 
-  const {
-    data: currentNotesData,
-    isLoading,
-    error,
-  } = useQuery({
+  const { data: currentNotesData, isLoading } = useQuery({
     queryKey: ['openNotes'],
     queryFn: async (): Promise<ClubNotesPageResponse> => {
       const response = await apiFetch('/v1/note/open', {
@@ -62,7 +58,6 @@ export function Summary({ moveToAll }: Props) {
   }, [api])
 
   if (isLoading) return <LoadingPage className="h-30" />
-  if (error) return <div>Error loading notes</div>
 
   return (
     <div>

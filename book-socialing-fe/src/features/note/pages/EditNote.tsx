@@ -57,7 +57,7 @@ export default function EditNote() {
     },
     onSuccess: () => {
       toast.success('수정되었습니다.', { position: 'top-center' })
-      // navigate('/note')
+      navigate('/note')
     },
     onError: error => {
       console.error('Error updating note:', error)
