@@ -11,6 +11,7 @@ const loginSchema = z.object({
   email: z.string().email('올바른 이메일 형식을 입력해 주세요'),
   password: z.string().min(6, '비밀번호는 6자 이상 입력해 주세요'),
 })
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
 
 type LoginFormData = z.infer<typeof loginSchema>
 
@@ -34,18 +35,7 @@ export default function Login() {
   }
 
   function requestKakaoLogin() {
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
-    // const clientId = import.meta.env.VITE_KAKAO_CLIENT_ID
-
-    // console.log({ apiBaseUrl, frontendUrl, clientId })
-
-    // // 오타 수정: clident_id → client_id, redirect_url → redirect_uri
-    // const requestTokenUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${clientId}&redirect_uri=${
-    //   frontendUrl + '/auth/kakao/callback'
-    // }&response_type=code`
-
-    // console.log('Redirecting to:', requestTokenUrl)
-    window.location.href = `${apiBaseUrl}/api/oauth2/authorization/kakao`
+    window.location.href = `${apiBaseUrl}/oauth2/authorization/kakao`
   }
 
   return (
