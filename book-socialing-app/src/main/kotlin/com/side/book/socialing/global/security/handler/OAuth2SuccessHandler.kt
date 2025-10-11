@@ -35,7 +35,7 @@ class OAuth2SuccessHandler(
         val accessToken = jwtTokenProvider.createAccessToken(email)
         val refreshToken = jwtTokenProvider.createRefreshToken()
 
-        val targetUrl = UriComponentsBuilder.fromUriString("http://$serverUrl/oauth/callback")
+        val targetUrl = UriComponentsBuilder.fromUriString("$serverUrl/oauth/callback")
             .queryParam("accessToken", accessToken)
             .queryParam("refreshToken", refreshToken)
             .build()
