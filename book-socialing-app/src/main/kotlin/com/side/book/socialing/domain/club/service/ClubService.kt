@@ -142,7 +142,7 @@ class ClubService(
         // 사용자가 참여하고 있는 모든 참여 정보를 찾는다.
         val clubs = clubRepository.findCreatedClubsByUserId(userId, pageable)
 
-        val groups =  clubs.map { club ->
+        val groups = clubs.map { club ->
             CommonClubResponse(
                 id = club.id!!,
                 clubName = club.clubName,
