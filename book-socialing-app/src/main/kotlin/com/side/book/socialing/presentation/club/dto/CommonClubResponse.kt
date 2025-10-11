@@ -1,6 +1,5 @@
 package com.side.book.socialing.presentation.club.dto
 
-import com.side.book.socialing.presentation.note.dto.ClubNotesGroupResponse
 import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(description = "클럽 페이지 응답(제네릭)")
