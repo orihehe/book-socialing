@@ -198,4 +198,32 @@ class ClubController(
         clubService.updateClub(command)
         return ResponseEntity.ok().build()
     }
+
+    @Operation(
+        summary = "클럽 검색",
+        description = "클럽 이름 또는 설명으로 클럽을 검색합니다."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "성공적으로 클럽 목록을 조회함"),
+            ApiResponse(responseCode = "500", description = "서버 내부 오류")
+        ]
+    )
+    @GetMapping("/search")
+    fun searchClubs(
+        @RequestParam query: String, // 검색어
+        @RequestParam(defaultValue = "10") pageSize: Int,
+        @RequestParam(defaultValue = "1") pageNum: Int
+    ): ResponseEntity<ClubPageResponse<CommonClubResponse>> {
+        val offset = (pageNum - 1) * pageSize
+
+        return try {
+            val searchResults = clubService.searchClub(query, pageSize, offset)
+            ResponseEntity.ok(searchResults)
+        } catch (e: Exception) {
+            log.error("Error searching clubs with query: $query", e)
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ClubPageResponse(totalCount = 0L, groups = emptyList()))
+        }
+    }
 }

@@ -54,4 +54,28 @@ interface NoteRepository : JpaRepository<Note, Long> {
         @Param("currentDateTime") currentDateTime: LocalDateTime,
         @Param("pageable") pageable: Pageable
     ): List<Note>
+
+    @Query(
+        """
+        SELECT COUNT(DISTINCT n.id) FROM Note n 
+        WHERE (n.bookName LIKE %:keyword%)
+        AND n.deleted = false
+    """
+    )
+    fun countNoteByBookName(
+        @Param("keyword") keyword: String
+    ): Long
+
+    @Query(
+        """
+        SELECT DISTINCT n FROM Note n 
+        WHERE (n.bookName LIKE %:keyword%)
+        AND n.deleted = false 
+        ORDER BY n.createdAt DESC
+    """
+    )
+    fun findNoteByBookName(
+        @Param("keyword") keyword: String,
+        pageable: Pageable
+    ): List<Note>
 }

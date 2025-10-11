@@ -291,4 +291,45 @@ class ClubService(
             throw e
         }
     }
+
+    /**
+     * 클럽 이름 또는 설명으로 클럽을 검색하고 페이징 처리된 결과를 반환합니다.
+     *
+     * @param query 검색어. 클럽 이름 또는 설명에 포함된 문자열로 검색됩니다.
+     * @param pageSize 한 페이지에 보여줄 클럽의 수.
+     * @param offset 페이징을 위한 오프셋 (페이지 번호에 기반하여 계산됨).
+     * @return 검색 결과에 해당하는 클럽 정보가 담긴 `ClubPageResponse` DTO.
+     *         검색 결과가 없으면 빈 리스트를 반환합니다.
+     */
+    @Transactional(readOnly = true)
+    fun searchClub(query: String, pageSize: Int, offset: Int): ClubPageResponse<CommonClubResponse> {
+        val pageIndex = offset / pageSize
+
+        val pageable = PageRequest.of(
+            pageIndex,
+            pageSize,
+            Sort.by(Sort.Order.desc("createdAt"))
+        )
+
+        val totalCount = clubRepository.countSearchClubByClubName(query)
+
+        // 만약 검색 결과가 없다면, 빈 결과 반환
+        if (totalCount == 0L) {
+            return ClubPageResponse(totalCount = 0L, groups = emptyList())
+        }
+
+        val clubs = clubRepository.findSearchClubByClubName(query, pageable)
+
+        val groups = clubs.map { club ->
+            CommonClubResponse(
+                id = club.id!!,
+                clubName = club.clubName,
+                clubImageUrls = club.files.map { it.filePath },
+                description = club.description ?: "",
+                memberCount = club.participants.size
+            )
+        }
+
+        return ClubPageResponse(totalCount = totalCount, groups = groups)
+    }
 }
