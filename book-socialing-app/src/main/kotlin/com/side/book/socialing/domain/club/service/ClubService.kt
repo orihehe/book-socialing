@@ -1,6 +1,7 @@
 package com.side.book.socialing.domain.club.service
 
 import com.side.book.socialing.domain.club.command.CreateClubCommand
+import com.side.book.socialing.domain.club.command.UpdateClubCommand
 import com.side.book.socialing.domain.club.entity.Club
 import com.side.book.socialing.domain.club.entity.ClubFile
 import com.side.book.socialing.domain.club.entity.ClubParticipant
@@ -9,6 +10,7 @@ import com.side.book.socialing.domain.club.enum.ParticipantStatus
 import com.side.book.socialing.domain.club.repository.ClubFileRepository
 import com.side.book.socialing.domain.club.repository.ClubParticipantRepository
 import com.side.book.socialing.domain.club.repository.ClubRepository
+import com.side.book.socialing.global.error.exception.ForbiddenException
 import com.side.book.socialing.global.file.FileUploader
 import com.side.book.socialing.global.file.StoredFile
 import com.side.book.socialing.presentation.club.dto.ClubPageResponse
@@ -19,6 +21,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.nio.file.Paths
 
 @Service
 class ClubService(
@@ -245,5 +248,47 @@ class ClubService(
         club.participants.forEach { it.delete() }
         club.files.forEach { it.delete() }
         club.reviews.forEach { it.delete() }
+    }
+
+    /**
+     * 클럽을 수정하고 관련된 파일 정보를 업데이트합니다.
+     *
+     * @param cmd 클럽 수정에 필요한 모든 정보(클럽 ID, 작성자 ID, 클럽 내용, 이미지 파일)가 담긴 커맨드 객체.
+     * @throws EntityNotFoundException 해당 ID의 클럽를 찾을 수 없을 때 발생합니다.
+     * @throws ForbiddenException 사용자가 클럽의 호스트가 아닐 경우 발생합니다.
+     */
+    @Transactional
+    fun updateClub(cmd: UpdateClubCommand) {
+        val club = clubRepository.findById(cmd.clubId)
+            .orElseThrow { EntityNotFoundException("Club with ID ${cmd.clubId} not found") }
+
+        club.update(cmd)
+
+        val clubFilePath = Paths.get(filePath, club.id!!.toString()).toString()
+        club.files.forEach {
+            it.delete()
+        }
+
+        val uploadedFiles = mutableListOf<StoredFile>()
+        try {
+            for (file in cmd.imageFiles) {
+                val storedFile = fileUploader.upload(file, clubFilePath)
+                uploadedFiles.add(storedFile)
+
+                val clubFile = ClubFile.create(
+                    club = club,
+                    originalFileName = storedFile.originalFileName,
+                    storedFileName = storedFile.storedFileName,
+                    filePath = storedFile.filePath,
+                    fileSize = file.size
+                )
+                clubFileRepository.save(clubFile)
+            }
+        } catch (e: Exception) {
+            for (file in uploadedFiles) {
+                fileUploader.delete(file.filePath)
+            }
+            throw e
+        }
     }
 }

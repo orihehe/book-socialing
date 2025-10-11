@@ -1,12 +1,14 @@
 package com.side.book.socialing.presentation.club
 
 import com.side.book.socialing.domain.club.command.CreateClubCommand
+import com.side.book.socialing.domain.club.command.UpdateClubCommand
 import com.side.book.socialing.domain.club.service.ClubService
 import com.side.book.socialing.global.auth.UserPrincipalResolver
 import com.side.book.socialing.global.utils.log
 import com.side.book.socialing.presentation.club.dto.ClubPageResponse
 import com.side.book.socialing.presentation.club.dto.CommonClubResponse
 import com.side.book.socialing.presentation.club.dto.CreateClubRequest
+import com.side.book.socialing.presentation.club.dto.UpdateClubRequest
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RequestPart
@@ -166,5 +169,33 @@ class ClubController(
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(emptyList()) // 빈 리스트 반환 또는 에러 DTO 반환
         }
+    }
+
+    @PutMapping("/{clubId}", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    @Operation(
+        summary = "클럽 수정",
+        description = "클럽 ID를 통해 특정 클럽을 수정합니다. 호스트만 수정할 수 있습니다."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "클럽 수정 성공")
+        ]
+    )
+    fun updateClub(
+        @PathVariable clubId: Long,
+        @RequestPart("request") request: UpdateClubRequest,
+        @RequestPart("images") imageFiles: List<MultipartFile>
+    ): ResponseEntity<Void> {
+        val userId = userPrincipalResolver.getUserId()
+        val command = UpdateClubCommand(
+            clubId = clubId,
+            userId = userId,
+            clubName = request.clubName,
+            description = request.description,
+            imageFiles = imageFiles
+        )
+
+        clubService.updateClub(command)
+        return ResponseEntity.ok().build()
     }
 }
