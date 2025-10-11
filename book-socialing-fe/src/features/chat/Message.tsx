@@ -18,6 +18,7 @@ import { MESSAGE_TYPE_LABELS } from './const'
 interface Props extends ChatMessageResponse {
   onUserClick: (senderNickname: string) => void
 }
+
 export function Message({ onUserClick, senderNickname, content, type, sentAt }: Props) {
   return (
     <div className="flex gap-2">

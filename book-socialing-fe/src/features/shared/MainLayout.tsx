@@ -1,8 +1,8 @@
 import { CircleUserRound, Search } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 import LNB from '@/components/layout/LNB'
 import { PageHeader } from '@/components/layout/PageHeader'
-import { Button } from '@/components/ui/button'
 
 interface Props {
   pageHeader?: React.ReactNode
@@ -34,12 +34,12 @@ export function MainLayout({ pageHeader, children, activeTab, onTabChange }: Pro
       {pageHeader ?? (
         <PageHeader title="SAISAI">
           <div className="flex items-center">
-            <Button variant="ghost" size="icon">
-              <Search />
-            </Button>
-            <Button variant="ghost" className="-ml-1">
-              <CircleUserRound />
-            </Button>
+            <Link to="/search" className="pr-3">
+              <Search className="w-5 h-5" />
+            </Link>
+            <Link to="/sign-in">
+              <CircleUserRound className="w-5 h-5" />
+            </Link>
           </div>
         </PageHeader>
       )}

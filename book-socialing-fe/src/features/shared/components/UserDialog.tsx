@@ -1,10 +1,18 @@
+import { Dispatch, SetStateAction } from 'react'
+
 import { Dialog, DialogContent } from '@/components/ui/dialog'
+import type { User } from '@/types/user'
 
 interface Props {
+  user?: User
   open: boolean
-  setOpen: () => void
+  setOpen: Dispatch<SetStateAction<boolean>>
 }
-export function UserDialog({ open, setOpen }: Props) {
+export function UserDialog({ user, open, setOpen }: Props) {
+  if (!user) {
+    return null
+  }
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="rounded-2xl p-6 w-[360px] bg-white border-none">
@@ -17,11 +25,11 @@ export function UserDialog({ open, setOpen }: Props) {
             <div className="space-y-4 text-sm">
               <div className="flex">
                 <span className="w-20 font-medium">이메일</span>
-                <span className="text-muted-foreground">yayaya@naver.com</span>
+                <span className="text-muted-foreground">{user.email}</span>
               </div>
               <div className="flex">
                 <span className="w-20 font-medium">닉네임</span>
-                <span className="">야오 야옹</span>
+                <span className="">{user.nickname}</span>
               </div>
               <div className="flex">
                 <span className="w-20 font-medium">소개</span>

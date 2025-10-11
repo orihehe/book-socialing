@@ -2,14 +2,15 @@ import { ChevronLeft, Search } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { ChatMessageResponse, MessageType } from '@/types/chat'
+import { User } from '@/types/user'
 
 import { ChatInput } from './ChatInput'
 import { FilterType } from './const'
 import { DownloadButton } from './DownloadButton'
 import { Filter } from './Filter'
 import { Message } from './Message'
+import { UserDialog } from '../shared/components/UserDialog'
 
 const dummyMessages: ChatMessageResponse[] = [
   {
@@ -44,12 +45,14 @@ const dummyMessages: ChatMessageResponse[] = [
 
 export default function ChatPage() {
   const [openUserDialog, setOpenUserDialog] = useState(false)
+  const [selectedUser, setSelectedUser] = useState<User>()
   const [activeFilter, setActiveFilter] = useState<FilterType>()
   const navigate = useNavigate()
 
   function handleUserClick(senderNickname: string) {
-    console.log(openUserDialog, senderNickname)
     setOpenUserDialog(true)
+    // TODO: user 조회
+    setSelectedUser({ nickname: senderNickname, email: senderNickname, id: 1 })
   }
 
   return (
@@ -75,33 +78,7 @@ export default function ChatPage() {
         {dummyMessages.map(message => (
           <Message key={message.messageId} onUserClick={handleUserClick} {...message} />
         ))}
-        <Dialog>
-          {/* 프로필 정보 */}
-          <DialogContent className="rounded-2xl p-6 w-[360px] bg-white border-none">
-            <div className="flex flex-col items-center space-y-6">
-              {/* 프로필 이미지 */}
-              <div className="w-24 h-24 rounded-md bg-muted" />
-
-              {/* 정보 목록 */}
-              <div className="w-full space-y-4 text-sm">
-                <div className="space-y-4 text-sm">
-                  <div className="flex">
-                    <span className="w-20 font-medium">이메일</span>
-                    <span className="text-muted-foreground">yayaya@naver.com</span>
-                  </div>
-                  <div className="flex">
-                    <span className="w-20 font-medium">닉네임</span>
-                    <span className="">야오 야옹</span>
-                  </div>
-                  <div className="flex">
-                    <span className="w-20 font-medium">소개</span>
-                    <span className="">야오 야옹야아오오오이이잉</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <UserDialog user={selectedUser} open={openUserDialog} setOpen={setOpenUserDialog} />
       </main>
 
       <footer className="p-2">
