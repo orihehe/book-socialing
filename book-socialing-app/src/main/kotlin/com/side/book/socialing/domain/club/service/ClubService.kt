@@ -11,9 +11,12 @@ import com.side.book.socialing.domain.club.repository.ClubParticipantRepository
 import com.side.book.socialing.domain.club.repository.ClubRepository
 import com.side.book.socialing.global.file.FileUploader
 import com.side.book.socialing.global.file.StoredFile
+import com.side.book.socialing.presentation.club.dto.ClubPageResponse
 import com.side.book.socialing.presentation.club.dto.CommonClubResponse
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -80,11 +83,26 @@ class ClubService(
      *         만약 참여 중인 클럽이 없으면 빈 리스트를 반환합니다.
      */
     @Transactional(readOnly = true)
-    fun getJoinedClubs(userId: Long): List<CommonClubResponse> {
-        // 사용자가 참여하고 있는 모든 참여 정보를 찾는다.
-        val clubs = clubRepository.findJoinedClubByUserId(userId)
+    fun getJoinedClubs(userId: Long, pageSize: Int, offset: Int): ClubPageResponse<CommonClubResponse> {
+        val pageIndex = offset / pageSize
 
-        return clubs.map { club ->
+        val pageable = PageRequest.of(
+            pageIndex,
+            pageSize,
+            Sort.by(Sort.Order.desc("createdAt"))
+        )
+
+        val totalCount = clubRepository.countJoinedClubByUserId(userId)
+
+        // 만약 목록이 없다면, 빈 결과 반환
+        if (totalCount == 0L) {
+            return ClubPageResponse(totalCount = 0L, groups = emptyList())
+        }
+
+        // 사용자가 참여하고 있는 모든 참여 정보를 찾는다.
+        val clubs = clubRepository.findJoinedClubByUserId(userId, pageable)
+
+        val groups = clubs.map { club ->
             CommonClubResponse(
                 id = club.id!!,
                 clubName = club.clubName,
@@ -93,6 +111,8 @@ class ClubService(
                 memberCount = club.participants.size
             )
         }
+
+        return ClubPageResponse(totalCount = totalCount, groups = groups)
     }
 
     /**
@@ -103,11 +123,26 @@ class ClubService(
      *         만약 생성한 클럽가 없으면 빈 리스트를 반환합니다.
      */
     @Transactional(readOnly = true)
-    fun getCreatedClubs(userId: Long): List<CommonClubResponse> {
-        // 사용자가 참여하고 있는 모든 참여 정보를 찾는다.
-        val clubs = clubRepository.findCreatedClubsByUserId(userId)
+    fun getCreatedClubs(userId: Long, pageSize: Int, offset: Int): ClubPageResponse<CommonClubResponse> {
+        val pageIndex = offset / pageSize
 
-        return clubs.map { club ->
+        val pageable = PageRequest.of(
+            pageIndex,
+            pageSize,
+            Sort.by(Sort.Order.desc("createdAt"))
+        )
+
+        val totalCount = clubRepository.countCreatedClubsByUserId(userId)
+
+        // 만약 목록이 없다면, 빈 결과 반환
+        if (totalCount == 0L) {
+            return ClubPageResponse(totalCount = 0L, groups = emptyList())
+        }
+
+        // 사용자가 참여하고 있는 모든 참여 정보를 찾는다.
+        val clubs = clubRepository.findCreatedClubsByUserId(userId, pageable)
+
+        val groups =  clubs.map { club ->
             CommonClubResponse(
                 id = club.id!!,
                 clubName = club.clubName,
@@ -116,6 +151,8 @@ class ClubService(
                 memberCount = club.participants.size
             )
         }
+
+        return ClubPageResponse(totalCount = totalCount, groups = groups)
     }
 
     /**
@@ -126,11 +163,26 @@ class ClubService(
      *         만약 신청한 클럽가 없으면 빈 리스트를 반환합니다.
      */
     @Transactional(readOnly = true)
-    fun getPendingClubs(userId: Long): List<CommonClubResponse> {
-        // 사용자가 참여하고 있는 모든 참여 정보를 찾는다.
-        val clubs = clubRepository.findPendingClubsByUserId(userId)
+    fun getPendingClubs(userId: Long, pageSize: Int, offset: Int): ClubPageResponse<CommonClubResponse> {
+        val pageIndex = offset / pageSize
 
-        return clubs.map { club ->
+        val pageable = PageRequest.of(
+            pageIndex,
+            pageSize,
+            Sort.by(Sort.Order.desc("createdAt"))
+        )
+
+        val totalCount = clubRepository.countPendingClubsByUserId(userId)
+
+        // 만약 목록이 없다면, 빈 결과 반환
+        if (totalCount == 0L) {
+            return ClubPageResponse(totalCount = 0L, groups = emptyList())
+        }
+
+        // 사용자가 참여하고 있는 모든 참여 정보를 찾는다.
+        val clubs = clubRepository.findPendingClubsByUserId(userId, pageable)
+
+        val groups = clubs.map { club ->
             CommonClubResponse(
                 id = club.id!!,
                 clubName = club.clubName,
@@ -139,6 +191,8 @@ class ClubService(
                 memberCount = club.participants.size
             )
         }
+
+        return ClubPageResponse(totalCount = totalCount, groups = groups)
     }
 
     @Transactional(readOnly = true)
