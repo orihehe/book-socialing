@@ -54,10 +54,11 @@ class JwtTokenProvider(
             return true
         } catch (e: Exception) {
             when (e) {
-                is io.jsonwebtoken.security.SecurityException, is MalformedJwtException -> log.error("Invalid JWT signature.")
-                is ExpiredJwtException -> log.error("Expired JWT token.")
-                is UnsupportedJwtException -> log.error("Unsupported JWT token.")
-                is IllegalArgumentException -> log.error("JWT token is invalid.")
+                is io.jsonwebtoken.security.SecurityException -> log.error("Invalid JWT signature.", e)
+                is MalformedJwtException -> log.error("Invalid JWT signature.", e)
+                is ExpiredJwtException -> log.error("Expired JWT token.", e)
+                is UnsupportedJwtException -> log.error("Unsupported JWT token.", e)
+                is IllegalArgumentException -> log.error("JWT token is invalid.", e)
                 else -> log.error("An unknown JWT error occurred.", e)
             }
         }
