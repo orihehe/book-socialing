@@ -35,20 +35,18 @@ export default function Login() {
 
   function requestKakaoLogin() {
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
-    const frontendUrl = import.meta.env.VITE_FRONTEND_URL
-    const clientId = import.meta.env.VITE_KAKAO_CLIENT_ID
+    // const clientId = import.meta.env.VITE_KAKAO_CLIENT_ID
 
-    console.log({ apiBaseUrl, frontendUrl, clientId })
+    // console.log({ apiBaseUrl, frontendUrl, clientId })
 
-    // 오타 수정: clident_id → client_id, redirect_url → redirect_uri
-    const requestTokenUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${clientId}&redirect_uri=${
-      frontendUrl + '/auth/kakao/callback'
-    }&response_type=code`
+    // // 오타 수정: clident_id → client_id, redirect_url → redirect_uri
+    // const requestTokenUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${clientId}&redirect_uri=${
+    //   frontendUrl + '/auth/kakao/callback'
+    // }&response_type=code`
 
-    console.log('Redirecting to:', requestTokenUrl)
-    window.location.href = requestTokenUrl
+    // console.log('Redirecting to:', requestTokenUrl)
+    window.location.href = `${apiBaseUrl}/api/oauth2/authorization/kakao`
   }
-  //team-beat.tistory.com/15 [BEAT Team Blog:티스토리]
 
   return (
     <>
