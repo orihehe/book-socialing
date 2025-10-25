@@ -14,56 +14,51 @@ import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 
-@ConditionalOnProperty(name = ["spring.auth.active"], havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(
+    name = ["spring.auth.active"],
+    havingValue = "true",
+    matchIfMissing = true
+)
 @Configuration
 @EnableWebSecurity
 class SecurityConfig(
-        private val customOAuth2UserService: CustomOAuth2UserService,
-        private val oAuth2SuccessHandler: OAuth2SuccessHandler,
-        private val jwtAuthService: JwtAuthService
+    private val customOAuth2UserService: CustomOAuth2UserService,
+    private val oAuth2SuccessHandler: OAuth2SuccessHandler,
+    private val jwtAuthService: JwtAuthService
 ) {
 
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
-                .csrf { it.disable() }
-                .formLogin { it.disable() }
-                .httpBasic { it.disable() }
-                .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
-                .authorizeHttpRequests { auth ->
-                    auth.requestMatchers(
-                                    "/",
-                                    "/oauth2/**",
-                                    "/login/oauth2/code/**",
-                                    "/error",
-                                    "/api/v1/file/**",
-                                    "/ws/**",
-                            )
-                            .permitAll()
-                            .requestMatchers("/api/**")
-                            .hasRole("USER")
-                            .anyRequest()
-                            .authenticated()
+            .csrf { it.disable() }
+            .formLogin { it.disable() }
+            .httpBasic { it.disable() }
+            .sessionManagement {
+                it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            }
+            .authorizeHttpRequests { auth ->
+                auth
+                    .requestMatchers("/", "/oauth2/**", "/login/oauth2/code/**", "/error", "/api/v1/file/**").permitAll()
+                    .requestMatchers("/api/**").hasRole("USER")
+                    .anyRequest().authenticated()
+            }
+            .oauth2Login { oauth2 ->
+                oauth2
+                    .successHandler(oAuth2SuccessHandler)
+                    .userInfoEndpoint { it.userService(customOAuth2UserService) }
+            }
+            .exceptionHandling { exceptions ->
+                exceptions.authenticationEntryPoint { _, response, _ ->
+                    response.status = HttpServletResponse.SC_UNAUTHORIZED
+                    response.contentType = "application/json"
+                    response.characterEncoding = "UTF-8"
+                    response.writer.write("""{"error": "Unauthorized", "message": "인증이 필요합니다"}""")
                 }
-                .oauth2Login { oauth2 ->
-                    oauth2.successHandler(oAuth2SuccessHandler).userInfoEndpoint {
-                        it.userService(customOAuth2UserService)
-                    }
-                }
-                .exceptionHandling { exceptions ->
-                    exceptions.authenticationEntryPoint { _, response, _ ->
-                        response.status = HttpServletResponse.SC_UNAUTHORIZED
-                        response.contentType = "application/json"
-                        response.characterEncoding = "UTF-8"
-                        response.writer.write(
-                                """{"error": "Unauthorized", "message": "인증이 필요합니다"}"""
-                        )
-                    }
-                }
-                .addFilterBefore(
-                        JwtAuthenticationFilter(jwtAuthService),
-                        UsernamePasswordAuthenticationFilter::class.java
-                )
+            }
+            .addFilterBefore(
+                JwtAuthenticationFilter(jwtAuthService),
+                UsernamePasswordAuthenticationFilter::class.java
+            )
 
         return http.build()
     }
