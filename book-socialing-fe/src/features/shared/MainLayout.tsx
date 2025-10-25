@@ -7,8 +7,9 @@ import { PageHeader } from '@/components/layout/PageHeader'
 interface Props {
   pageHeader?: React.ReactNode
   children: React.ReactNode
-  activeTab?: string
-  onTabChange?: (key: string) => void
+  activeItemIndex?: number
+  activeChildIndex?: number
+  onChildTabChange?: (index: number) => void
 }
 
 const lnbItems = [
@@ -28,7 +29,13 @@ const lnbItems = [
   },
 ]
 
-export function MainLayout({ pageHeader, children, activeTab, onTabChange }: Props) {
+export function MainLayout({
+  pageHeader,
+  children,
+  activeItemIndex = 0,
+  activeChildIndex,
+  onChildTabChange,
+}: Props) {
   return (
     <>
       {pageHeader ?? (
@@ -44,7 +51,12 @@ export function MainLayout({ pageHeader, children, activeTab, onTabChange }: Pro
         </PageHeader>
       )}
 
-      <LNB activeItemIndex={0} items={lnbItems} activeTab={activeTab} onTabChange={onTabChange} />
+      <LNB
+        activeItemIndex={activeItemIndex}
+        items={lnbItems}
+        activeChildIndex={activeChildIndex}
+        onChildTabChange={onChildTabChange}
+      />
 
       {children}
     </>

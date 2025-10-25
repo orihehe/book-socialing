@@ -41,6 +41,7 @@ export function CurrentNoteCard({
             <div className="flex -space-x-2">
               {visible.map(p => (
                 <UserImage
+                  key={p.userId}
                   user={{ nickname: `${p.userId}`, id: p.userId, email: 'test' }}
                   size={8}
                 />

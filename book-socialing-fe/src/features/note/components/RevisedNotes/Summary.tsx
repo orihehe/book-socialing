@@ -35,6 +35,11 @@ export function Summary({ moveToAll }: RevisedNotesProps) {
 
   if (isLoading) return <LoadingPage className="h-30" />
 
+  // 닫힌 노트가 0개면 아무것도 표시하지 않음
+  if (!data?.totalCount || data.totalCount === 0) {
+    return null
+  }
+
   return (
     <>
       <BaseCard title={`닫힌 노트 (${data?.totalCount ?? 0})`}>

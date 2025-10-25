@@ -30,10 +30,6 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
         ws: true,
-        rewrite: path => {
-          console.log('Proxying WebSocket request:', path)
-          return path
-        },
       },
     },
   },

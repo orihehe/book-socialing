@@ -13,23 +13,28 @@ import { Summary as RevisedSummary } from './components/RevisedNotes/Summary'
 import { SuggestedNotes } from './components/shared/SuggestedNotes'
 
 export default function NoteView() {
-  const [activeTab, setActiveTab] = useState('all')
+  // 0: 전체, 1: 열린노트, 2: 닫힌 노트
+  const [activeChildIndex, setActiveChildIndex] = useState(0)
   const navigate = useNavigate()
 
   return (
     <>
-      <MainLayout activeTab={activeTab} onTabChange={setActiveTab}>
+      <MainLayout
+        activeItemIndex={1}
+        activeChildIndex={activeChildIndex}
+        onChildTabChange={setActiveChildIndex}
+      >
         <div className="flex flex-col p-2 mx-auto">
-          {activeTab === 'all' && (
+          {activeChildIndex === 0 && (
             <>
-              <CurrentSummary moveToAll={() => setActiveTab('open')} />
+              <CurrentSummary moveToAll={() => setActiveChildIndex(1)} />
               <MyNotes />
               <SuggestedNotes />
-              <RevisedSummary moveToAll={() => setActiveTab('closed')} />
+              <RevisedSummary moveToAll={() => setActiveChildIndex(2)} />
             </>
           )}
-          {activeTab === 'open' && <CurrentNotes />}
-          {activeTab === 'closed' && <RevisedNotes />}
+          {activeChildIndex === 1 && <CurrentNotes />}
+          {activeChildIndex === 2 && <RevisedNotes />}
         </div>
       </MainLayout>
       <div className="fixed bottom-10 right-2 flex flex-col gap-1">
