@@ -34,7 +34,9 @@ export function Filter({ activeFilter, setActiveFilter }: FilterProps) {
       >
         자유
       </BaseButton>
+      {/* TODO: 내글만보기 기능 추가 */}
       <BaseButton
+        disabled
         isActive={activeFilter === FILTER_TYPE.My}
         onClick={() => setActiveFilter(FILTER_TYPE.My)}
       >

@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { ChevronLeft, Search } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { useWebSocket } from '@/hooks/useWebSocket'
@@ -24,6 +24,7 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<ChatMessageResponse[]>([])
   const navigate = useNavigate()
   const { id: noteId } = useParams<{ id: string }>()
+  const messagesEndRef = useRef<HTMLDivElement>(null)
 
   // 노트 데이터 가져오기
   const { data: noteData } = useQuery({
@@ -60,24 +61,28 @@ export default function ChatPage() {
 
   // 이전 채팅기록 useQuery로 불러오기
   const { data: chatHistory } = useQuery({
-    queryKey: ['chatHistory', noteId],
+    queryKey: ['chatHistory', noteId, activeFilter],
     queryFn: async (): Promise<ChatMessageResponse[]> => {
       if (!noteId) return []
-      const response = await apiFetch(`/api/v1/chat/rooms/${noteId}/messages`)
+      const url = activeFilter
+        ? `/v1/chat/messages?roomId=${noteId}&messageType=${activeFilter}`
+        : `/v1/chat/messages?roomId=${noteId}`
+      const response = await apiFetch(url)
       if (!response.ok) {
         throw new Error('Failed to fetch chat history')
       }
       return response.json()
     },
     enabled: !!noteId,
+    retry: 0,
   })
 
-  // WebSocket 연결 전에 이전 채팅 기록을 한 번만 로드
+  // 채팅 기록이 변경되면 메시지 업데이트
   useEffect(() => {
-    if (chatHistory && !isConnected && messages.length === 0) {
+    if (chatHistory) {
       setMessages(chatHistory)
     }
-  }, [chatHistory, isConnected, messages.length])
+  }, [chatHistory])
 
   // 컴포넌트 마운트 시 WebSocket 연결 (한 번만)
   useEffect(() => {
@@ -92,6 +97,11 @@ export default function ChatPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [noteId, token, navigate])
 
+  // 메시지가 추가될 때마다 스크롤을 최하단으로 이동
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
+
   function handleUserClick(userId: number) {
     setOpenUserDialog(true)
     // TODO: user 조회
@@ -100,6 +110,10 @@ export default function ChatPage() {
 
   function handleSendMessage(content: string, type: MessageType) {
     sendMessage(content, type)
+  }
+
+  function handleFilterChange(filter: FilterType) {
+    setActiveFilter(prev => (prev === filter ? undefined : filter))
   }
 
   return (
@@ -123,10 +137,11 @@ export default function ChatPage() {
       </header>
 
       <main className="flex-1 overflow-y-auto px-4 py-2 space-y-4">
-        <Filter activeFilter={activeFilter} setActiveFilter={setActiveFilter} />
+        <Filter activeFilter={activeFilter} setActiveFilter={handleFilterChange} />
         {messages.map(message => (
           <Message key={message.messageId} onUserClick={handleUserClick} {...message} />
         ))}
+        <div ref={messagesEndRef} />
         <UserDialog user={selectedUser} open={openUserDialog} setOpen={setOpenUserDialog} />
       </main>
 
