@@ -44,7 +44,7 @@ export function MainLayout({ pageHeader, children, activeTab, onTabChange }: Pro
         </PageHeader>
       )}
 
-      <LNB items={lnbItems} activeTab={activeTab} onTabChange={onTabChange} />
+      <LNB activeItemIndex={0} items={lnbItems} activeTab={activeTab} onTabChange={onTabChange} />
 
       {children}
     </>
