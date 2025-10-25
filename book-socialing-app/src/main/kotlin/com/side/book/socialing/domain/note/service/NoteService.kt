@@ -10,6 +10,8 @@ import com.side.book.socialing.domain.note.event.NoteCreatedEvent
 import com.side.book.socialing.domain.note.repository.NoteFileRepository
 import com.side.book.socialing.domain.note.repository.NoteParticipantRepository
 import com.side.book.socialing.domain.note.repository.NoteRepository
+import com.side.book.socialing.domain.user.dto.UserDto
+import com.side.book.socialing.domain.user.service.UserService
 import com.side.book.socialing.global.error.exception.ForbiddenException
 import com.side.book.socialing.global.file.FileUploader
 import com.side.book.socialing.global.file.StoredFile
@@ -38,6 +40,7 @@ class NoteService(
     private val noteParticipantRepository: NoteParticipantRepository,
     private val fileUploader: FileUploader,
     private val applicationEventPublisher: ApplicationEventPublisher,
+    private val userService: UserService,
 
     @Value("\${file.note-dir}") private val filePath: String
 ) {
@@ -544,5 +547,10 @@ class NoteService(
         }
 
         return NotesPageResponse(totalCount = totalCount, groups = groups)
+    }
+
+    fun getUsers(noteId: Long): List<UserDto> {
+        val participants = noteParticipantRepository.findAllByNoteId(noteId)
+        return participants.mapNotNull { userService.getUser(it.userId) }
     }
 }
