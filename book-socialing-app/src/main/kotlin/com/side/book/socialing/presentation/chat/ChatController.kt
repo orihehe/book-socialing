@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.handler.annotation.SendTo
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -32,7 +31,7 @@ class ChatController(
         val userId = userPrincipalResolver.getUserId()
 
         val command = SaveMessageCommand(
-            roomId = request.roomId,
+            noteId = request.noteId,
             senderId = userId,
             content = request.content,
             messageType = request.type
@@ -53,15 +52,15 @@ class ChatController(
         summary = "채팅방의 이전 대화 내역 조회",
         description = "특정 채팅방에 입장했을 때, 이전에 나눈 대화 내역을 모두 조회합니다."
     )
-    @GetMapping("/rooms/{roomId}/messages")
+    @GetMapping("/messages")
     fun getChatMessages(
-        @PathVariable roomId: Long,
-        @RequestParam(required = false) messageType: String,
+        @RequestParam noteId: Long,
+        @RequestParam(required = false) messageType: String?,
         @RequestParam(required = false) lastMessageId: Long?,
         @RequestParam(defaultValue = "20") size: Int
     ): ChatMessagesApiResponse {
         val userId = userPrincipalResolver.getUserId()
-        val queryResult = chatMessageService.findMessagesByRoomId(roomId, userId, messageType, lastMessageId, size)
+        val queryResult = chatMessageService.findMessages(noteId, userId, messageType, lastMessageId, size)
 
         val messages = queryResult.messages.map {
             ChatMessageResponse(

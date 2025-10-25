@@ -10,7 +10,6 @@ import com.side.book.socialing.domain.chat.repository.ChatRoomParticipantReposit
 import com.side.book.socialing.domain.chat.repository.ChatRoomRepository
 import com.side.book.socialing.global.error.exception.ResourceNotFoundException
 import org.springframework.data.domain.PageRequest
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -23,10 +22,10 @@ class ChatMessageService(
 
     @Transactional
     fun saveMessage(command: SaveMessageCommand): SavedMessageDto {
-        val chatRoom = chatRoomRepository.findByIdOrNull(command.roomId)
+        val chatRoom = chatRoomRepository.findByNoteId(command.noteId)
             ?: throw ResourceNotFoundException("ChatRoom not found")
-        chatRoomParticipantRepository.findByChatRoomIdAndUserId(command.roomId, command.senderId)
-            ?: throw IllegalArgumentException("User ${command.senderId} not participate chat room ${command.roomId}")
+        chatRoomParticipantRepository.findByChatRoomIdAndUserId(chatRoom.id!!, command.senderId)
+            ?: throw IllegalArgumentException("User ${command.senderId} not participate chat room ${command.noteId}")
 
         val message = ChatMessage.create(
             chatRoom = chatRoom,
@@ -46,24 +45,28 @@ class ChatMessageService(
     }
 
     @Transactional(readOnly = true)
-    fun findMessagesByRoomId(
-        roomId: Long,
+    fun findMessages(
+        noteId: Long,
         userId: Long,
-        messageType: String,
+        messageType: String?,
         lastMessageId: Long?,
         pageSize: Int
     ): ChatMessagesResponse {
-        if (!chatRoomRepository.existsById(roomId)) {
+        if (!chatRoomRepository.existsById(noteId)) {
             throw ResourceNotFoundException("ChatRoom not found")
         }
 
         val cursor = lastMessageId
-            ?: chatRoomParticipantRepository.findByChatRoomIdAndUserId(roomId, userId)?.lastReadMessageId
+            ?: chatRoomParticipantRepository.findByChatRoomIdAndUserId(noteId, userId)?.lastReadMessageId
             ?: Long.MAX_VALUE
         val pageable = PageRequest.of(0, pageSize)
 
-        val messageTypeEnum = MessageType.valueOf(messageType)
-        val messagesSlice = chatMessageRepository.findByChatRoomIdAndMessageTypeAndIdLessThanOrderByIdDesc(roomId, messageTypeEnum, cursor, pageable)
+        val messagesSlice = if (messageType != null) {
+            val messageTypeEnum = MessageType.valueOf(messageType)
+            chatMessageRepository.findByChatRoomIdAndMessageTypeAndIdLessThanOrderByIdDesc(noteId, messageTypeEnum, cursor, pageable)
+        } else {
+            chatMessageRepository.findByChatRoomIdAndIdLessThanOrderByIdDesc(noteId, cursor, pageable)
+        }
 
         val savedMessageDtos = messagesSlice.content.map {
             SavedMessageDto(
