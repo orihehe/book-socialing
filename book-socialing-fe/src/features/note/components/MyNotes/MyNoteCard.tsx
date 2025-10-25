@@ -11,7 +11,7 @@ export function CreatedNote({ notes, ...club }: ClubNotesGroup) {
     <div>
       {club.clubId && <div>{club.clubName}</div>}
       {notes.map(note => (
-        <DefaultNote {...note}>
+        <DefaultNote key={note.id} {...note}>
           <BaseButton className="flex-shrink-0" onClick={() => navigate(`/note/${note.id}/edit`)}>
             수정
           </BaseButton>
@@ -29,7 +29,7 @@ export function AppliedNote({ notes, ...club }: ClubNotesGroup) {
     <div className="">
       <div>{club.clubName}</div>
       {notes.map(note => (
-        <DefaultNote {...note}>
+        <DefaultNote key={note.id} {...note}>
           <BaseButton className="flex-shrink-0">신청취소</BaseButton>
         </DefaultNote>
       ))}
