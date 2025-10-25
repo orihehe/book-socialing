@@ -25,24 +25,25 @@ export function useWebSocket({ token, noteId, onMessage, onConnect, onError }: U
     setIsConnecting(true)
 
     try {
-      // SockJS 연결 생성
-      const socket = new SockJS('/api/ws')
+      // SockJS 연결 생성 - 토큰을 쿼리 파라미터로 전달
+      const wsUrl = token ? `/ws?token=${encodeURIComponent(token)}` : '/ws'
+      console.log('Attempting WebSocket connection to:', wsUrl)
+      const socket = new SockJS(wsUrl)
       socketRef.current = socket
 
       // STOMP 클라이언트 생성
       const stompClient = Stomp.over(socket)
-      stompClient.debug = (str: string) => {
-        console.log('STOMP Debug:', str)
-      }
+      // Disable debug logs to reduce spam
+      stompClient.debug = () => {}
 
       stompClientRef.current = stompClient
 
-      // JWT 토큰을 헤더에 포함하여 연결
+      // JWT 토큰을 헤더에도 포함하여 연결
       const headers = token ? { Authorization: `Bearer ${token}` } : {}
       stompClient.connect(
         headers,
         (frame: unknown) => {
-          console.log('Connected: ' + frame)
+          console.log('✅ WebSocket Connected:', frame)
           setIsConnected(true)
           setIsConnecting(false)
           onConnect?.()
@@ -61,14 +62,14 @@ export function useWebSocket({ token, noteId, onMessage, onConnect, onError }: U
           }
         },
         (error: unknown) => {
-          console.error('STOMP Error:', error)
+          console.error('❌ STOMP Connection Error:', error)
           setIsConnected(false)
           setIsConnecting(false)
           onError?.(error)
         }
       )
     } catch (error) {
-      console.error('Connection error:', error)
+      console.error('❌ WebSocket Connection Error:', error)
       setIsConnecting(false)
       onError?.(error)
     }
@@ -108,9 +109,20 @@ export function useWebSocket({ token, noteId, onMessage, onConnect, onError }: U
   // 컴포넌트 언마운트 시 연결 해제
   useEffect(() => {
     return () => {
-      disconnect()
+      try {
+        if (stompClientRef.current && stompClientRef.current.connected) {
+          stompClientRef.current.disconnect(() => {
+            console.log('Disconnected on unmount')
+          })
+        }
+        if (socketRef.current) {
+          socketRef.current.close()
+        }
+      } catch (error) {
+        console.log('Error during cleanup:', error)
+      }
     }
-  }, [disconnect])
+  }, [])
 
   return {
     isConnected,
