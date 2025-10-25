@@ -92,10 +92,10 @@ export default function ChatPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [noteId, token, navigate])
 
-  function handleUserClick(senderNickname: string) {
+  function handleUserClick(userId: number) {
     setOpenUserDialog(true)
     // TODO: user 조회
-    setSelectedUser({ nickname: senderNickname, email: senderNickname, id: 1 })
+    setSelectedUser({ nickname: 'senderNickname', email: 'senderNickname', id: userId })
   }
 
   function handleSendMessage(content: string, type: MessageType) {
