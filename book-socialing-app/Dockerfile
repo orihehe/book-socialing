@@ -2,7 +2,7 @@
 FROM gradle:8.5-jdk17 AS build
 WORKDIR /app
 COPY . .
-RUN gradle clean build -x test
+RUN gradle clean build -x test --no-daemon
 
 # Runtime stage
 FROM openjdk:17-jdk-slim
