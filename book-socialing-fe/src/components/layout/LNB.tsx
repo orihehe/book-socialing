@@ -8,9 +8,9 @@ export interface LNBItem {
 
 interface LNBProps {
   items: LNBItem[]
-  activeTab?: string
+  activeChildIndex?: number
   activeItemIndex: number
-  onTabChange?: (key: string) => void
+  onChildTabChange?: (index: number) => void
   getRoutePath?: (key: string) => string
 }
 
@@ -19,8 +19,8 @@ const TAB_WIDTH = 41
 
 export default function LNB({
   items,
-  activeTab,
-  onTabChange,
+  activeChildIndex = 0,
+  onChildTabChange,
   activeItemIndex,
   getRoutePath = key => `/${key}`,
 }: LNBProps) {
@@ -33,12 +33,12 @@ export default function LNB({
       {/* First Level Navigation */}
       <div className="border-b border-gray-200">
         <div className="flex space-x-8 px-6 pt-4">
-          {items.map(item => (
+          {items.map((item, index) => (
             <Link
               key={item.key}
               to={getRoutePath(item.key)}
               className={`text-sm font-semibold transition-colors ${
-                activeItem.key === item.key
+                activeItemIndex === index
                   ? 'text-gray-900 border-b-2 border-gray-900 pb-1'
                   : 'text-gray-500 hover:text-gray-700'
               }`}
@@ -56,12 +56,12 @@ export default function LNB({
             className="flex space-x-8 px-6 py-4"
             style={{ marginLeft: `${activeItemIndex * TAB_WIDTH + MARGIN_LEFT}px` }}
           >
-            {activeItem!.children!.map(child => (
+            {activeItem!.children!.map((child, index) => (
               <button
                 key={child.key}
-                onClick={() => onTabChange?.(child.key)}
+                onClick={() => onChildTabChange?.(index)}
                 className={`text-sm transition-colors font-semibold ${
-                  activeTab === child.key ? 'text-gray-900' : 'text-gray-500 hover:text-gray-700'
+                  activeChildIndex === index ? 'text-gray-900' : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
                 {child.name}
