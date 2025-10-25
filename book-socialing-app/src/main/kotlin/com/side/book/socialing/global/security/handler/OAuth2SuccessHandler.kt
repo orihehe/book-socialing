@@ -14,7 +14,7 @@ import org.springframework.web.util.UriComponentsBuilder
 @Component
 class OAuth2SuccessHandler(
     private val jwtTokenProvider: JwtTokenProvider,
-    @Value("\${app.fe-url}") private val feUrl: String
+    @Value("\${app.server-url}") private val serverUrl: String
 ) : AuthenticationSuccessHandler {
 
     override fun onAuthenticationSuccess(
