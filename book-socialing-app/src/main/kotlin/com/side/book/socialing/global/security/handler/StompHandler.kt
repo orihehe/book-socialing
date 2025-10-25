@@ -9,6 +9,7 @@ import org.springframework.messaging.simp.stomp.StompCommand
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor
 import org.springframework.messaging.support.ChannelInterceptor
 import org.springframework.messaging.support.MessageHeaderAccessor
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 
 @Component
@@ -27,6 +28,7 @@ class StompHandler(
                 token?.let {
                     val authentication = authService.getAuthentication(it)
                     accessor.user = authentication
+                    SecurityContextHolder.getContext().authentication = authentication
                 }
             } catch (e: JwtAuthenticationException) {
                 log.error("WebSocket 연결 인증 실패: ${e.message}", e)
