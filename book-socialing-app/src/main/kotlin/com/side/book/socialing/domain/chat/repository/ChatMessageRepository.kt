@@ -13,4 +13,10 @@ interface ChatMessageRepository : JpaRepository<ChatMessage, Long> {
         id: Long,
         pageable: Pageable
     ): Slice<ChatMessage>
+
+    fun findByChatRoomIdAndIdLessThanOrderByIdDesc(
+        chatRoomId: Long,
+        id: Long,
+        pageable: Pageable
+    ): Slice<ChatMessage>
 }
