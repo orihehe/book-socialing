@@ -21,3 +21,6 @@ logging:
   level:
     org.hibernate.SQL: info
     org.hibernate.type.descriptor.sql.BasicBinder: warn
+
+cors:
+  allowed-origins: "http://saisai-dev.duckdns.org,https://saisai-dev.duckdns.org"
