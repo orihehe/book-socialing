@@ -52,20 +52,20 @@ class ChatMessageService(
         lastMessageId: Long?,
         pageSize: Int
     ): ChatMessagesResponse {
-        if (!chatRoomRepository.existsById(noteId)) {
-            throw ResourceNotFoundException("ChatRoom not found")
-        }
+        val chatRoom = chatRoomRepository.findByNoteId(noteId)
+            ?: throw ResourceNotFoundException("ChatRoom not found")
+        val roomId = chatRoom.id!!
 
         val cursor = lastMessageId
-            ?: chatRoomParticipantRepository.findByChatRoomIdAndUserId(noteId, userId)?.lastReadMessageId
+            ?: chatRoomParticipantRepository.findByChatRoomIdAndUserId(roomId, userId)?.lastReadMessageId
             ?: Long.MAX_VALUE
         val pageable = PageRequest.of(0, pageSize)
 
         val messagesSlice = if (messageType != null) {
             val messageTypeEnum = MessageType.valueOf(messageType)
-            chatMessageRepository.findByChatRoomIdAndMessageTypeAndIdLessThanOrderByIdDesc(noteId, messageTypeEnum, cursor, pageable)
+            chatMessageRepository.findByChatRoomIdAndMessageTypeAndIdLessThanOrderByIdDesc(roomId, messageTypeEnum, cursor, pageable)
         } else {
-            chatMessageRepository.findByChatRoomIdAndIdLessThanOrderByIdDesc(noteId, cursor, pageable)
+            chatMessageRepository.findByChatRoomIdAndIdLessThanOrderByIdDesc(roomId, cursor, pageable)
         }
 
         val savedMessageDtos = messagesSlice.content.map {
