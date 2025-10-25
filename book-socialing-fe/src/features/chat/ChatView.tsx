@@ -87,7 +87,8 @@ export default function ChatPage() {
       if (!response.ok) {
         throw new Error('Failed to fetch chat history')
       }
-      return response.json()
+      const data = await response.json()
+      return data.messages || []
     },
     enabled: !!noteId,
     retry: 0,
