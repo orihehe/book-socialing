@@ -1,9 +1,13 @@
+import { useQuery } from '@tanstack/react-query'
+import dayjs from 'dayjs'
 import { ChevronLeft, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { useWebSocket } from '@/hooks/useWebSocket'
+import { apiFetch } from '@/lib/api'
 import { ChatMessageResponse, MessageType } from '@/types/chat'
+import { Note } from '@/types/note'
 import { User } from '@/types/user'
 
 import { ChatInput } from './ChatInput'
@@ -21,6 +25,19 @@ export default function ChatPage() {
   const navigate = useNavigate()
   const { id: noteId } = useParams<{ id: string }>()
 
+  // 노트 데이터 가져오기
+  const { data: noteData } = useQuery({
+    queryKey: ['note', noteId],
+    queryFn: async (): Promise<Note> => {
+      const response = await apiFetch(`/v1/note/${noteId}`)
+      if (!response.ok) {
+        throw new Error('Failed to fetch note data')
+      }
+      return response.json()
+    },
+    enabled: !!noteId,
+  })
+
   // JWT 토큰을 localStorage에서 가져오기
   const token = localStorage.getItem('accessToken') || localStorage.getItem('token') || ''
 
@@ -28,7 +45,6 @@ export default function ChatPage() {
     token,
     noteId: noteId ? Number(noteId) : undefined,
     onMessage: message => {
-      console.log('Received message:', message)
       setMessages(prev => [...prev, message])
     },
     onConnect: () => {
@@ -41,6 +57,27 @@ export default function ChatPage() {
       console.error('WebSocket error:', error)
     },
   })
+
+  // 이전 채팅기록 useQuery로 불러오기
+  const { data: chatHistory } = useQuery({
+    queryKey: ['chatHistory', noteId],
+    queryFn: async (): Promise<ChatMessageResponse[]> => {
+      if (!noteId) return []
+      const response = await apiFetch(`/api/v1/chat/rooms/${noteId}/messages`)
+      if (!response.ok) {
+        throw new Error('Failed to fetch chat history')
+      }
+      return response.json()
+    },
+    enabled: !!noteId,
+  })
+
+  // WebSocket 연결 전에 이전 채팅 기록을 한 번만 로드
+  useEffect(() => {
+    if (chatHistory && !isConnected && messages.length === 0) {
+      setMessages(chatHistory)
+    }
+  }, [chatHistory, isConnected, messages.length])
 
   // 컴포넌트 마운트 시 WebSocket 연결 (한 번만)
   useEffect(() => {
@@ -72,8 +109,10 @@ export default function ChatPage() {
           <ChevronLeft onClick={() => navigate(-1)} />
         </button>
         <div className="flex gap-4">
-          <div className="text-sm text-gray-500">2025.04.02</div>
-          <h1 className="text-lg font-bold">빛과 실</h1>
+          <div className="text-sm text-gray-500">
+            {noteData?.endAt ? dayjs(noteData.endAt).format('YYYY.MM.DD') : ''}
+          </div>
+          <h1 className="text-lg font-bold">{noteData?.bookName || '로딩중...'}</h1>
         </div>
         <div className="flex gap-1">
           <button>
