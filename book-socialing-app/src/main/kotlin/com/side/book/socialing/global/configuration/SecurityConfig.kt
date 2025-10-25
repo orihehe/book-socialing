@@ -30,7 +30,7 @@ class SecurityConfig(
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
-            .csrf { it.disable() }
+            .csrf { it.ignoringRequestMatchers("/ws/**") }
             .formLogin { it.disable() }
             .httpBasic { it.disable() }
             .sessionManagement {
