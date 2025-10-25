@@ -3,7 +3,7 @@ package com.side.book.socialing.presentation.chat.dto
 import java.time.LocalDateTime
 
 data class ChatMessageRequest(
-    val roomId: Long,
+    val noteId: Long,
     val content: String,
     val type: String
 )
