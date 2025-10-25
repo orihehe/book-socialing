@@ -22,6 +22,7 @@ export default function ChatPage() {
   const [selectedUser, setSelectedUser] = useState<User>()
   const [activeFilter, setActiveFilter] = useState<FilterType>()
   const [messages, setMessages] = useState<ChatMessageResponse[]>([])
+  const [userMap, setUserMap] = useState<Map<number, User>>(new Map())
   const navigate = useNavigate()
   const { id: noteId } = useParams<{ id: string }>()
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -59,14 +60,29 @@ export default function ChatPage() {
     },
   })
 
+  // 노트 참여자(유저) 정보 가져오기
+  const { data: noteUsers } = useQuery({
+    queryKey: ['noteUsers', noteId],
+    queryFn: async (): Promise<User[]> => {
+      if (!noteId) return []
+      const response = await apiFetch(`/v1/note/${noteId}/users`)
+      if (!response.ok) {
+        throw new Error('Failed to fetch note users')
+      }
+      return response.json()
+    },
+    enabled: !!noteId,
+    retry: 0,
+  })
+
   // 이전 채팅기록 useQuery로 불러오기
   const { data: chatHistory } = useQuery({
     queryKey: ['chatHistory', noteId, activeFilter],
     queryFn: async (): Promise<ChatMessageResponse[]> => {
       if (!noteId) return []
       const url = activeFilter
-        ? `/v1/chat/messages?roomId=${noteId}&messageType=${activeFilter}`
-        : `/v1/chat/messages?roomId=${noteId}`
+        ? `/v1/chat/messages?noteId=${noteId}&messageType=${activeFilter}`
+        : `/v1/chat/messages?noteId=${noteId}`
       const response = await apiFetch(url)
       if (!response.ok) {
         throw new Error('Failed to fetch chat history')
@@ -76,6 +92,17 @@ export default function ChatPage() {
     enabled: !!noteId,
     retry: 0,
   })
+
+  // noteUsers가 로드되면 userMap 생성
+  useEffect(() => {
+    if (noteUsers) {
+      const map = new Map<number, User>()
+      noteUsers.forEach(user => {
+        map.set(user.id, user)
+      })
+      setUserMap(map)
+    }
+  }, [noteUsers])
 
   // 채팅 기록이 변경되면 메시지 업데이트
   useEffect(() => {
@@ -103,9 +130,11 @@ export default function ChatPage() {
   }, [messages])
 
   function handleUserClick(userId: number) {
-    setOpenUserDialog(true)
-    // TODO: user 조회
-    setSelectedUser({ nickname: 'senderNickname', email: 'senderNickname', id: userId })
+    const user = userMap.get(userId)
+    if (user) {
+      setSelectedUser(user)
+      setOpenUserDialog(true)
+    }
   }
 
   function handleSendMessage(content: string, type: MessageType) {
@@ -139,7 +168,12 @@ export default function ChatPage() {
       <main className="flex-1 overflow-y-auto px-4 py-2 space-y-4">
         <Filter activeFilter={activeFilter} setActiveFilter={handleFilterChange} />
         {messages.map(message => (
-          <Message key={message.messageId} onUserClick={handleUserClick} {...message} />
+          <Message
+            key={message.messageId}
+            onUserClick={handleUserClick}
+            user={userMap.get(message.userId)}
+            {...message}
+          />
         ))}
         <div ref={messagesEndRef} />
         <UserDialog user={selectedUser} open={openUserDialog} setOpen={setOpenUserDialog} />

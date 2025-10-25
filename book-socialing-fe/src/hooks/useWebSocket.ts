@@ -52,7 +52,6 @@ export function useWebSocket({ token, noteId, onMessage, onConnect, onError }: U
             stompClient.subscribe(`/topic/chat/${noteId}`, (message: Stomp.Message) => {
               try {
                 const chatMessage: ChatMessageResponse = JSON.parse(message.body)
-                console.log('Received message:', chatMessage)
                 onMessage?.(chatMessage)
               } catch (error) {
                 console.error('Error parsing message:', error)
