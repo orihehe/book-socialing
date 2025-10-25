@@ -9,7 +9,7 @@ import com.side.book.socialing.presentation.chat.dto.ChatMessagesApiResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.messaging.handler.annotation.MessageMapping
-import org.springframework.messaging.handler.annotation.SendTo
+import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -20,14 +20,14 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/v1/chat")
 class ChatController(
     private val chatMessageService: ChatMessageService,
-    private val userPrincipalResolver: UserPrincipalResolver
+    private val userPrincipalResolver: UserPrincipalResolver,
+    private val messagingTemplate: SimpMessagingTemplate
 ) {
 
     @MessageMapping("/chat.sendMessage")
-    @SendTo("/topic/public")
     fun sendMessage(
         request: ChatMessageRequest
-    ): ChatMessageResponse {
+    ) {
         val userId = userPrincipalResolver.getUserId()
 
         val command = SaveMessageCommand(
@@ -38,14 +38,16 @@ class ChatController(
         )
 
         val savedMessageDto = chatMessageService.saveMessage(command)
-
-        return ChatMessageResponse(
+        val response = ChatMessageResponse(
             messageId = savedMessageDto.messageId,
             userId = savedMessageDto.userId,
             content = savedMessageDto.content,
             type = savedMessageDto.messageType,
             sentAt = savedMessageDto.sentAt
         )
+
+        val destination = "/topic/chat/${request.noteId}"
+        messagingTemplate.convertAndSend(destination, response)
     }
 
     @Operation(
