@@ -13,6 +13,11 @@ import { MessageType } from '@/types/chat'
 
 import { MESSAGE_TYPE_LABELS } from './const'
 
+interface ChatInputProps {
+  onSendMessage?: (content: string, type: MessageType) => void
+  disabled?: boolean
+}
+
 const MessagePlaceholder = {
   [MessageType.NOTICE]: '공지사항을 입력해 주세요.',
   [MessageType.QUESTION]: '책에 대해 궁금한 내용을 입력해 주세요.',
@@ -20,11 +25,26 @@ const MessagePlaceholder = {
   [MessageType.GENERAL]: '생각을 입력해 주세요.',
 }
 
-export function ChatInput() {
+export function ChatInput({ onSendMessage, disabled = false }: ChatInputProps) {
   const [messageType, setMessageType] = useState(MessageType.GENERAL)
+  const [message, setMessage] = useState('')
 
   function handleMessageTypeChange(value: MessageType) {
     setMessageType(value)
+  }
+
+  function handleSend() {
+    if (!message.trim() || disabled) return
+
+    onSendMessage?.(message.trim(), messageType)
+    setMessage('')
+  }
+
+  function handleKeyPress(e: React.KeyboardEvent) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSend()
+    }
   }
 
   return (
@@ -52,10 +72,19 @@ export function ChatInput() {
         </Select>
 
         <input
+          value={message}
+          onChange={e => setMessage(e.target.value)}
+          onKeyPress={handleKeyPress}
           placeholder={MessagePlaceholder[messageType]}
-          className="flex-1 border-0 shadow-none focus:border-0 focus:ring-0 focus:outline-none bg-transparent placeholder:text-gray-500"
+          disabled={disabled}
+          className="flex-1 border-0 shadow-none focus:border-0 focus:ring-0 focus:outline-none bg-transparent placeholder:text-gray-500 disabled:opacity-50"
         />
-        <Button size="icon" variant="ghost">
+        <Button
+          size="icon"
+          variant="ghost"
+          onClick={handleSend}
+          disabled={!message.trim() || disabled}
+        >
           <Send />
         </Button>
       </div>

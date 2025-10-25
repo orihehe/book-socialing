@@ -13,34 +13,45 @@ import org.springframework.web.util.UriComponentsBuilder
 
 @Component
 class OAuth2SuccessHandler(
-    private val jwtTokenProvider: JwtTokenProvider,
-    @Value("\${app.server-url}") private val serverUrl: String
+        private val jwtTokenProvider: JwtTokenProvider,
+        @Value("\${app.server-url}") private val serverUrl: String
 ) : AuthenticationSuccessHandler {
 
-    override fun onAuthenticationSuccess(
-        request: HttpServletRequest,
-        response: HttpServletResponse,
-        authentication: Authentication
-    ) {
-        val oAuth2User = authentication.principal as OAuth2User
-        val oAuth2AuthenticationToken = authentication as OAuth2AuthenticationToken
+        override fun onAuthenticationSuccess(
+                request: HttpServletRequest,
+                response: HttpServletResponse,
+                authentication: Authentication
+        ) {
+                val oAuth2User = authentication.principal as OAuth2User
+                val oAuth2AuthenticationToken = authentication as OAuth2AuthenticationToken
 
-        val registrationId = oAuth2AuthenticationToken.authorizedClientRegistrationId
+                val registrationId = oAuth2AuthenticationToken.authorizedClientRegistrationId
 
-        val email = when (registrationId) {
-            "kakao" -> (oAuth2User.attributes["kakao_account"] as Map<String, Any>)["email"] as String
-            else -> throw IllegalStateException("Unsupported registrationId: $registrationId")
+                val email =
+                        when (registrationId) {
+                                "kakao" ->
+                                        (oAuth2User.attributes["kakao_account"] as
+                                                Map<String, Any>)["email"] as
+                                                String
+                                else ->
+                                        throw IllegalStateException(
+                                                "Unsupported registrationId: $registrationId"
+                                        )
+                        }
+
+                val accessToken = jwtTokenProvider.createAccessToken(email)
+                val refreshToken = jwtTokenProvider.createRefreshToken()
+
+                // state 파라미터에서 redirect_uri 가져오기, 없으면 기본값
+                val redirectUri = request.getParameter("state") ?: "$serverUrl/oauth/callback"
+
+                val targetUrl =
+                        UriComponentsBuilder.fromUriString(redirectUri)
+                                .queryParam("accessToken", accessToken)
+                                .queryParam("refreshToken", refreshToken)
+                                .build()
+                                .toUriString()
+
+                response.sendRedirect(targetUrl)
         }
-
-        val accessToken = jwtTokenProvider.createAccessToken(email)
-        val refreshToken = jwtTokenProvider.createRefreshToken()
-
-        val targetUrl = UriComponentsBuilder.fromUriString("$serverUrl/oauth/callback")
-            .queryParam("accessToken", accessToken)
-            .queryParam("refreshToken", refreshToken)
-            .build()
-            .toUriString()
-
-        response.sendRedirect(targetUrl)
-    }
 }

@@ -34,7 +34,8 @@ export default function Login() {
   }
 
   function requestKakaoLogin() {
-    window.location.href = `${apiBaseUrl}/oauth2/authorization/kakao`
+    const redirectUri = `${window.location.origin}/kakao/callback`
+    window.location.href = `${apiBaseUrl}/oauth2/authorization/kakao?state=${encodeURIComponent(redirectUri)}`
   }
 
   return (
