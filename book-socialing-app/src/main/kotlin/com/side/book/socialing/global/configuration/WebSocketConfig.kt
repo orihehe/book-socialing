@@ -1,6 +1,7 @@
 package com.side.book.socialing.global.configuration
 
 import com.side.book.socialing.global.security.handler.StompHandler
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Configuration
 import org.springframework.messaging.simp.config.ChannelRegistration
 import org.springframework.messaging.simp.config.MessageBrokerRegistry
@@ -11,11 +12,15 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @Configuration
 @EnableWebSocketMessageBroker
 class WebSocketConfig(
-    private val stompHandler: StompHandler
+    private val stompHandler: StompHandler,
+    @Value("\${cors.allowed-origins}")
+    private val allowedOrigins: String
 ) : WebSocketMessageBrokerConfigurer {
 
     override fun registerStompEndpoints(registry: StompEndpointRegistry) {
-        registry.addEndpoint("/ws").setAllowedOriginPatterns("*").withSockJS()
+        registry.addEndpoint("/ws")
+            .setAllowedOriginPatterns(*allowedOrigins.split(",").toTypedArray())
+            .withSockJS()
     }
 
     override fun configureMessageBroker(registry: MessageBrokerRegistry) {
