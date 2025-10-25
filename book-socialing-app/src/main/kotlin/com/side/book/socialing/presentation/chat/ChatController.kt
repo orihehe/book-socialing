@@ -2,6 +2,7 @@ package com.side.book.socialing.presentation.chat
 
 import com.side.book.socialing.domain.chat.command.SaveMessageCommand
 import com.side.book.socialing.domain.chat.service.ChatMessageService
+import com.side.book.socialing.domain.user.entity.User
 import com.side.book.socialing.global.auth.UserPrincipalResolver
 import com.side.book.socialing.presentation.chat.dto.ChatMessageRequest
 import com.side.book.socialing.presentation.chat.dto.ChatMessageResponse
@@ -10,10 +11,12 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.simp.SimpMessagingTemplate
+import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import java.security.Principal
 
 @Tag(name = "채팅 API", description = "채팅 관련 API")
 @RestController
@@ -26,9 +29,11 @@ class ChatController(
 
     @MessageMapping("/chat.sendMessage")
     fun sendMessage(
-        request: ChatMessageRequest
+        request: ChatMessageRequest,
+        principal: Principal
     ) {
-        val userId = userPrincipalResolver.getUserId()
+        val user = (principal as Authentication).principal as User
+        val userId = user.id!!
 
         val command = SaveMessageCommand(
             noteId = request.noteId,

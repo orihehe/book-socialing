@@ -28,6 +28,3 @@ file:
   base-dir: ${user.home}/dev/saisai-file
   note-dir: note/
   club-dir: club/
-
-cors:
-  allowed-origins: "http://localhost:3000,http://saisai-dev.duckdns.org,https://saisai-dev.duckdns.org"
