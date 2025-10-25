@@ -72,17 +72,18 @@ export default function ChatPage() {
     },
   })
 
-  // 컴포넌트 마운트 시 WebSocket 연결
+  // 컴포넌트 마운트 시 WebSocket 연결 (한 번만)
   useEffect(() => {
     if (!token) {
       console.warn('No token found, redirecting to login')
       navigate('/signin')
       return
     }
-    if (noteId) {
+    if (noteId && !isConnected && !isConnecting) {
       connect()
     }
-  }, [connect, noteId, token, navigate])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [noteId, token, navigate])
 
   function handleUserClick(senderNickname: string) {
     setOpenUserDialog(true)

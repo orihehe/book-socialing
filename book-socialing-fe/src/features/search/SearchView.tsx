@@ -2,9 +2,9 @@ import { useQuery } from '@tanstack/react-query'
 import { CircleUserRound, Search } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useSearchParams } from 'react-router-dom'
+// import { useSearchParams } from 'react-router-dom'
 
-import LNB from '@/components/layout/LNB'
+// import LNB from '@/components/layout/LNB'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 const lnbItems = [
@@ -25,7 +25,7 @@ const lnbItems = [
 type SearchTarget = 'all' | 'club' | 'note'
 
 export default function SearchView() {
-  const [searchTarget, setSearchTarget] = useState<SearchTarget>('all')
+  const [searchTarget] = useState<SearchTarget>('all')
   const activeItemIndex = lnbItems.findIndex(item => item.key === searchTarget)
 
   const [searchValue, setSearchValue] = useState<string>()
@@ -45,6 +45,8 @@ export default function SearchView() {
     enabled: !!searchValue,
     retry: false,
   })
+
+  console.log(noteSearchData, noteSearchLoading, activeItemIndex, noteSearchError)
 
   return (
     <div>
