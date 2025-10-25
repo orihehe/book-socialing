@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 export interface LNBItem {
   name: string
@@ -9,18 +9,21 @@ export interface LNBItem {
 interface LNBProps {
   items: LNBItem[]
   activeTab?: string
+  activeItemIndex: number
   onTabChange?: (key: string) => void
+  getRoutePath?: (key: string) => string
 }
 
 const MARGIN_LEFT = 16
 const TAB_WIDTH = 41
 
-export default function LNB({ items, activeTab, onTabChange }: LNBProps) {
-  const { pathname } = useLocation()
-
-  const activeFirstLevel = pathname.slice(1).split('/')[0]
-
-  const activeItemIndex = items.findIndex(item => item.key === activeFirstLevel)
+export default function LNB({
+  items,
+  activeTab,
+  onTabChange,
+  activeItemIndex,
+  getRoutePath = key => `/${key}`,
+}: LNBProps) {
   const activeItem = activeItemIndex !== -1 ? items[activeItemIndex] : items[0]
 
   const hasChildren = activeItem?.children && activeItem.children.length > 0
@@ -33,9 +36,9 @@ export default function LNB({ items, activeTab, onTabChange }: LNBProps) {
           {items.map(item => (
             <Link
               key={item.key}
-              to={`/${item.key}`}
+              to={getRoutePath(item.key)}
               className={`text-sm font-semibold transition-colors ${
-                activeFirstLevel === item.key
+                activeItem.key === item.key
                   ? 'text-gray-900 border-b-2 border-gray-900 pb-1'
                   : 'text-gray-500 hover:text-gray-700'
               }`}
