@@ -20,16 +20,20 @@ export default defineConfig({
     open: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:8080',
-        // target: 'http://saisai-dev.duckdns.org',
+        // target: 'http://localhost:8080',
+        target: 'http://saisai-dev.duckdns.org',
         changeOrigin: true,
         secure: false,
       },
       '/ws': {
-        target: 'http://localhost:8080',
+        target: 'http://saisai-dev.duckdns.org',
         changeOrigin: true,
         secure: false,
         ws: true,
+        rewrite: path => {
+          console.log('Proxying WebSocket request:', path)
+          return path
+        },
       },
     },
   },

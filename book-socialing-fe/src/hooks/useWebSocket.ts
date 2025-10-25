@@ -25,9 +25,8 @@ export function useWebSocket({ token, noteId, onMessage, onConnect, onError }: U
     setIsConnecting(true)
 
     try {
-      // SockJS 연결 생성 - 토큰을 쿼리 파라미터로 전달
-      const wsUrl = token ? `/ws?token=${encodeURIComponent(token)}` : '/ws'
-      console.log('Attempting WebSocket connection to:', wsUrl)
+      // SockJS 연결 생성
+      const wsUrl = '/ws'
       const socket = new SockJS(wsUrl)
       socketRef.current = socket
 
@@ -39,7 +38,7 @@ export function useWebSocket({ token, noteId, onMessage, onConnect, onError }: U
       stompClientRef.current = stompClient
 
       // JWT 토큰을 헤더에도 포함하여 연결
-      const headers = token ? { Authorization: `Bearer ${token}` } : {}
+      const headers = { Authorization: `Bearer ${token}` }
       stompClient.connect(
         headers,
         (frame: unknown) => {
@@ -96,12 +95,12 @@ export function useWebSocket({ token, noteId, onMessage, onConnect, onError }: U
       }
 
       const message = {
+        noteId: noteId,
         content,
         type,
-        emojis: [],
       }
 
-      stompClientRef.current.send(`/app/chat/${noteId}/sendMessage`, {}, JSON.stringify(message))
+      stompClientRef.current.send('/app/chat.sendMessage', {}, JSON.stringify(message))
     },
     [isConnected, noteId]
   )

@@ -13,42 +13,11 @@ import { Filter } from './Filter'
 import { Message } from './Message'
 import { UserDialog } from '../shared/components/UserDialog'
 
-const dummyMessages: ChatMessageResponse[] = [
-  {
-    messageId: 1,
-    senderNickname: '유저1',
-    content: '9월 9일 오후 8시 서울역 카페에서 만나요\n~^^',
-    type: MessageType.NOTICE,
-    sentAt: '2025-09-09T19:00:00',
-  },
-  {
-    messageId: 2,
-    senderNickname: '유저2',
-    content: '반전 미쳤다',
-    type: MessageType.REVIEW,
-    sentAt: '2025-09-09T19:06:00',
-  },
-  {
-    messageId: 3,
-    senderNickname: '유저2',
-    content: '근데 내가 이 상황이었다면?',
-    type: MessageType.QUESTION,
-    sentAt: '2025-09-09T19:10:00',
-  },
-  {
-    messageId: 4,
-    senderNickname: '유저3',
-    content: '너무 감동적 p.45',
-    type: MessageType.REVIEW,
-    sentAt: '2025-09-09T19:11:00',
-  },
-]
-
 export default function ChatPage() {
   const [openUserDialog, setOpenUserDialog] = useState(false)
   const [selectedUser, setSelectedUser] = useState<User>()
   const [activeFilter, setActiveFilter] = useState<FilterType>()
-  const [messages, setMessages] = useState<ChatMessageResponse[]>(dummyMessages)
+  const [messages, setMessages] = useState<ChatMessageResponse[]>([])
   const navigate = useNavigate()
   const { id: noteId } = useParams<{ id: string }>()
 
@@ -59,6 +28,7 @@ export default function ChatPage() {
     token,
     noteId: noteId ? Number(noteId) : undefined,
     onMessage: message => {
+      console.log('Received message:', message)
       setMessages(prev => [...prev, message])
     },
     onConnect: () => {
@@ -76,7 +46,7 @@ export default function ChatPage() {
   useEffect(() => {
     if (!token) {
       console.warn('No token found, redirecting to login')
-      navigate('/signin')
+      navigate('/sign-in')
       return
     }
     if (noteId && !isConnected && !isConnecting) {

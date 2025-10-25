@@ -7,14 +7,14 @@ export enum MessageType {
 
 export type ChatMessageResponse = {
   messageId: number
-  senderNickname: string
+  userId: number
   content: string
-  type: MessageType
+  type: string
   sentAt: string
 }
 
 export type ChatMessageRequest = {
+  noteId: number
   content: string
-  type: MessageType
-  emojis: string[]
+  type: string
 }
