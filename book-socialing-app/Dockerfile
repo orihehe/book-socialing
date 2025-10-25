@@ -1,5 +1,11 @@
+# Build stage
+FROM gradle:8.5-jdk17 AS build
+WORKDIR /app
+COPY . .
+RUN gradle clean build -x test
+
+# Runtime stage
 FROM openjdk:17-jdk-slim
-ARG JAR_FILE=build/libs/*.jar
-COPY ${JAR_FILE} app.jar
+COPY --from=build /app/build/libs/*.jar app.jar
 ENV JAVA_OPTS=""
 ENTRYPOINT exec java $JAVA_OPTS -jar app.jar
