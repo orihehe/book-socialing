@@ -36,6 +36,8 @@ export function MainLayout({
   activeChildIndex,
   onChildTabChange,
 }: Props) {
+  const hasToken = !!localStorage.getItem('accessToken')
+
   return (
     <>
       {pageHeader ?? (
@@ -44,7 +46,7 @@ export function MainLayout({
             <Link to="/search" className="pr-3">
               <Search className="w-5 h-5" />
             </Link>
-            <Link to="/sign-in">
+            <Link to={hasToken ? '/my' : '/sign-in'}>
               <CircleUserRound className="w-5 h-5" />
             </Link>
           </div>
