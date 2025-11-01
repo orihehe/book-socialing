@@ -1,8 +1,13 @@
+import { useQuery } from '@tanstack/react-query'
+import dayjs from 'dayjs'
 import { ChevronLeft, Search } from 'lucide-react'
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 
+import { useWebSocket } from '@/hooks/useWebSocket'
+import { apiFetch } from '@/lib/api'
 import { ChatMessageResponse, MessageType } from '@/types/chat'
+import { Note } from '@/types/note'
 import { User } from '@/types/user'
 
 import { ChatInput } from './ChatInput'
@@ -12,47 +17,133 @@ import { Filter } from './Filter'
 import { Message } from './Message'
 import { UserDialog } from '../shared/components/UserDialog'
 
-const dummyMessages: ChatMessageResponse[] = [
-  {
-    messageId: '1',
-    senderNickname: '유저1',
-    content: '9월 9일 오후 8시 서울역 카페에서 만나요\n~^^',
-    type: MessageType.NOTICE,
-    sentAt: '2025-09-09T19:00:00',
-  },
-  {
-    messageId: '2',
-    senderNickname: '유저2',
-    content: '반전 미쳤다',
-    type: MessageType.REVIEW,
-    sentAt: '2025-09-09T19:06:00',
-  },
-  {
-    messageId: '3',
-    senderNickname: '유저2',
-    content: '근데 내가 이 상황이었다면?',
-    type: MessageType.QUESTION,
-    sentAt: '2025-09-09T19:10:00',
-  },
-  {
-    messageId: '4',
-    senderNickname: '유저3',
-    content: '너무 감동적 p.45',
-    type: MessageType.REVIEW,
-    sentAt: '2025-09-09T19:11:00',
-  },
-]
-
 export default function ChatPage() {
   const [openUserDialog, setOpenUserDialog] = useState(false)
   const [selectedUser, setSelectedUser] = useState<User>()
   const [activeFilter, setActiveFilter] = useState<FilterType>()
+  const [messages, setMessages] = useState<ChatMessageResponse[]>([])
+  const [userMap, setUserMap] = useState<Map<number, User>>(new Map())
   const navigate = useNavigate()
+  const { id: noteId } = useParams<{ id: string }>()
+  const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  function handleUserClick(senderNickname: string) {
-    setOpenUserDialog(true)
-    // TODO: user 조회
-    setSelectedUser({ nickname: senderNickname, email: senderNickname, id: 1 })
+  // 노트 데이터 가져오기
+  const { data: noteData } = useQuery({
+    queryKey: ['note', noteId],
+    queryFn: async (): Promise<Note> => {
+      const response = await apiFetch(`/v1/note/${noteId}`)
+      if (!response.ok) {
+        throw new Error('Failed to fetch note data')
+      }
+      return response.json()
+    },
+    enabled: !!noteId,
+  })
+
+  // JWT 토큰을 localStorage에서 가져오기
+  const token = localStorage.getItem('accessToken') || localStorage.getItem('token') || ''
+
+  const { isConnected, isConnecting, connect, sendMessage } = useWebSocket({
+    token,
+    noteId: noteId ? Number(noteId) : undefined,
+    onMessage: message => {
+      setMessages(prev => [...prev, message])
+    },
+    onConnect: () => {
+      console.log('WebSocket connected')
+    },
+    onDisconnect: () => {
+      console.log('WebSocket disconnected')
+    },
+    onError: error => {
+      console.error('WebSocket error:', error)
+    },
+  })
+
+  // 노트 참여자(유저) 정보 가져오기
+  const { data: noteUsers } = useQuery({
+    queryKey: ['noteUsers', noteId],
+    queryFn: async (): Promise<User[]> => {
+      if (!noteId) return []
+      const response = await apiFetch(`/v1/note/${noteId}/users`)
+      if (!response.ok) {
+        throw new Error('Failed to fetch note users')
+      }
+      return response.json()
+    },
+    enabled: !!noteId,
+    retry: 0,
+  })
+
+  // 이전 채팅기록 useQuery로 불러오기
+  const { data: chatHistory } = useQuery({
+    queryKey: ['chatHistory', noteId, activeFilter],
+    queryFn: async (): Promise<ChatMessageResponse[]> => {
+      if (!noteId) return []
+      const url = activeFilter
+        ? `/v1/chat/messages?noteId=${noteId}&messageType=${activeFilter}`
+        : `/v1/chat/messages?noteId=${noteId}`
+      const response = await apiFetch(url)
+      if (!response.ok) {
+        throw new Error('Failed to fetch chat history')
+      }
+      const data = await response.json()
+      return data.messages || []
+    },
+    enabled: !!noteId,
+    retry: 0,
+  })
+
+  // noteUsers가 로드되면 userMap 생성
+  useEffect(() => {
+    if (noteUsers) {
+      const map = new Map<number, User>()
+      noteUsers.forEach(user => {
+        map.set(user.id, user)
+      })
+      setUserMap(map)
+    }
+  }, [noteUsers])
+
+  // 채팅 기록이 변경되면 메시지 업데이트
+  useEffect(() => {
+    if (chatHistory) {
+      setMessages(chatHistory)
+    }
+  }, [chatHistory])
+
+  // 컴포넌트 마운트 시 WebSocket 연결 (한 번만)
+  useEffect(() => {
+    if (!token) {
+      console.warn('No token found, redirecting to login')
+      navigate('/sign-in')
+      return
+    }
+    if (noteId && !isConnected && !isConnecting) {
+      connect()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [noteId, token, navigate])
+
+  // 메시지가 추가될 때마다 스크롤을 최하단으로 이동
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
+
+  function handleUserClick(userId: number) {
+    const user = userMap.get(userId)
+    if (user) {
+      setSelectedUser(user)
+      setOpenUserDialog(true)
+    }
+  }
+
+  function handleSendMessage(content: string, type: MessageType) {
+    sendMessage(content, type)
+  }
+
+  function handleFilterChange(filter: FilterType) {
+    setActiveFilter(prev => (prev === filter ? undefined : filter))
   }
 
   return (
@@ -62,8 +153,10 @@ export default function ChatPage() {
           <ChevronLeft onClick={() => navigate(-1)} />
         </button>
         <div className="flex gap-4">
-          <div className="text-sm text-gray-500">2025.04.02</div>
-          <h1 className="text-lg font-bold">빛과 실</h1>
+          <div className="text-sm text-gray-500">
+            {noteData?.endAt ? dayjs(noteData.endAt).format('YYYY.MM.DD') : ''}
+          </div>
+          <h1 className="text-lg font-bold">{noteData?.bookName || '로딩중...'}</h1>
         </div>
         <div className="flex gap-1">
           <button>
@@ -74,15 +167,26 @@ export default function ChatPage() {
       </header>
 
       <main className="flex-1 overflow-y-auto px-4 py-2 space-y-4">
-        <Filter activeFilter={activeFilter} setActiveFilter={setActiveFilter} />
-        {dummyMessages.map(message => (
-          <Message key={message.messageId} onUserClick={handleUserClick} {...message} />
+        <Filter activeFilter={activeFilter} setActiveFilter={handleFilterChange} />
+        {messages.map(message => (
+          <Message
+            key={message.messageId}
+            onUserClick={handleUserClick}
+            user={userMap.get(message.userId)}
+            {...message}
+          />
         ))}
+        <div ref={messagesEndRef} />
         <UserDialog user={selectedUser} open={openUserDialog} setOpen={setOpenUserDialog} />
       </main>
 
       <footer className="p-2">
-        <ChatInput />
+        <ChatInput onSendMessage={handleSendMessage} disabled={!isConnected} />
+        {!isConnected && (
+          <div className="text-center text-sm text-gray-500 px-4">
+            {isConnecting ? '연결 중...' : '연결되지 않음'}
+          </div>
+        )}
       </footer>
     </div>
   )

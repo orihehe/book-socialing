@@ -13,6 +13,7 @@ import NoteView from './features/note/NoteView'
 import CreateNote from './features/note/pages/CreateNote'
 import EditNote from './features/note/pages/EditNote'
 import GuestManagement from './features/note/pages/GuestManagement'
+import SearchView from './features/search/SearchView'
 import KakaoCallback from './features/user/KakaoCallback'
 import My from './features/user/My'
 import SignIn from './features/user/SignIn'
@@ -48,7 +49,8 @@ function App() {
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/oauth/callback" element={<KakaoCallback />} />
 
-        {/* not found */}
+        {/* etc */}
+        <Route path="/search" element={<SearchView />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </QueryClientProvider>

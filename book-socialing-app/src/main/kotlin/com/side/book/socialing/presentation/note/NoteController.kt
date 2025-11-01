@@ -3,6 +3,7 @@ package com.side.book.socialing.presentation.note
 import com.side.book.socialing.domain.note.command.CreateNoteCommand
 import com.side.book.socialing.domain.note.command.UpdateNoteCommand
 import com.side.book.socialing.domain.note.service.NoteService
+import com.side.book.socialing.domain.user.dto.UserDto
 import com.side.book.socialing.global.auth.UserPrincipalResolver
 import com.side.book.socialing.global.utils.log
 import com.side.book.socialing.presentation.note.dto.ClubNotesPageResponse
@@ -303,5 +304,22 @@ class NoteController(
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(NotesPageResponse(totalCount = 0L, groups = emptyList()))
         }
+    }
+
+    @Operation(
+        summary = "유저 목록 검색",
+        description = "노트에 속한 모든 유저를 검색합니다."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "성공적으로 유저 목록을 조회함")
+        ]
+    )
+    @GetMapping("/{noteId}/users")
+    fun getUsers(
+        @PathVariable noteId: Long
+    ): ResponseEntity<List<UserDto>> {
+        // TODO: auth
+        return ResponseEntity.ok(noteService.getUsers(noteId))
     }
 }

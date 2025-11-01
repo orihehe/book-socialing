@@ -12,14 +12,25 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  define: {
+    global: 'globalThis',
+  },
   server: {
     port: 3000,
     open: true,
     proxy: {
       '/api': {
         target: 'http://localhost:8080',
+        // target: 'http://saisai-dev.duckdns.org',
         changeOrigin: true,
         secure: false,
+      },
+      '/ws': {
+        target: 'http://localhost:8080',
+        // target: 'http://saisai-dev.duckdns.org',
+        changeOrigin: true,
+        secure: false,
+        ws: true,
       },
     },
   },

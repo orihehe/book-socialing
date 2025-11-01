@@ -6,9 +6,15 @@ export enum MessageType {
 }
 
 export type ChatMessageResponse = {
-  messageId: string
-  senderNickname: string
+  messageId: number
+  userId: number
   content: string
-  type: MessageType
+  type: string
   sentAt: string
+}
+
+export type ChatMessageRequest = {
+  noteId: number
+  content: string
+  type: string
 }
