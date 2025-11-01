@@ -12,6 +12,7 @@ import com.side.book.socialing.presentation.note.dto.CreateNoteRequest
 import com.side.book.socialing.presentation.note.dto.GetNoteResponse
 import com.side.book.socialing.presentation.note.dto.NotesPageResponse
 import com.side.book.socialing.presentation.note.dto.OpenNoteResponse
+import com.side.book.socialing.presentation.note.dto.SearchNoteResponse
 import com.side.book.socialing.presentation.note.dto.UpdateNoteRequest
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -293,11 +294,12 @@ class NoteController(
         @RequestParam query: String, // 검색어
         @RequestParam(defaultValue = "10") pageSize: Int,
         @RequestParam(defaultValue = "1") pageNum: Int
-    ): ResponseEntity<NotesPageResponse<CommonNoteResponse>> {
+    ): ResponseEntity<NotesPageResponse<SearchNoteResponse>> {
+        val userId = userPrincipalResolver.getUserId()
         val offset = (pageNum - 1) * pageSize
 
         return try {
-            val searchResults = noteService.searchNote(query, pageSize, offset)
+            val searchResults = noteService.searchNote(userId, query, pageSize, offset)
             ResponseEntity.ok(searchResults)
         } catch (e: Exception) {
             log.error("Error searching notes with query: $query", e)

@@ -1,5 +1,6 @@
 package com.side.book.socialing.domain.note.repository
 
+import com.side.book.socialing.domain.note.dto.SearchNoteDto
 import com.side.book.socialing.domain.note.entity.Note
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
@@ -58,24 +59,31 @@ interface NoteRepository : JpaRepository<Note, Long> {
     @Query(
         """
         SELECT COUNT(DISTINCT n.id) FROM Note n 
-        WHERE (n.bookName LIKE %:keyword%)
+        WHERE (n.bookName LIKE :keyword OR :keyword IS NULL)
         AND n.deleted = false
     """
     )
     fun countNoteByBookName(
-        @Param("keyword") keyword: String
+        @Param("keyword") keyword: String?
     ): Long
 
     @Query(
         """
-        SELECT DISTINCT n FROM Note n 
-        WHERE (n.bookName LIKE %:keyword%)
-        AND n.deleted = false 
-        ORDER BY n.createdAt DESC
-    """
+        SELECT 
+            new com.side.book.socialing.domain.note.dto.SearchNoteDto(
+                n,
+                CASE WHEN :userId IS NOT NULL AND p.id IS NOT NULL AND p.status = 'JOINED' THEN TRUE ELSE FALSE END AS isJoined,
+                CASE WHEN :userId IS NOT NULL AND p.id IS NOT NULL AND p.role = 'HOST' THEN TRUE ELSE FALSE END AS isHost
+            )
+        FROM Note n 
+        JOIN n.participants p
+        WHERE (n.bookName LIKE :keyword OR :keyword IS NULL)
+        AND n.deleted = false
+        """
     )
     fun findNoteByBookName(
-        @Param("keyword") keyword: String,
-        pageable: Pageable
-    ): List<Note>
+        @Param("userId") userId: Long?,
+        @Param("keyword") keyword: String?,
+        @Param("pageable") pageable: Pageable
+    ): List<SearchNoteDto>
 }
