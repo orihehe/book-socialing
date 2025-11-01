@@ -29,7 +29,7 @@ export function CurrentNoteCard({
         <img
           src={getImageUrl(bookImageUrl)}
           alt={bookName}
-          className="w-30 h-54 object-cover rounded-md border-none"
+          className="w-38 h-54 object-cover rounded-md border-none"
         />
         <div className="flex flex-col justify-between flex-1">
           <div>

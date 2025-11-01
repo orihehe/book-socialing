@@ -15,7 +15,9 @@ export function BottomButton({
 }: BottomButtonProps) {
   return (
     <>
-      <div className={`fixed left-4 right-4 ${isSub ? 'bottom-20 mb-2' : 'bottom-6'}`}>
+      <div
+        className={`fixed left-0 right-0 px-4 max-w-[500px] mx-auto ${isSub ? 'bottom-20 mb-2' : 'bottom-6'}`}
+      >
         <button
           type={type}
           onClick={onClick}
