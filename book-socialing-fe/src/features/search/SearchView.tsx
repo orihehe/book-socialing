@@ -62,6 +62,7 @@ export default function SearchView() {
   const [searchTarget, setSearchTarget] = useState<SearchTarget>('all')
   const [searchValue, setSearchValue] = useState<string>('')
   const searchInputRef = useRef<HTMLInputElement>(null)
+  const hasToken = !!localStorage.getItem('accessToken')
 
   const { data: clubSearchData, isLoading: clubSearchLoading } = useQuery<ClubSearchResponse>({
     queryKey: ['club-search', searchValue],
@@ -105,7 +106,7 @@ export default function SearchView() {
     <div className="min-h-screen bg-white">
       <PageHeader showBack>
         <div className="flex items-center">
-          <Link to="/sign-in">
+          <Link to={hasToken ? '/my' : '/sign-in'}>
             <CircleUserRound className="w-5 h-5" />
           </Link>
         </div>
