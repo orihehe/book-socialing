@@ -154,7 +154,7 @@ export default function ChatPage() {
         </button>
         <div className="flex gap-4">
           <div className="text-sm text-gray-500">
-            {noteData?.endAt ? dayjs(noteData.endAt).format('YYYY.MM.DD') : ''}
+            {noteData?.endAt ? dayjs.utc(noteData.endAt).local().format('YYYY.MM.DD') : ''}
           </div>
           <h1 className="text-lg font-bold">{noteData?.bookName || '로딩중...'}</h1>
         </div>

@@ -44,7 +44,9 @@ export function Message({ onUserClick, content, type, sentAt, userId, user }: Pr
             )}
 
             {/* 시간 */}
-            <div className="text-[10px] text-gray-700">{dayjs(sentAt).format('HH:mm')}</div>
+            <div className="text-[10px] text-gray-700">
+              {dayjs.utc(sentAt).local().format('HH:mm')}
+            </div>
           </div>
         </div>
       </div>

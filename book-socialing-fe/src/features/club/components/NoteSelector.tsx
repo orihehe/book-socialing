@@ -29,25 +29,31 @@ export default function NoteSelector() {
     <div className="mb-10">
       <div className="space-y-2 my-7">
         <Label className="text-base font-bold">클럽 내역</Label>
-        <div
-          className="overflow-x-auto mt-2"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-        >
-          <div className="flex gap-3 w-max">
-            {noteQuery.data?.notes.map(note => (
-              <button
-                key={note.id}
-                onClick={() => setSelectedNote(note)}
-                className="w-15 h-15 rounded-lg bg-gray-300 shrink-0 hover:cursor-pointer"
-                style={{
-                  backgroundImage: `url(${getImageUrl(note.bookImageUrl)})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }}
-              />
-            ))}
+        {noteQuery.data?.notes && noteQuery.data.notes.length > 0 ? (
+          <div
+            className="overflow-x-auto mt-2"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            <div className="flex gap-3 w-max">
+              {noteQuery.data.notes.map(note => (
+                <button
+                  key={note.id}
+                  onClick={() => setSelectedNote(note)}
+                  className="w-15 h-15 rounded-lg bg-gray-300 shrink-0 hover:cursor-pointer"
+                  style={{
+                    backgroundImage: `url(${getImageUrl(note.bookImageUrl)})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                  }}
+                />
+              ))}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="flex items-center justify-center py-10">
+            <p className="text-gray-400 text-sm">클럽 내역이 없습니다</p>
+          </div>
+        )}
       </div>
 
       {selectedNote && (
