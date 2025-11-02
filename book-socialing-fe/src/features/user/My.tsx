@@ -37,21 +37,16 @@ export default function My() {
 
   return (
     <>
-      <PageHeader title="SAISAI" />
+      <PageHeader title="SAISAI">
+        <Link to="/my/edit">
+          <Button variant="ghost" size="sm" className="text-gray-500 text-xs hover:text-gray-800">
+            수정하기
+          </Button>
+        </Link>
+      </PageHeader>
 
       <BaseCard title="개인 정보 관리">
         <div className="w-full max-w-sm p-6 bg-white rounded-xl">
-          {/* 수정하기 버튼 */}
-          <Link to="/my/edit">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="absolute right-4 top-4 text-gray-500 text-xs hover:text-gray-800"
-            >
-              수정하기
-            </Button>
-          </Link>
-
           {/* 프로필 본문 */}
           <div className="flex flex-col items-center gap-4">
             {/* 프로필 이미지 */}

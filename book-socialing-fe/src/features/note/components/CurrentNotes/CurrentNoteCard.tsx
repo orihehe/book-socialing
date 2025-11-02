@@ -21,8 +21,9 @@ export function CurrentNoteCard({
   const dDay = dayjs(endAt).diff(dayjs().startOf('day'), 'day')
   const navigate = useNavigate()
 
-  const visible = participants.slice(0, 3)
-  const remaining = participants.length - visible.length
+  const joinedParticipants = participants.filter(p => p.status === 'JOINED')
+  const visible = joinedParticipants.slice(0, 3)
+  const remaining = joinedParticipants.length - visible.length
   return (
     <>
       <div className="flex gap-4 mt-5">
@@ -42,6 +43,7 @@ export function CurrentNoteCard({
               {visible.map(p => (
                 <UserImage
                   key={p.userId}
+                  // TODO: 사용자 정보 조회 후 적용
                   user={{ nickname: `${p.userId}`, id: p.userId, email: 'test' }}
                   size={8}
                 />

@@ -4,19 +4,11 @@ import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
 
 import { apiFetch } from '@/lib/api'
+import { NoteSearchResult } from '@/types/note'
 import { getImageUrl } from '@/util'
 
 interface NoteListItemProps {
-  note: {
-    id: number
-    clubName?: string
-    bookName: string
-    bookImageUrl: string
-    startAt: string
-    endAt: string
-    isJoined: boolean
-    isHost: boolean
-  }
+  note: NoteSearchResult
 }
 
 export function NoteListItem({ note }: NoteListItemProps) {
@@ -69,14 +61,14 @@ export function NoteListItem({ note }: NoteListItemProps) {
         </div>
       </Link>
       {!isExpired &&
-        (note.isHost ? (
+        (note.role === 'HOST' ? (
           <Link
             to={`/note/${note.id}/guest`}
             className="px-4 py-1.5 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 flex-shrink-0"
           >
             관리
           </Link>
-        ) : note.isJoined ? (
+        ) : note.status === 'PENDING_APPROVAL' ? (
           <button
             onClick={e => {
               e.preventDefault()

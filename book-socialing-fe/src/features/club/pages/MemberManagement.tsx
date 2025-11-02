@@ -38,35 +38,52 @@ export default function MemberManagement() {
     },
   })
 
-  const rejectMutation = useMutation({
-    mutationFn: async ({ noteId, userId }: { noteId: string; userId: string }) => {
-      const response = await apiFetch(`/v1/note/${noteId}/participants/${userId}/reject`, {
+  const approveMutation = useMutation({
+    mutationFn: async ({ clubId, userId }: { clubId: string; userId: number }) => {
+      const response = await apiFetch(`/v1/club/${clubId}/members/${userId}/approve`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
       })
-      if (!response.ok) throw new Error('Failed to reject participant')
+      if (!response.ok) throw new Error('Failed to approve member')
       return response.json()
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['noteParticipants'] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['clubMembers', id] }),
+  })
+
+  const rejectMutation = useMutation({
+    mutationFn: async ({ clubId, userId }: { clubId: string; userId: number }) => {
+      const response = await apiFetch(`/v1/club/${clubId}/members/${userId}/reject`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+      })
+      if (!response.ok) throw new Error('Failed to reject member')
+      return response.json()
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['clubMembers', id] }),
   })
 
   const kickMutation = useMutation({
-    mutationFn: async ({ noteId, userId }: { noteId: string; userId: string }) => {
-      const response = await apiFetch(`/v1/note/${noteId}/participants/${userId}`, {
+    mutationFn: async ({ clubId, userId }: { clubId: string; userId: number }) => {
+      const response = await apiFetch(`/v1/club/${clubId}/members/${userId}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
       })
-      if (!response.ok) throw new Error('Failed to kick participant')
+      if (!response.ok) throw new Error('Failed to kick member')
       return response.json()
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['noteParticipants'] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['clubMembers', id] }),
   })
 
-  const handleReject = (userId: string) => {
-    rejectMutation.mutate({ noteId: id as string, userId })
+  const handleApprove = (userId: number) => {
+    approveMutation.mutate({ clubId: id as string, userId })
   }
-  const handleKick = (userId: string) => {
-    kickMutation.mutate({ noteId: id as string, userId })
+
+  const handleReject = (userId: number) => {
+    rejectMutation.mutate({ clubId: id as string, userId })
+  }
+
+  const handleKick = (userId: number) => {
+    kickMutation.mutate({ clubId: id as string, userId })
   }
 
   const pendingUsers = clubMembers.filter(user => user.status === 'PENDING_APPROVAL')
@@ -98,12 +115,21 @@ export default function MemberManagement() {
                   key={`pending-${user.user.id}`}
                   user={user.user}
                   action={
-                    <BaseButton
-                      onClick={() => handleReject('user-id')}
-                      disabled={rejectMutation.isPending}
-                    >
-                      승인
-                    </BaseButton>
+                    <div className="flex gap-2">
+                      <BaseButton
+                        isActive
+                        onClick={() => handleApprove(user.user.id)}
+                        disabled={approveMutation.isPending}
+                      >
+                        승인
+                      </BaseButton>
+                      <BaseButton
+                        onClick={() => handleReject(user.user.id)}
+                        disabled={rejectMutation.isPending}
+                      >
+                        거절
+                      </BaseButton>
+                    </div>
                   }
                 />
               ))}
@@ -127,13 +153,7 @@ export default function MemberManagement() {
                   action={
                     <div className="flex gap-2">
                       <BaseButton
-                        onClick={() => handleKick('user-id')}
-                        disabled={kickMutation.isPending}
-                      >
-                        승인취소
-                      </BaseButton>
-                      <BaseButton
-                        onClick={() => handleKick('user-id')}
+                        onClick={() => handleKick(user.user.id)}
                         disabled={kickMutation.isPending}
                       >
                         강퇴
