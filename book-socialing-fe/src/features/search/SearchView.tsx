@@ -6,6 +6,8 @@ import { Link } from 'react-router-dom'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { apiFetch } from '@/lib/api'
+import { ClubSearchResult } from '@/types/club'
+import { NoteSearchResult } from '@/types/note'
 
 import { ClubListItem } from './ClubListItem'
 import { NoteListItem } from './NoteListItem'
@@ -26,27 +28,6 @@ const lnbItems = [
 ]
 
 type SearchTarget = 'all' | 'club' | 'note'
-
-interface ClubSearchResult {
-  id: number
-  clubName: string
-  clubImageUrls: string[]
-  description: string
-  memberCount: number
-  isJoined: boolean
-  isHost: boolean
-}
-
-interface NoteSearchResult {
-  id: number
-  clubName?: string
-  bookName: string
-  bookImageUrl: string
-  startAt: string
-  endAt: string
-  isJoined: boolean
-  isHost: boolean
-}
 
 interface ClubSearchResponse {
   totalCount: number

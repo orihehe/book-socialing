@@ -59,7 +59,7 @@ export default function GuestManagementPage() {
     },
     onSuccess: () => {
       // 성공 시 쿼리 무효화하여 데이터 새로고침
-      queryClient.invalidateQueries({ queryKey: ['noteParticipants'] })
+      queryClient.invalidateQueries({ queryKey: ['noteGuests', id] })
     },
   })
 
@@ -80,7 +80,7 @@ export default function GuestManagementPage() {
       return response.json()
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['noteParticipants'] })
+      queryClient.invalidateQueries({ queryKey: ['noteGuests', id] })
     },
   })
 
@@ -94,13 +94,13 @@ export default function GuestManagementPage() {
       })
 
       if (!response.ok) {
-        throw new Error('Failed to reject participant')
+        throw new Error('Failed to kick participant')
       }
 
       return response.json()
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['noteParticipants'] })
+      queryClient.invalidateQueries({ queryKey: ['noteGuests', id] })
     },
   })
 
@@ -150,13 +150,13 @@ export default function GuestManagementPage() {
                       onClick={() => handleApprove(user.user.id)}
                       disabled={approveMutation.isPending}
                     >
-                      {approveMutation.isPending ? '처리중...' : '승인'}
+                      승인
                     </BaseButton>
                     <BaseButton
                       onClick={() => handleReject(user.user.id)}
                       disabled={rejectMutation.isPending}
                     >
-                      {rejectMutation.isPending ? '처리중...' : '거절'}
+                      거절
                     </BaseButton>
                   </div>
                 }
@@ -182,7 +182,7 @@ export default function GuestManagementPage() {
                     onClick={() => handleKick(user.user.id)}
                     disabled={kickMutation.isPending}
                   >
-                    {kickMutation.isPending ? '처리중...' : '취소'}
+                    강퇴
                   </BaseButton>
                 }
               />

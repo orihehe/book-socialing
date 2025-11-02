@@ -1,20 +1,60 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
+import { toast } from 'sonner'
 
+import { BaseButton } from '@/components/common/BaseButton'
+import { apiFetch } from '@/lib/api'
+import { ClubSearchResult } from '@/types/club'
 import { getImageUrl } from '@/util'
 
 interface ClubListItemProps {
-  club: {
-    id: number
-    clubName: string
-    clubImageUrls: string[]
-    description: string
-    memberCount: number
-    isJoined: boolean
-    isHost: boolean
-  }
+  club: ClubSearchResult
 }
 
 export function ClubListItem({ club }: ClubListItemProps) {
+  const queryClient = useQueryClient()
+  const cancelJoinClubMutation = useMutation({
+    mutationFn: async () => {
+      await apiFetch(`/v1/club/${club.id}/join/cancel`, {
+        method: 'PATCH',
+      })
+    },
+    onSuccess: () => {
+      toast.success('클럽 신청이 취소되었습니다.')
+    },
+    onError: () => {
+      toast.error('클럽 신청 취소에 실패했습니다.')
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['clubMembers', club.id] })
+    },
+  })
+
+  const joinClubMutation = useMutation({
+    mutationFn: async () => {
+      await apiFetch(`/v1/club/${club.id}/join`, {
+        method: 'PATCH',
+      })
+    },
+    onSuccess: () => {
+      toast.success('클럽 신청이 완료되었습니다.')
+    },
+    onError: () => {
+      toast.error('클럽 신청에 실패했습니다.')
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['clubs'] })
+    },
+  })
+
+  const handleCancelJoinClub = () => {
+    cancelJoinClubMutation.mutate()
+  }
+
+  const handleJoinClub = () => {
+    joinClubMutation.mutate()
+  }
+
   return (
     <div className="flex items-center space-x-3 py-3 border-b border-gray-100 last:border-b-0">
       <Link to={`/club/${club.id}`} className="flex items-center space-x-3 flex-1">
@@ -30,35 +70,18 @@ export function ClubListItem({ club }: ClubListItemProps) {
           </p>
         </div>
       </Link>
-      {club.isHost ? (
+      {club.role === 'HOST' ? (
         <Link
           to={`/club/${club.id}/members`}
           className="px-4 py-1.5 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 flex-shrink-0"
         >
           관리
         </Link>
-      ) : club.isJoined ? (
-        <button
-          onClick={e => {
-            e.preventDefault()
-            // TODO: 클럽 신청 취소 기능 구현
-          }}
-          className="px-4 py-1.5 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 flex-shrink-0"
-        >
-          신청취소
-        </button>
+      ) : club.status === 'PENDING_APPROVAL' ? (
+        <BaseButton onClick={() => handleCancelJoinClub()}>신청취소</BaseButton>
       ) : (
-        <button
-          onClick={e => {
-            e.preventDefault()
-            // TODO: 클럽 신청 기능 구현
-          }}
-          className="px-4 py-1.5 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 flex-shrink-0"
-        >
-          신청하기
-        </button>
+        <BaseButton onClick={() => handleJoinClub()}>신청하기</BaseButton>
       )}
     </div>
   )
 }
-

@@ -1,3 +1,5 @@
+import { UserStatus, UserRole } from './user'
+
 export interface Club {
   id: number
   clubName: string
@@ -21,4 +23,14 @@ export interface CreateClubCommand {
   clubName: string
   description: string
   images: File[]
+}
+
+export interface ClubSearchResult {
+  id: number
+  clubName: string
+  clubImageUrls: string[]
+  description: string
+  memberCount: number
+  status: UserStatus
+  role?: UserRole
 }
