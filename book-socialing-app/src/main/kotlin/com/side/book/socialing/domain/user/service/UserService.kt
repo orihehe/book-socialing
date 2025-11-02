@@ -32,7 +32,7 @@ class UserService(
      * 사용자 정보를 반환합니다.
      *
      * @return 사용자 정보가 담긴 `UserResponse` DTO 리스트
-     *         만약 노트가 없으면 null를 반환합니다.
+     *         만약 노트가 없으면 null를 반환합니다
      */
     @Transactional(readOnly = true) // 읽기 전용 트랜잭션
     fun getUserProfileResponse(userId: Long): UserResponse? {
