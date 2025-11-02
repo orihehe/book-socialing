@@ -77,7 +77,7 @@ class ChatController(
                 type = it.messageType,
                 sentAt = it.sentAt
             )
-        }
+        }.sortedBy { it.messageId }
 
         return ChatMessagesApiResponse(
             messages = messages,
