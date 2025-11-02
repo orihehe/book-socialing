@@ -522,10 +522,10 @@ class NoteService(
         val pageable = PageRequest.of(
             pageIndex,
             pageSize,
-            Sort.by(Sort.Order.desc("createdAt")) // 최신순 정렬
+            Sort.by(Sort.Order.desc("endAt")) // 퇴고일 내림차순 정렬
         )
 
-        val keywordParam = if (query.isNullOrBlank()) {
+        val keywordParam = if (query.isBlank()) {
             null // keyword가 비어있으면 null을 전달
         } else {
             "%$query%" // keyword가 있으면 %를 붙여서 전달

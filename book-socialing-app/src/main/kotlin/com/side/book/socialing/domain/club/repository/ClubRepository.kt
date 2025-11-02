@@ -1,5 +1,6 @@
 package com.side.book.socialing.domain.club.repository
 
+import com.side.book.socialing.domain.club.dto.SearchClubDto
 import com.side.book.socialing.domain.club.entity.Club
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
@@ -44,22 +45,29 @@ interface ClubRepository : JpaRepository<Club, Long> {
     @Query(
         """
         SELECT COUNT(DISTINCT c.id) FROM Club c 
-        WHERE c.clubName LIKE %:keyword% OR c.description LIKE %:keyword%
+        WHERE (c.clubName LIKE %:keyword% OR c.description LIKE %:keyword% OR :keyword IS NULL)
     """
     )
     fun countSearchClubByClubName(
-        @Param("keyword") keyword: String
+        @Param("keyword") keyword: String?
     ): Long
 
     @Query(
         """
-        SELECT DISTINCT c FROM Club c 
-        WHERE c.clubName LIKE %:keyword% OR c.description LIKE %:keyword%
-        ORDER BY c.createdAt DESC
+        SELECT new com.side.book.socialing.domain.club.dto.SearchClubDto(
+            c,
+            CASE WHEN :userId IS NOT NULL AND p.id IS NOT NULL AND p.status = 'JOINED' THEN TRUE ELSE FALSE END AS isJoined,
+            CASE WHEN :userId IS NOT NULL AND p.id IS NOT NULL AND p.role = 'HOST' THEN TRUE ELSE FALSE END AS isHost
+        )
+        FROM Club c
+        JOIN c.participants p
+        WHERE (c.clubName LIKE %:keyword% OR c.description LIKE %:keyword%) OR (:keyword IS NULL)
+        AND c.deleted = false
     """
     )
     fun findSearchClubByClubName(
-        @Param("keyword") keyword: String,
-        pageable: Pageable
-    ): List<Club>
+        @Param("userId") userId: Long?,
+        @Param("keyword") keyword: String?,
+        @Param("pageable") pageable: Pageable
+    ): List<SearchClubDto>
 }

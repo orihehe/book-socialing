@@ -2,6 +2,7 @@ package com.side.book.socialing.domain.club.service
 
 import com.side.book.socialing.domain.club.command.CreateClubCommand
 import com.side.book.socialing.domain.club.command.UpdateClubCommand
+import com.side.book.socialing.domain.club.dto.SearchClubDto
 import com.side.book.socialing.domain.club.entity.Club
 import com.side.book.socialing.domain.club.entity.ClubFile
 import com.side.book.socialing.domain.club.entity.ClubParticipant
@@ -15,6 +16,7 @@ import com.side.book.socialing.global.file.FileUploader
 import com.side.book.socialing.global.file.StoredFile
 import com.side.book.socialing.presentation.club.dto.ClubPageResponse
 import com.side.book.socialing.presentation.club.dto.CommonClubResponse
+import com.side.book.socialing.presentation.club.dto.SearchClubResponse
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.PageRequest
@@ -302,7 +304,7 @@ class ClubService(
      *         검색 결과가 없으면 빈 리스트를 반환합니다.
      */
     @Transactional(readOnly = true)
-    fun searchClub(query: String, pageSize: Int, offset: Int): ClubPageResponse<CommonClubResponse> {
+    fun searchClub(userId: Long?, query: String, pageSize: Int, offset: Int): ClubPageResponse<SearchClubResponse> {
         val pageIndex = offset / pageSize
 
         val pageable = PageRequest.of(
@@ -311,22 +313,31 @@ class ClubService(
             Sort.by(Sort.Order.desc("createdAt"))
         )
 
-        val totalCount = clubRepository.countSearchClubByClubName(query)
+        val keywordParam = if (query.isBlank()) {
+            null // keyword가 비어있으면 null을 전달
+        } else {
+            "%$query%" // keyword가 있으면 %를 붙여서 전달
+        }
+
+        val totalCount = clubRepository.countSearchClubByClubName(keywordParam)
 
         // 만약 검색 결과가 없다면, 빈 결과 반환
         if (totalCount == 0L) {
             return ClubPageResponse(totalCount = 0L, groups = emptyList())
         }
 
-        val clubs = clubRepository.findSearchClubByClubName(query, pageable)
+        val rows: List<SearchClubDto> = clubRepository.findSearchClubByClubName(userId, keywordParam, pageable)
 
-        val groups = clubs.map { club ->
-            CommonClubResponse(
-                id = club.id!!,
-                clubName = club.clubName,
-                clubImageUrls = club.files.map { it.filePath },
-                description = club.description ?: "",
-                memberCount = club.participants.size
+        val groups = rows.map { row ->
+            val c = row.club
+            SearchClubResponse(
+                id = c.id!!,
+                clubName = c.clubName,
+                clubImageUrls = c.files.map { it.filePath },
+                description = c.description ?: "",
+                memberCount = c.participants.size,
+                isJoined = row.isJoined,
+                isHost = row.isHost
             )
         }
 
