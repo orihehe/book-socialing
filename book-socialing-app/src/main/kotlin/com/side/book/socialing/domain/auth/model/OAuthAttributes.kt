@@ -15,12 +15,12 @@ data class OAuthAttributes(
     val picture: String
 ) {
 
-    fun toEntity(): User {
+    fun toEntity(nickname: String): User {
         return User(
             provider = this.provider.name,
             providerId = this.attributes[this.nameAttributeKey].toString(),
             email = this.email,
-            nickname = this.name,
+            nickname = nickname,
             role = "ROLE_USER"
         )
     }
