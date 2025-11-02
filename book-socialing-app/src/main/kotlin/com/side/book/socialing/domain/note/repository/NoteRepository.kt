@@ -72,11 +72,11 @@ interface NoteRepository : JpaRepository<Note, Long> {
         SELECT 
             new com.side.book.socialing.domain.note.dto.SearchNoteDto(
                 n,
-                CASE WHEN :userId IS NOT NULL AND p.id IS NOT NULL AND p.status = 'JOINED' THEN TRUE ELSE FALSE END AS isJoined,
-                CASE WHEN :userId IS NOT NULL AND p.id IS NOT NULL AND p.role = 'HOST' THEN TRUE ELSE FALSE END AS isHost
+                CASE WHEN p.status = 'JOINED' THEN TRUE ELSE FALSE END AS isJoined,
+                CASE WHEN p.role = 'HOST' THEN TRUE ELSE FALSE END AS isHost
             )
         FROM Note n 
-        JOIN n.participants p
+        LEFT JOIN n.participants p WITH p.userId = :userId
         WHERE (n.bookName LIKE :keyword OR :keyword IS NULL)
         AND n.deleted = false
         """
