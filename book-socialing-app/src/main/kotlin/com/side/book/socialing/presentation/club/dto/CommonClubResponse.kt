@@ -56,8 +56,8 @@ data class SearchClubResponse(
     val memberCount: Int,
 
     @field:Schema(description = "참여상태", type = "string", format = "string", example = "JOINED")
-    val status: String,
+    val status: String?,
 
     @field:Schema(description = "역할", type = "string", format = "string", example = "HOST")
-    val role: String
+    val role: String?
 )
