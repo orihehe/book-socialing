@@ -42,11 +42,17 @@ class UserService(
             return null
         }
 
+        // 이미지 URL 목록 정제
+        // 대표 이미지 경로
+        val imageUrl = user.files.firstOrNull()?.filePath ?: "/images/default_book_image.jpg"
+
         return UserResponse(
             id = user.id,
             email = user.email,
             nickname = user.nickname,
-            role = user.role
+            description = user.description,
+            role = user.role,
+            imageUrl = imageUrl
         )
     }
 }

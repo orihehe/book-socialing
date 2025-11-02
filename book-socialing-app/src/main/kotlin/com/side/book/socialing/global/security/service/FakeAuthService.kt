@@ -19,6 +19,7 @@ class FakeAuthService : AuthService {
                 providerId = "test_id",
                 email = "test@example.com",
                 nickName = "Test User",
+                description = "test description",
                 role = "User"
             )
         )
