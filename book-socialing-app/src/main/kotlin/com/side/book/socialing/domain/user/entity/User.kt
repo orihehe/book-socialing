@@ -7,8 +7,10 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 import jakarta.persistence.UniqueConstraint
+import org.hibernate.annotations.BatchSize
 import org.hibernate.annotations.SQLRestriction
 
 @Entity
@@ -17,7 +19,7 @@ import org.hibernate.annotations.SQLRestriction
 class User(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null,
+    var id: Long? = null,
 
     @Column(nullable = false)
     val provider: String,
@@ -31,8 +33,15 @@ class User(
     @Column(nullable = false)
     val nickname: String,
 
+    @Column(name = "description", length = 1000)
+    var description: String? = null,
+
     @Column(nullable = false)
     val role: String = "ROLE_USER",
+
+    @BatchSize(size = 100)
+    @OneToMany(mappedBy = "user")
+    var files: List<UserFile> = listOf(),
 
     @Column(name = "deleted", nullable = false)
     var deleted: Boolean = false
@@ -42,11 +51,11 @@ class User(
     companion object {
         fun create(cmd: CreateUserCommand, id: Long? = null): User {
             return User(
-                id = id,
                 provider = cmd.provider,
                 providerId = cmd.providerId,
                 email = cmd.email,
                 nickname = cmd.nickName,
+                description = cmd.description,
                 role = cmd.role
             )
         }

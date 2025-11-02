@@ -5,5 +5,6 @@ data class CreateUserCommand(
     val providerId: String,
     val email: String,
     val nickName: String,
+    val description: String?,
     val role: String
 )

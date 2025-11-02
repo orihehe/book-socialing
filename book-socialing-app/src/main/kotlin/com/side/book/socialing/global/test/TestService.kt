@@ -79,6 +79,7 @@ class TestService(
                     providerId = index.toString(),
                     email = "test$index@email.com",
                     nickName = "testName$index",
+                    description = "나는야 개발자",
                     role = "ROLE_USER"
                 ),
                 it

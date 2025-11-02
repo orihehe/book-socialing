@@ -42,11 +42,20 @@ class UserService(
             return null
         }
 
+        // 이미지 URL 목록 정제
+        val imageUrls: List<String> = if (user.files.isNotEmpty()) {
+            user.files.map { it.filePath } // 파일 엔티티의 filePath를 String 리스트로 변환
+        } else {
+            listOf("/images/default_book_image.jpg") // 기본 이미지 1개를 추가하는 예시
+        }
+
         return UserResponse(
             id = user.id,
             email = user.email,
             nickname = user.nickname,
-            role = user.role
+            description = user.description,
+            role = user.role,
+            imageUrls = imageUrls,
         )
     }
 }

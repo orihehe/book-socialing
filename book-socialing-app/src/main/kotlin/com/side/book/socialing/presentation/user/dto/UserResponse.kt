@@ -1,5 +1,6 @@
 package com.side.book.socialing.presentation.user.dto
 
+import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(description = "사용자 정보")
@@ -13,6 +14,12 @@ data class UserResponse(
     @field:Schema(description = "닉네임", example = "saisai")
     val nickname: String,
 
+    @field:Schema(description = "사용자 소개", example = "나는야 개발자", nullable = true)
+    val description: String?,
+
     @field:Schema(description = "사용자 역할", example = "ROLE_USER")
-    val role: String
+    val role: String,
+
+    @field:ArraySchema(arraySchema = Schema(description = "이미지 URL 목록"), schema = Schema(format = "uri", example = "/note/27/cover1.png"))
+    val imageUrls: List<String>,
 )
