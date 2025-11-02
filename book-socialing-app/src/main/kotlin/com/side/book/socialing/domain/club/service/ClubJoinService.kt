@@ -113,7 +113,8 @@ class ClubJoinService(
             .map {
                 ClubMemberResponse(
                     user = it.value,
-                    role = participantMap[it.key]?.role ?: ParticipantRole.MEMBER
+                    role = participantMap[it.key]!!.role.toString(),
+                    status = participantMap[it.key]!!.status.toString()
                 )
             }
     }
