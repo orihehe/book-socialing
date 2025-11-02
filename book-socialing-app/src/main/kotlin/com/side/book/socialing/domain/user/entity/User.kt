@@ -30,7 +30,11 @@ class User(
     val nickname: String,
 
     @Column(nullable = false)
-    val role: String = "ROLE_USER"
+    val role: String = "ROLE_USER",
+
+    @Column(name = "deleted", nullable = false)
+    var deleted: Boolean = false
+
 ) : BaseEntity() {
 
     companion object {
