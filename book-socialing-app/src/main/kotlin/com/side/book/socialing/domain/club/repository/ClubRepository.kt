@@ -54,17 +54,16 @@ interface ClubRepository : JpaRepository<Club, Long> {
 
     @Query(
         """
-        SELECT 
-            new com.side.book.socialing.domain.club.dto.SearchClubDto(
-                n,
-                CASE WHEN p.status = 'JOINED' THEN TRUE ELSE FALSE END AS isJoined,
-                CASE WHEN p.role = 'HOST' THEN TRUE ELSE FALSE END AS isHost
-            )
+        SELECT new com.side.book.socialing.domain.club.dto.SearchClubDto(
+            c,
+            CASE WHEN :userId IS NOT NULL AND p.id IS NOT NULL AND p.status = 'JOINED' THEN TRUE ELSE FALSE END AS isJoined,
+            CASE WHEN :userId IS NOT NULL AND p.id IS NOT NULL AND p.role = 'HOST' THEN TRUE ELSE FALSE END AS isHost
+        )
         FROM Club c
-        LEFT JOIN c.participants p WITH p.userId = :userId
+        JOIN c.participants p
         WHERE (c.clubName LIKE %:keyword% OR c.description LIKE %:keyword%) OR (:keyword IS NULL)
         AND c.deleted = false
-        """
+    """
     )
     fun findSearchClubByClubName(
         @Param("userId") userId: Long?,
