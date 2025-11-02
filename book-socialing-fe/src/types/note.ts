@@ -1,3 +1,5 @@
+import { UserStatus, UserRole } from './user'
+
 export interface Note {
   id: number
   clubName?: string
@@ -34,5 +36,16 @@ export interface Participant {
   participantId: number
   userId: number
   role: ParticipantRole
-  status: 'JOINED'
+  status: UserStatus
+}
+
+export interface NoteSearchResult {
+  id: number
+  clubName?: string
+  bookName: string
+  bookImageUrl: string
+  startAt: string
+  endAt: string
+  status: UserStatus
+  role?: UserRole
 }
