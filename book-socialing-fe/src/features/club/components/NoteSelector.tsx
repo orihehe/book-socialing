@@ -20,7 +20,8 @@ export default function NoteSelector() {
       if (!res.ok) throw new Error('클럽 멤버 정보를 불러오지 못했습니다.')
       const result = await res.json()
 
-      return result?.groups?.[1] as ClubNotesGroup
+      // undefined 대신 기본값 반환
+      return (result?.groups?.[1] || { clubId: 0, clubName: '', notes: [] }) as ClubNotesGroup
     },
     enabled: !!id,
   })
