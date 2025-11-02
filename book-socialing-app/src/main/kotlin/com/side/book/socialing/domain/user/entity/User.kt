@@ -31,7 +31,10 @@ class User(
     val email: String,
 
     @Column(nullable = false)
-    val nickname: String,
+    var nickname: String,
+
+    @Column(name = "profile_image_url")
+    var profileImageUrl: String? = null,
 
     @Column(name = "description", length = 1000)
     var description: String? = null,
@@ -61,7 +64,9 @@ class User(
         }
     }
 
-    fun delete(userId: Long) {
-        deleted = true
+    fun update(nickname: String, profileImageUrl: String?, description: String?) {
+        this.nickname = nickname
+        this.profileImageUrl = profileImageUrl
+        this.description = description
     }
 }
