@@ -9,6 +9,8 @@ services:
     restart: always
     env_file:
       - ../.env
+    volumes:
+      - ../data:/var/data/saisai-file
 
   frontend:
     build:
