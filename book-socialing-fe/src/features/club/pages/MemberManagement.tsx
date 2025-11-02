@@ -27,18 +27,9 @@ const MemberListItem = ({ user, action }: { user: User; action: React.ReactNode 
 export default function MemberManagement() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const pendingMembers = [
-    { id: 1, nickname: '닉네임', email: '이메일' },
-    { id: 2, nickname: '닉네임', email: '이메일' },
-    { id: 3, nickname: '닉네임', email: '이메일' },
-  ]
-  const approvedMembers = [
-    { id: 1, nickname: '닉네임', email: '이메일' },
-    { id: 2, nickname: '닉네임', email: '이메일' },
-    { id: 3, nickname: '닉네임', email: '이메일' },
-  ]
+  const queryClient = useQueryClient()
 
-  const { data: clubMembers } = useQuery<UserDetail[]>({
+  const { data: clubMembers = [] } = useQuery<UserDetail[]>({
     queryKey: ['clubMembers', id],
     queryFn: async () => {
       const res = await apiFetch(`/v1/club/${id}/members`)
@@ -46,8 +37,6 @@ export default function MemberManagement() {
       return res.json()
     },
   })
-  console.log(clubMembers)
-  const queryClient = useQueryClient()
 
   const rejectMutation = useMutation({
     mutationFn: async ({ noteId, userId }: { noteId: string; userId: string }) => {
@@ -74,13 +63,14 @@ export default function MemberManagement() {
   })
 
   const handleReject = (userId: string) => {
-    const noteId = 'your-note-id'
-    rejectMutation.mutate({ noteId, userId })
+    rejectMutation.mutate({ noteId: id as string, userId })
   }
   const handleKick = (userId: string) => {
-    const noteId = 'your-note-id'
-    kickMutation.mutate({ noteId, userId })
+    kickMutation.mutate({ noteId: id as string, userId })
   }
+
+  const pendingUsers = clubMembers.filter(user => user.status === 'PENDING_APPROVAL')
+  const approvedUsers = clubMembers.filter(user => user.status === 'JOINED')
 
   return (
     <div className="flex flex-col min-h-screen px-4 pt-4 pb-6 bg-background">
@@ -101,51 +91,63 @@ export default function MemberManagement() {
         {/* Pending Section */}
         <section className="rounded-2xl bg-[#FBFBFB]">
           <h2 className="text-mx font-bold px-4 pt-4">신청멤버</h2>
-          <div className="mt-2 px-2 pb-4 space-y-3">
-            {pendingMembers.map((user, idx) => (
-              <MemberListItem
-                key={`pending-${idx}`}
-                user={user}
-                action={
-                  <BaseButton
-                    onClick={() => handleReject('user-id')}
-                    disabled={rejectMutation.isPending}
-                  >
-                    승인
-                  </BaseButton>
-                }
-              />
-            ))}
-          </div>
+          {pendingUsers.length > 0 ? (
+            <div className="mt-2 px-2 pb-4 space-y-3">
+              {pendingUsers.map(user => (
+                <MemberListItem
+                  key={`pending-${user.user.id}`}
+                  user={user.user}
+                  action={
+                    <BaseButton
+                      onClick={() => handleReject('user-id')}
+                      disabled={rejectMutation.isPending}
+                    >
+                      승인
+                    </BaseButton>
+                  }
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="flex items-center justify-center py-10">
+              <p className="text-gray-400 text-sm">신청한 멤버가 없습니다</p>
+            </div>
+          )}
         </section>
 
         {/* Approved Section */}
         <section className="rounded-2xl bg-[#FBFBFB] mt-8">
           <h2 className="text-mx font-bold px-4 pt-4">참가멤버</h2>
-          <div className="mt-2 px-2 pb-4 space-y-3">
-            {approvedMembers.map((user, idx) => (
-              <MemberListItem
-                key={`approved-${idx}`}
-                user={user}
-                action={
-                  <div className="flex gap-2">
-                    <BaseButton
-                      onClick={() => handleKick('user-id')}
-                      disabled={kickMutation.isPending}
-                    >
-                      승인취소
-                    </BaseButton>
-                    <BaseButton
-                      onClick={() => handleKick('user-id')}
-                      disabled={kickMutation.isPending}
-                    >
-                      강퇴
-                    </BaseButton>
-                  </div>
-                }
-              />
-            ))}
-          </div>
+          {approvedUsers.length > 0 ? (
+            <div className="mt-2 px-2 pb-4 space-y-3">
+              {approvedUsers.map(user => (
+                <MemberListItem
+                  key={`approved-${user.user.id}`}
+                  user={user.user}
+                  action={
+                    <div className="flex gap-2">
+                      <BaseButton
+                        onClick={() => handleKick('user-id')}
+                        disabled={kickMutation.isPending}
+                      >
+                        승인취소
+                      </BaseButton>
+                      <BaseButton
+                        onClick={() => handleKick('user-id')}
+                        disabled={kickMutation.isPending}
+                      >
+                        강퇴
+                      </BaseButton>
+                    </div>
+                  }
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="flex items-center justify-center py-10">
+              <p className="text-gray-400 text-sm">참가 중인 멤버가 없습니다</p>
+            </div>
+          )}
         </section>
       </ScrollArea>
 

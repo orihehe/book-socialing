@@ -16,4 +16,5 @@ export type UserNoteStatus =
 export interface UserDetail {
   role: UserRole
   user: User
+  status: UserNoteStatus
 }
