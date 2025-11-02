@@ -23,7 +23,7 @@ class UserController (
 ) {
     @Operation(
         summary = "로그인한 사용자 정보 조회",
-        description = "현재 로그인한 사용자의 상세 정보(ID, 이메일, 닉네임, 역할)가 반환됩니다."
+        description = "현재 로그인한 사용자의 상세 정보(ID, 이메일, 닉네임, 역할)가 반환됩니다"
     )
     @ApiResponses(
         value = [
