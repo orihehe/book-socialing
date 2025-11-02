@@ -1,8 +1,8 @@
 package com.side.book.socialing.presentation.note
 
 import com.side.book.socialing.domain.note.service.NoteHostService
-import com.side.book.socialing.domain.user.dto.UserDto
 import com.side.book.socialing.global.auth.UserPrincipalResolver
+import com.side.book.socialing.presentation.note.dto.NoteGuestResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
@@ -32,7 +32,7 @@ class NoteHostController(
     )
     fun getGuests(
         @RequestParam noteId: Long
-    ): List<UserDto> {
+    ): List<NoteGuestResponse> {
         val userId = userPrincipalResolver.getUserId()
         return noteHostService.getGuests(userId, noteId)
     }
