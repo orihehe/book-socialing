@@ -4,6 +4,7 @@ import com.side.book.socialing.domain.auth.model.OAuthAttributes
 import com.side.book.socialing.domain.auth.model.SocialType
 import com.side.book.socialing.domain.user.entity.User
 import com.side.book.socialing.domain.user.repository.UserRepository
+import com.side.book.socialing.domain.user.service.NicknameGenerationService
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest
@@ -14,7 +15,8 @@ import org.springframework.stereotype.Service
 
 @Service
 class CustomOAuth2UserService(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val nicknameGenerationService: NicknameGenerationService
 ) : OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
     override fun loadUser(userRequest: OAuth2UserRequest): OAuth2User {
@@ -51,7 +53,8 @@ class CustomOAuth2UserService(
     private fun saveOrUpdate(attributes: OAuthAttributes): User {
         var user = userRepository.findByEmail(attributes.email)
         if (user == null) {
-            user = userRepository.save(attributes.toEntity())
+            val nickname = nicknameGenerationService.generate()
+            user = userRepository.save(attributes.toEntity(nickname))
         }
         return user
     }
