@@ -162,16 +162,20 @@ class NoteController(
         ]
     )
     @GetMapping("/recommend")
-    fun getRecommendNotes(): ResponseEntity<List<CommonNoteResponse>> {
+    fun getRecommendNotes(
+        @RequestParam(defaultValue = "2") pageSize: Int,
+        @RequestParam(defaultValue = "1") pageNum: Int
+    ): ResponseEntity<ClubNotesPageResponse<CommonNoteResponse>> {
         val userId = userPrincipalResolver.getUserId()
+        val offset = (pageNum - 1) * pageSize
 
         return try {
-            val recommendNotes = noteService.getRecommendNotes(userId)
+            val recommendNotes = noteService.getRecommendNotes(userId, pageSize, offset)
             ResponseEntity.ok(recommendNotes)
         } catch (e: Exception) {
             log.error("Error fetching recommend notes for user $userId", e)
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(emptyList())
+                .body(ClubNotesPageResponse(totalCount = 0L, groups = emptyList()))
         }
     }
 

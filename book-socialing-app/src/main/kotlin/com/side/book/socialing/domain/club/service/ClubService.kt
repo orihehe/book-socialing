@@ -212,11 +212,26 @@ class ClubService(
      *         만약 추천 클럽가 없으면 빈 리스트를 반환합니다.
      */
     @Transactional(readOnly = true)
-    fun getRecommendClubs(userId: Long): List<CommonClubResponse> {
-        // 사용자가 참여하고 있는 모든 참여 정보를 찾는다.
-        val clubs = clubRepository.findRecommendClubsByUserId(userId)
+    fun getRecommendClubs(userId: Long, pageSize: Int, offset: Int): ClubPageResponse<CommonClubResponse> {
+        val pageIndex = offset / pageSize
 
-        return clubs.map { club ->
+        val pageable = PageRequest.of(
+            pageIndex,
+            pageSize,
+            Sort.unsorted()
+        )
+
+        val totalCount = clubRepository.countRecommendClubsByUserId(userId)
+
+        // 만약 목록이 없다면, 빈 결과 반환
+        if (totalCount == 0L) {
+            return ClubPageResponse(totalCount = 0L, groups = emptyList())
+        }
+
+        // 사용자가 참여하고 있는 모든 참여 정보를 찾는다.
+        val clubs = clubRepository.findRecommendClubsByUserId(userId, pageable)
+
+        val groups = clubs.map { club ->
             CommonClubResponse(
                 id = club.id!!,
                 clubName = club.clubName,
@@ -225,6 +240,8 @@ class ClubService(
                 memberCount = club.participants.size
             )
         }
+
+        return ClubPageResponse(totalCount = totalCount, groups = groups)
     }
 
     @Transactional(readOnly = true)
