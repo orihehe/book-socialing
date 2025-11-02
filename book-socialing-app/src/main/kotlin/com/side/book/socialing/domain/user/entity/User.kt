@@ -9,9 +9,11 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import jakarta.persistence.UniqueConstraint
+import org.hibernate.annotations.SQLRestriction
 
 @Entity
 @Table(name = "users", uniqueConstraints = [UniqueConstraint(columnNames = ["provider", "provider_id"])])
+@SQLRestriction("deleted = false")
 class User(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,5 +50,9 @@ class User(
                 role = cmd.role
             )
         }
+    }
+
+    fun delete(userId: Long) {
+        deleted = true
     }
 }
