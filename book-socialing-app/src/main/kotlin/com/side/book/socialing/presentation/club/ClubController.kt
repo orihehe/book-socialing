@@ -159,16 +159,20 @@ class ClubController(
         ]
     )
     @GetMapping("/recommend")
-    fun getRecommendedClubs(): ResponseEntity<List<CommonClubResponse>> {
+    fun getRecommendedClubs(
+        @RequestParam(defaultValue = "2") pageSize: Int,
+        @RequestParam(defaultValue = "1") pageNum: Int
+    ): ResponseEntity<ClubPageResponse<CommonClubResponse>> {
         val userId = userPrincipalResolver.getUserId()
+        val offset = (pageNum - 1) * pageSize
 
         return try {
-            val recommendClubs = clubService.getRecommendClubs(userId)
+            val recommendClubs = clubService.getRecommendClubs(userId, pageSize, offset)
             ResponseEntity.ok(recommendClubs)
         } catch (e: Exception) {
             log.error("Error fetching recommend clubs for user $userId", e)
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(emptyList()) // 빈 리스트 반환 또는 에러 DTO 반환
+                .body(ClubPageResponse(totalCount = 0L, groups = emptyList())) // 빈 리스트 반환 또는 에러 DTO 반환
         }
     }
 

@@ -283,23 +283,56 @@ class NoteService(
      *         만약 추천 노트가 없으면 빈 리스트를 반환합니다.
      */
     @Transactional(readOnly = true)
-    fun getRecommendNotes(userId: Long): List<CommonNoteResponse> {
+    fun getRecommendNotes(userId: Long, pageSize: Int, offset: Int): ClubNotesPageResponse<CommonNoteResponse> {
+        val pageIndex = offset / pageSize
+
+        // 2) Service에서 Pageable 생성 (정렬 강제)
+        val pageable = PageRequest.of(
+            pageIndex,
+            pageSize,
+            Sort.unsorted()
+        )
+
+        val now = LocalDateTime.now()
+        val totalCount = noteRepository.countRecommendNotesByUserId(userId, now)
+
+        // 만약 전체 노트가 없다면, 빈 결과 반환
+        if (totalCount == 0L) {
+            return ClubNotesPageResponse(totalCount = 0L, groups = emptyList())
+        }
+
         // 사용자가 참여하고 있는 모든 참여 정보를 찾는다.
-        val notes = noteRepository.findRecommendNotesByUserId(userId, LocalDateTime.now())
+        val notes = noteRepository.findRecommendNotesByUserId(userId, now, pageable)
 
-        return notes.map { note ->
-            // 대표 이미지 경로
-            val bookImageUrl = note.files.firstOrNull()?.filePath ?: "/images/default_book_image.jpg"
+        val groupedByClub = notes.groupBy { it.club?.id }
 
-            CommonNoteResponse(
-                id = note.id!!,
-                clubName = note.club?.clubName,
-                bookName = note.bookName,
-                bookImageUrl = bookImageUrl,
-                startAt = note.startAt,
-                endAt = note.endAt
+        val groups = mutableListOf<ClubNotesGroupResponse<CommonNoteResponse>>()
+
+        // 클럽 있는 노트들
+        groupedByClub.filterKeys { it != null }.forEach { (clubId, list) ->
+            val clubName = list.first().club!!.clubName
+            groups.add(
+                ClubNotesGroupResponse(
+                    clubId = clubId,
+                    clubName = clubName,
+                    notes = list.map(::toCommonNoteResponse)
+                )
             )
         }
+
+        // 클럽 없는 노트들 (옵션: clubId = 0L, clubName = "NO_CLUB")
+        groupedByClub[null]?.let { list ->
+            groups.add(
+                0, // 맨 앞
+                ClubNotesGroupResponse(
+                    clubId = null,
+                    clubName = "NONE",
+                    notes = list.map(::toCommonNoteResponse)
+                )
+            )
+        }
+
+        return ClubNotesPageResponse(totalCount = totalCount, groups = groups)
     }
 
     /**
