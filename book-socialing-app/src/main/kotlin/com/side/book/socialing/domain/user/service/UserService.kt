@@ -2,18 +2,15 @@ package com.side.book.socialing.domain.user.service
 
 import com.side.book.socialing.domain.user.dto.UserDto
 import com.side.book.socialing.domain.user.repository.UserRepository
-import com.side.book.socialing.global.file.FileUploader
 import com.side.book.socialing.global.utils.log
 import com.side.book.socialing.presentation.user.dto.UserResponse
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.web.multipart.MultipartFile
 import kotlin.jvm.optionals.getOrNull
 
 @Service
 class UserService(
-    private val userRepository: UserRepository,
-    private val fileUploader: FileUploader
+    private val userRepository: UserRepository
 ) {
     fun getUserMap(userIds: Set<Long>): Map<Long, UserDto> {
         val users = userRepository.findAllById(userIds)
@@ -57,23 +54,5 @@ class UserService(
             role = user.role,
             imageUrl = imageUrl
         )
-    }
-
-    @Transactional
-    fun updateUserProfile(userId: Long, nickname: String, profileImage: MultipartFile?, description: String?) {
-        val user = userRepository.findActiveUserByUserId(userId) ?: throw Exception("Not Found User")
-
-        var profileImageUrl: String? = null
-        profileImage?.let {
-            profileImageUrl = fileUploader.upload(it, "user-profile").filePath
-        }
-
-        user.update(
-            nickname = nickname,
-            profileImageUrl = profileImageUrl,
-            description = description
-        )
-
-        userRepository.save(user)
     }
 }

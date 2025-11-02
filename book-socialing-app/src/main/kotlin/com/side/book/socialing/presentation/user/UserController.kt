@@ -4,7 +4,6 @@ import com.side.book.socialing.domain.user.service.UserService
 import com.side.book.socialing.global.auth.UserPrincipalResolver
 import com.side.book.socialing.global.utils.log
 import com.side.book.socialing.presentation.user.dto.UserResponse
-import com.side.book.socialing.presentation.user.dto.UserUpdateDto
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
@@ -12,11 +11,8 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.multipart.MultipartFile
 
 @Tag(name = "유저 API", description = "유저 관련 API")
 @RestController
@@ -61,35 +57,5 @@ class UserController(
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .build()
         }
-    }
-
-    @Operation(
-        summary = "로그인한 사용자 정보 수정",
-        description = "현재 로그인한 사용자의 정보(프로필사진, 닉네임, 소개)를 수정합니다."
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(
-                responseCode = "200",
-                description = "성공적으로 사용자 정보를 수정함"
-            ),
-            ApiResponse(
-                responseCode = "404",
-                description = "로그인한 사용자를 찾을 수 없음"
-            ),
-            ApiResponse(
-                responseCode = "500",
-                description = "서버 내부 오류 발생"
-            )
-        ]
-    )
-    @PatchMapping("/me")
-    fun updateUserProfile(
-        @RequestPart(value = "request") request: UserUpdateDto,
-        @RequestPart(value = "profileImage", required = false) profileImage: MultipartFile?
-    ): ResponseEntity<Unit> {
-        val userId = userPrincipalResolver.getUserId()
-        userService.updateUserProfile(userId, request.nickname.trim(), profileImage, request.description?.trim())
-        return ResponseEntity.ok().build()
     }
 }
