@@ -4,6 +4,6 @@ import com.side.book.socialing.domain.club.entity.Club
 
 data class SearchClubDto(
     val club: Club,
-    val isJoined: Boolean,
-    val isHost: Boolean
+    val status: String,
+    val role: String
 )

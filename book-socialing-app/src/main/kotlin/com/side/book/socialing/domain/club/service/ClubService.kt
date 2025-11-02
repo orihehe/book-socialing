@@ -353,8 +353,8 @@ class ClubService(
                 clubImageUrls = c.files.map { it.filePath },
                 description = c.description ?: "",
                 memberCount = c.participants.size,
-                isJoined = row.isJoined,
-                isHost = row.isHost
+                status = row.status,
+                role = row.role
             )
         }
 

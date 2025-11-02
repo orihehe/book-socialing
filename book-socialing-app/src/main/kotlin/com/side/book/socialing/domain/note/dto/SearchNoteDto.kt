@@ -4,6 +4,6 @@ import com.side.book.socialing.domain.note.entity.Note
 
 data class SearchNoteDto(
     val note: Note,
-    val isJoined: Boolean,
-    val isHost: Boolean
+    val status: String,
+    val role: String
 )

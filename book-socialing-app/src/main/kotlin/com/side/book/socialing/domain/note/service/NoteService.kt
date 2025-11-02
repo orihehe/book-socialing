@@ -584,8 +584,8 @@ class NoteService(
                 bookImageUrl = bookImageUrl,
                 startAt = n.startAt,
                 endAt = n.endAt,
-                isJoined = row.isJoined,
-                isHost = row.isHost
+                status = row.status,
+                role = row.role
             )
         }
 
