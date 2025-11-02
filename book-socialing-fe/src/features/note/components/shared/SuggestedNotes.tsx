@@ -21,7 +21,7 @@ export function SuggestedNotes() {
 
   const joinNoteMutation = useMutation({
     mutationFn: async (noteId: number) => {
-      const res = await apiFetch(`/v1/note/${noteId}/join`, {
+      const res = await apiFetch(`/v1/note/${noteId}/join/request`, {
         method: 'POST',
       })
       if (!res.ok) throw new Error('Failed to join note')
