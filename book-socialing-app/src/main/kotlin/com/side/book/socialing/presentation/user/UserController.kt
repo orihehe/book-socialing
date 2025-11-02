@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController
 @Tag(name = "유저 API", description = "유저 관련 API")
 @RestController
 @RequestMapping("/api/v1/user")
-class UserController (
+class UserController(
     private val userService: UserService,
     private val userPrincipalResolver: UserPrincipalResolver
 ) {
@@ -29,7 +29,7 @@ class UserController (
         value = [
             ApiResponse(
                 responseCode = "200",
-                description = "성공적으로 로그인한 사용자 정보를 조회함",
+                description = "성공적으로 로그인한 사용자 정보를 조회함"
             ),
             ApiResponse(
                 responseCode = "404",

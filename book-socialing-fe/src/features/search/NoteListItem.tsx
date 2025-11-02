@@ -1,6 +1,9 @@
+import { useMutation } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { Link } from 'react-router-dom'
+import { toast } from 'sonner'
 
+import { apiFetch } from '@/lib/api'
 import { getImageUrl } from '@/util'
 
 interface NoteListItemProps {
@@ -24,6 +27,34 @@ export function NoteListItem({ note }: NoteListItemProps) {
 
   const isExpired = dayjs(note.endAt).diff(dayjs().startOf('day'), 'day') < 0
 
+  const joinNoteMutation = useMutation({
+    mutationFn: async () => {
+      await apiFetch(`/v1/note/${note.id}/join/request`, {
+        method: 'POST',
+      })
+    },
+    onSuccess: () => {
+      toast.success('노트 신청이 완료되었습니다.')
+    },
+    onError: () => {
+      toast.error('노트 신청에 실패했습니다.')
+    },
+  })
+
+  const cancelJoinNoteMutation = useMutation({
+    mutationFn: async () => {
+      await apiFetch(`/v1/note/${note.id}/join/cancel`, {
+        method: 'PATCH',
+      })
+    },
+    onSuccess: () => {
+      toast.success('노트 신청이 취소되었습니다.')
+    },
+    onError: () => {
+      toast.error('노트 신청 취소에 실패했습니다.')
+    },
+  })
+
   return (
     <div className="flex items-center space-x-3 py-3 border-b border-gray-100 last:border-b-0">
       <Link to={`/note/${note.id}`} className="flex items-center space-x-3 flex-1">
@@ -40,7 +71,7 @@ export function NoteListItem({ note }: NoteListItemProps) {
       {!isExpired &&
         (note.isHost ? (
           <Link
-            to={`/note/${note.id}/guests`}
+            to={`/note/${note.id}/guest`}
             className="px-4 py-1.5 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 flex-shrink-0"
           >
             관리
@@ -49,7 +80,7 @@ export function NoteListItem({ note }: NoteListItemProps) {
           <button
             onClick={e => {
               e.preventDefault()
-              // TODO: 노트 신청 취소 기능 구현
+              cancelJoinNoteMutation.mutate()
             }}
             className="px-4 py-1.5 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 flex-shrink-0"
           >
@@ -59,7 +90,7 @@ export function NoteListItem({ note }: NoteListItemProps) {
           <button
             onClick={e => {
               e.preventDefault()
-              // TODO: 노트 신청 기능 구현
+              joinNoteMutation.mutate()
             }}
             className="px-4 py-1.5 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 flex-shrink-0"
           >

@@ -2,6 +2,7 @@ export interface User {
   id: number
   email: string
   nickname: string
+  description?: string
 }
 
 export type UserRole = 'HOST' | 'GUEST'
@@ -16,4 +17,5 @@ export type UserNoteStatus =
 export interface UserDetail {
   role: UserRole
   user: User
+  status: UserNoteStatus
 }

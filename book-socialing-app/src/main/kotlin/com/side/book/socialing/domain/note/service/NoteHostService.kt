@@ -3,9 +3,9 @@ package com.side.book.socialing.domain.note.service
 import com.side.book.socialing.domain.club.service.ClubService
 import com.side.book.socialing.domain.note.repository.NoteParticipantRepository
 import com.side.book.socialing.domain.note.repository.NoteRepository
-import com.side.book.socialing.domain.user.dto.UserDto
 import com.side.book.socialing.domain.user.service.UserService
 import com.side.book.socialing.global.error.exception.PermissionDeniedException
+import com.side.book.socialing.presentation.note.dto.NoteGuestResponse
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -19,7 +19,7 @@ class NoteHostService(
 ) {
 
     @Transactional(readOnly = true)
-    fun getGuests(userId: Long, noteId: Long): List<UserDto> {
+    fun getGuests(userId: Long, noteId: Long): List<NoteGuestResponse> {
         val note = noteRepository.findById(noteId).orElseThrow { throw EntityNotFoundException("Note $noteId not found") }
 
         if (!note.isHost(userId)) {
@@ -29,16 +29,26 @@ class NoteHostService(
         val noteParticipants = noteParticipantRepository.findAllByNoteId(noteId)
 
         val club = note.club ?: return noteParticipants.filter { !it.isHost() }.map {
-            userService.getUser(it.userId)
+            val user = userService.getUser(it.userId)
                 ?: throw EntityNotFoundException("User $userId not found")
+            NoteGuestResponse(
+                user = user,
+                role = it.role.toString(),
+                status = it.status.toString()
+            )
         }
         val clubMemberUserIds = clubService.getClubMemberIds(club.id!!)
 
         val guestIds = noteParticipants.filter { it.userId !in clubMemberUserIds }.map { it.userId }.toSet()
         val users = userService.getUserMap(guestIds)
 
-        return noteParticipants.mapNotNull {
-            users[it.userId]
+        return noteParticipants.map {
+            val user = users[it.userId] ?: throw EntityNotFoundException("User $userId not found")
+            NoteGuestResponse(
+                user = user,
+                role = it.role.toString(),
+                status = it.status.toString()
+            )
         }
     }
 }

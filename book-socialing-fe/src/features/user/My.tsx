@@ -1,21 +1,39 @@
-import { Link } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 
 import { BaseCard } from '@/components/common/BaseCard'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { User } from '@/types/user'
+import { useUser } from '@/hooks/useUser'
 
 import MyCalendar from './MyNoteCalendar'
 
 export default function My() {
-  const user: User = {
-    nickname: '야옹야옹',
-    email: 'yaong@naver.com',
-    id: 4,
-  }
+  const { user, isLoading, hasToken } = useUser()
+  const navigate = useNavigate()
   const profileUrl = ''
-  const bio = '야오 야옹야아오오오이이잉'
+
+  useEffect(() => {
+    if (!hasToken) {
+      navigate('/sign-in')
+    }
+  }, [hasToken, navigate])
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <span className="sr-only">로딩 중...</span>
+        <div className="flex justify-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted-foreground/30 border-t-primary" />
+        </div>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return null
+  }
 
   return (
     <>
@@ -57,7 +75,9 @@ export default function My() {
               </div>
               <div className="flex items-start">
                 <span className="w-16 font-medium text-gray-500">소개</span>
-                <span className="text-gray-800 whitespace-pre-line">{bio}</span>
+                <span className="text-gray-800 whitespace-pre-line">
+                  {user.description ?? '나를 소개하는 글을 써보세요!'}
+                </span>
               </div>
             </div>
           </div>
