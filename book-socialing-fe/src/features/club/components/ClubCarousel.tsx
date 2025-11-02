@@ -27,15 +27,38 @@ export function ClubCarousel({ images }: Props) {
     <div className="mb-3">
       <Carousel setApi={setApi}>
         <CarouselContent>
-          {images.map(url => (
-            <div className="min-w-full" key={url}>
-              <CarouselItem>
-                <div className="flex justify-center items-center w-full h-full">
-                  <img src={getImageUrl(url)} className="mx-auto" />
-                </div>
-              </CarouselItem>
-            </div>
-          ))}
+          {images.length > 0 ? (
+            images.map(url => (
+              <div className="min-w-full" key={url}>
+                <CarouselItem>
+                  <div className="flex justify-center items-center w-full min-h-64">
+                    <img
+                      src={getImageUrl(url)}
+                      className="mx-auto"
+                      onError={e => {
+                        const target = e.target as HTMLImageElement
+                        target.style.display = 'none'
+                        const parent = target.parentElement
+                        if (parent) {
+                          parent.classList.add('bg-gray-100', 'h-64')
+                          const placeholder = document.createElement('p')
+                          placeholder.className = 'text-gray-400 text-sm'
+                          placeholder.textContent = '이미지를 불러올 수 없습니다'
+                          parent.appendChild(placeholder)
+                        }
+                      }}
+                    />
+                  </div>
+                </CarouselItem>
+              </div>
+            ))
+          ) : (
+            <CarouselItem>
+              <div className="flex justify-center items-center w-full h-64 bg-gray-100">
+                <p className="text-gray-400 text-sm">이미지가 없습니다</p>
+              </div>
+            </CarouselItem>
+          )}
         </CarouselContent>
       </Carousel>
       {images.length > 1 && (
