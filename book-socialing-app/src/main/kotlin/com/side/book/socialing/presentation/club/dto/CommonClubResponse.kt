@@ -55,9 +55,9 @@ data class SearchClubResponse(
     @field:Schema(description = "클럽 멤버 수", example = "8")
     val memberCount: Int,
 
-    @field:Schema(description = "참여여부", type = "boolean", format = "boolean", example = "true")
-    val isJoined: Boolean,
+    @field:Schema(description = "참여상태", type = "string", format = "string", example = "JOINED")
+    val status: String,
 
-    @field:Schema(description = "호스트여부", type = "boolean", format = "boolean", example = "true")
-    val isHost: Boolean
+    @field:Schema(description = "역할", type = "string", format = "string", example = "HOST")
+    val role: String
 )

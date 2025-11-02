@@ -139,9 +139,9 @@ data class SearchNoteResponse(
     @field:Schema(description = "탈고일(ISO-8601)", type = "string", format = "date-time", example = "2025-06-28T12:00:00")
     val endAt: LocalDateTime,
 
-    @field:Schema(description = "참여여부", type = "boolean", format = "boolean", example = "true")
-    val isJoined: Boolean,
+    @field:Schema(description = "참여상태", type = "string", format = "string", example = "JOINED")
+    val status: String,
 
-    @field:Schema(description = "호스트여부", type = "boolean", format = "boolean", example = "true")
-    val isHost: Boolean
+    @field:Schema(description = "역할", type = "string", format = "string", example = "HOST")
+    val role: String
 )

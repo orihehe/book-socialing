@@ -63,8 +63,8 @@ interface ClubRepository : JpaRepository<Club, Long> {
         SELECT 
             new com.side.book.socialing.domain.club.dto.SearchClubDto(
                 c,
-                CASE WHEN p.status = 'JOINED' THEN TRUE ELSE FALSE END AS isJoined,
-                CASE WHEN p.role = 'HOST' THEN TRUE ELSE FALSE END AS isHost
+                CAST(p.status AS string),
+                CAST(p.role AS string)
             )
         FROM Club c
         LEFT JOIN c.participants p WITH p.userId = :userId
