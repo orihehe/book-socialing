@@ -16,6 +16,7 @@ import GuestManagement from './features/note/pages/GuestManagement'
 import SearchView from './features/search/SearchView'
 import KakaoCallback from './features/user/KakaoCallback'
 import My from './features/user/My'
+import MyEdit from './features/user/MyEdit'
 import SignIn from './features/user/SignIn'
 import NotFound from './pages/NotFound'
 
@@ -24,35 +25,40 @@ const queryClient = new QueryClient()
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Toaster />
+      <div className="min-h-screen bg-gray-100">
+        <div className="max-w-[500px] mx-auto bg-white shadow-lg min-h-screen">
+          <Toaster />
 
-      <Routes>
-        <Route path="/" element={<Navigate to="/note" replace />} />
+          <Routes>
+            <Route path="/" element={<Navigate to="/note" replace />} />
 
-        {/* note */}
-        <Route path="/note" element={<NoteView />} />
-        <Route path="/note/create" element={<CreateNote />} />
-        <Route path="/note/:id" element={<ChatView />} />
-        <Route path="/note/:id/edit" element={<EditNote />} />
-        <Route path="/note/:id/guest" element={<GuestManagement />} />
+            {/* note */}
+            <Route path="/note" element={<NoteView />} />
+            <Route path="/note/create" element={<CreateNote />} />
+            <Route path="/note/:id" element={<ChatView />} />
+            <Route path="/note/:id/edit" element={<EditNote />} />
+            <Route path="/note/:id/guest" element={<GuestManagement />} />
 
-        {/* club */}
-        <Route path="/club" element={<ClubView />} />
-        <Route path="/club/create" element={<CreateClub />} />
-        <Route path="/club/:id" element={<ClubDetail />} />
-        <Route path="/club/:id/edit" element={<EditClub />} />
-        <Route path="/club/:id/members" element={<MemberManagement />} />
-        {/* <Route path="/about" element={<AboutPage />} /> */}
+            {/* club */}
+            <Route path="/club" element={<ClubView />} />
+            <Route path="/club/create" element={<CreateClub />} />
+            <Route path="/club/:id" element={<ClubDetail />} />
+            <Route path="/club/:id/edit" element={<EditClub />} />
+            <Route path="/club/:id/members" element={<MemberManagement />} />
+            {/* <Route path="/about" element={<AboutPage />} /> */}
 
-        {/* user */}
-        <Route path="/my" element={<My />} />
-        <Route path="/sign-in" element={<SignIn />} />
-        <Route path="/oauth/callback" element={<KakaoCallback />} />
+            {/* user */}
+            <Route path="/my" element={<My />} />
+            <Route path="/my/edit" element={<MyEdit />} />
+            <Route path="/sign-in" element={<SignIn />} />
+            <Route path="/oauth/callback" element={<KakaoCallback />} />
 
-        {/* etc */}
-        <Route path="/search" element={<SearchView />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+            {/* etc */}
+            <Route path="/search" element={<SearchView />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </div>
+      </div>
     </QueryClientProvider>
   )
 }

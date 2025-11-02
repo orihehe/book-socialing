@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 import { BaseCard } from '@/components/common/BaseCard'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
@@ -22,14 +24,15 @@ export default function My() {
       <BaseCard title="개인 정보 관리">
         <div className="w-full max-w-sm p-6 bg-white rounded-xl">
           {/* 수정하기 버튼 */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="absolute right-4 top-4 text-gray-500 text-xs hover:text-gray-800"
-            // onClick={onEdit}
-          >
-            수정하기
-          </Button>
+          <Link to="/my/edit">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="absolute right-4 top-4 text-gray-500 text-xs hover:text-gray-800"
+            >
+              수정하기
+            </Button>
+          </Link>
 
           {/* 프로필 본문 */}
           <div className="flex flex-col items-center gap-4">

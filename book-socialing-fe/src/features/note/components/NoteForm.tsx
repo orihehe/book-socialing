@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { ko } from 'date-fns/locale'
 import dayjs from 'dayjs'
 import { ChevronLeft } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm, FormProvider } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { z } from 'zod'
@@ -35,10 +35,10 @@ const noteSchema = z.object({
   description: z.string().min(10, '10자 이상 입력해 주세요'),
   bookImages: z
     .array(z.instanceof(File))
-    .min(1, '이미지는 최소 1장 이상 필요해요')
+    .min(1, '이미지는 필수에요')
     .max(1, '최대 1장까지만 등록할 수 있어요'),
   startAt: z.string().min(1, '시작일을 선택해 주세요'),
-  endAt: z.string().min(1, '종료일을 선택해 주세요'),
+  endAt: z.string().min(1, '모임일을 선택해 주세요'),
   clubId: z.union([z.number(), z.undefined(), z.null()]),
 })
 
@@ -53,7 +53,6 @@ interface Props {
 export function NoteForm({ mode, note, onSubmit }: Props) {
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
-  const [calendarType, setCalendarType] = useState<'start' | 'end' | ''>('')
 
   const { data: clubs } = useQuery<Club[], Error>({
     queryKey: ['clubs', 'created'],
@@ -83,20 +82,23 @@ export function NoteForm({ mode, note, onSubmit }: Props) {
     setValue,
     getValues,
     trigger,
-    formState: { errors, touchedFields },
+    formState: { errors, touchedFields, isSubmitted },
   } = form
+
+  // Set startAt to today on mount
+  useEffect(() => {
+    if (!note) {
+      const today = dayjs().startOf('day').toISOString()
+      setValue('startAt', today, { shouldValidate: true })
+    }
+  }, [note, setValue])
 
   // Calendar field helpers
   const handleCalendarSelect = (date: Date | undefined) => {
     if (!date) return
     const iso = date.toISOString()
-    if (calendarType === 'start') {
-      setValue('startAt', iso, { shouldValidate: true, shouldDirty: true })
-      trigger('startAt')
-    } else if (calendarType === 'end') {
-      setValue('endAt', iso, { shouldValidate: true, shouldDirty: true })
-      trigger('endAt')
-    }
+    setValue('endAt', iso, { shouldValidate: true, shouldDirty: true })
+    trigger('endAt')
     setOpen(false)
   }
 
@@ -144,65 +146,47 @@ export function NoteForm({ mode, note, onSubmit }: Props) {
               <Label className="text-lg font-bold">
                 모임일 선택
                 <span className="text-xs text-gray-400 ml-2">
-                  노트 탈고일은 일주일 뒤를 권고합니다.
+                  오늘부터 모임일까지의 기간을 선택해 주세요.
                 </span>
               </Label>
               <div className="flex w-full gap-10 my-2 mx-4">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCalendarType('start')
-                    setOpen(true)
-                  }}
-                  className="flex flex-col items-start gap-1"
-                >
-                  <span className="text-lg font-bold">모임일</span>
-                  {getValues('startAt') ? dayjs(getValues('startAt')).format('YYYY.MM.DD') : '선택'}
-                </button>
+                <div className="flex flex-col items-start gap-1">
+                  <span className="text-lg font-bold">시작일</span>
+                  <span className="text-gray-700">
+                    {getValues('startAt')
+                      ? dayjs(getValues('startAt')).format('YYYY.MM.DD')
+                      : dayjs().format('YYYY.MM.DD')}
+                  </span>
+                </div>
 
                 <button
                   type="button"
                   className="flex flex-col items-start gap-1"
-                  onClick={() => {
-                    setCalendarType('end')
-                    setOpen(true)
-                  }}
+                  onClick={() => setOpen(true)}
                 >
-                  <span className="text-lg font-bold">탈고일</span>
+                  <span className="text-lg font-bold">모임일</span>
                   {getValues('endAt') ? dayjs(getValues('endAt')).format('YYYY.MM.DD') : '선택'}
                 </button>
               </div>
               <Dialog open={open} onOpenChange={setOpen}>
                 <DialogContent className="w-[340px] rounded-xl px-0 py-7 border-none bg-white">
                   <DialogHeader>
-                    <DialogTitle>
-                      {calendarType === 'start' ? '모임일 선택' : '탈고일 선택'}
-                    </DialogTitle>
+                    <DialogTitle className="ml-8">모임일 선택</DialogTitle>
                   </DialogHeader>
                   <div className="w-full px-3">
                     <Calendar
                       locale={ko}
                       mode="single"
                       className="w-full px-3"
-                      selected={
-                        calendarType === 'start'
-                          ? getValues('startAt')
-                            ? new Date(getValues('startAt'))
-                            : undefined
-                          : getValues('endAt')
-                            ? new Date(getValues('endAt'))
-                            : undefined
-                      }
+                      selected={getValues('endAt') ? new Date(getValues('endAt')) : undefined}
                       onSelect={handleCalendarSelect}
+                      disabled={date => dayjs(date).isBefore(dayjs(), 'day')}
                     />
                   </div>
                 </DialogContent>
               </Dialog>
               <div>
-                {touchedFields.startAt && errors.startAt && (
-                  <p className="text-red-500 text-sm mt-2">{errors.startAt.message}</p>
-                )}
-                {touchedFields.endAt && errors.endAt && (
+                {(touchedFields.endAt || isSubmitted) && errors.endAt && (
                   <p className="text-red-500 text-sm mt-2">{errors.endAt.message}</p>
                 )}
               </div>

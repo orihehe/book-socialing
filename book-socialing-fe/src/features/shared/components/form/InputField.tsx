@@ -9,9 +9,17 @@ type Props = {
   placeholder?: string
   type?: string
   className?: string
+  hideError?: boolean
 }
 
-export function InputField({ name, label, placeholder, type = 'text', className }: Props) {
+export function InputField({
+  name,
+  label,
+  placeholder,
+  type = 'text',
+  className,
+  hideError = false,
+}: Props) {
   const {
     register,
     formState: { errors },
@@ -35,7 +43,7 @@ export function InputField({ name, label, placeholder, type = 'text', className 
         className={`w-full h-[35px] rounded-md mt-2 px-3 py-2.5 bg-[rgba(247,248,249,0.5)] ${className ?? ''}`}
       />
 
-      {errMsg && <p className="text-red-500 text-sm mt-2">{errMsg}</p>}
+      {!hideError && errMsg && <p className="text-red-500 text-sm mt-2">{errMsg}</p>}
     </div>
   )
 }
