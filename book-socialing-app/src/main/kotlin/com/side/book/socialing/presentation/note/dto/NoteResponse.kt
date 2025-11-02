@@ -118,3 +118,30 @@ data class GetNoteResponse(
     @field:Schema(description = "탈고일", type = "string", format = "date-time", example = "2025-09-29T12:00:00")
     val endAt: LocalDateTime
 )
+
+@Schema(description = "검색용 노트 DTO")
+data class SearchNoteResponse(
+    @field:Schema(description = "노트 ID", example = "1")
+    val id: Long,
+
+    @field:Schema(description = "클럽 이름", example = "saisai", nullable = true)
+    val clubName: String?,
+
+    @field:Schema(description = "책 이름", example = "두 개의 탑")
+    val bookName: String,
+
+    @field:Schema(description = "책 이미지 URL", example = "https://covers.openlibrary.org/b/id/8231856-L.jpg", format = "uri")
+    val bookImageUrl: String,
+
+    @field:Schema(description = "모임일(ISO-8601)", type = "string", format = "date-time", example = "2025-06-22T10:00:00")
+    val startAt: LocalDateTime,
+
+    @field:Schema(description = "탈고일(ISO-8601)", type = "string", format = "date-time", example = "2025-06-28T12:00:00")
+    val endAt: LocalDateTime,
+
+    @field:Schema(description = "참여여부", type = "boolean", format = "boolean", example = "true")
+    val isJoined: Boolean,
+
+    @field:Schema(description = "호스트여부", type = "boolean", format = "boolean", example = "true")
+    val isHost: Boolean
+)

@@ -3,6 +3,7 @@ package com.side.book.socialing.domain.note.service
 import com.side.book.socialing.domain.club.repository.ClubRepository
 import com.side.book.socialing.domain.note.command.CreateNoteCommand
 import com.side.book.socialing.domain.note.command.UpdateNoteCommand
+import com.side.book.socialing.domain.note.dto.SearchNoteDto
 import com.side.book.socialing.domain.note.entity.Note
 import com.side.book.socialing.domain.note.entity.NoteFile
 import com.side.book.socialing.domain.note.entity.NoteParticipant
@@ -22,6 +23,7 @@ import com.side.book.socialing.presentation.note.dto.GetNoteResponse
 import com.side.book.socialing.presentation.note.dto.NotesPageResponse
 import com.side.book.socialing.presentation.note.dto.OpenNoteResponse
 import com.side.book.socialing.presentation.note.dto.ParticipantInfoResponse
+import com.side.book.socialing.presentation.note.dto.SearchNoteResponse
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationEventPublisher
@@ -514,35 +516,43 @@ class NoteService(
      *         검색 결과가 없으면 빈 리스트를 반환합니다.
      */
     @Transactional(readOnly = true)
-    fun searchNote(query: String, pageSize: Int, offset: Int): NotesPageResponse<CommonNoteResponse> {
+    fun searchNote(userId: Long?, query: String, pageSize: Int, offset: Int): NotesPageResponse<SearchNoteResponse> {
         val pageIndex = offset / pageSize
 
         val pageable = PageRequest.of(
             pageIndex,
             pageSize,
-            Sort.by(Sort.Order.desc("createdAt")) // 최신순 정렬
+            Sort.by(Sort.Order.desc("endAt")) // 퇴고일 내림차순 정렬
         )
 
-        val totalCount = noteRepository.countNoteByBookName(query)
+        val keywordParam = if (query.isBlank()) {
+            null // keyword가 비어있으면 null을 전달
+        } else {
+            "%$query%" // keyword가 있으면 %를 붙여서 전달
+        }
+
+        val totalCount = noteRepository.countNoteByBookName(keywordParam)
 
         // 만약 검색 결과가 없다면, 빈 결과 반환
         if (totalCount == 0L) {
             return NotesPageResponse(totalCount = 0L, groups = emptyList())
         }
 
-        val notes = noteRepository.findNoteByBookName(query, pageable)
+        val rows: List<SearchNoteDto> = noteRepository.findNoteByBookName(userId, keywordParam, pageable)
 
-        val groups = notes.map { note ->
-            // 대표 이미지 경로
-            val bookImageUrl = note.files.firstOrNull()?.filePath ?: "/images/default_book_image.jpg"
+        val groups = rows.map { row ->
+            val n = row.note
+            val bookImageUrl = n.files.firstOrNull()?.filePath ?: "/images/default_book_image.jpg"
 
-            CommonNoteResponse(
-                id = note.id!!,
-                clubName = note.club?.clubName,
-                bookName = note.bookName,
+            SearchNoteResponse(
+                id = n.id!!,
+                clubName = n.club?.clubName,
+                bookName = n.bookName,
                 bookImageUrl = bookImageUrl,
-                startAt = note.startAt,
-                endAt = note.endAt
+                startAt = n.startAt,
+                endAt = n.endAt,
+                isJoined = row.isJoined,
+                isHost = row.isHost
             )
         }
 

@@ -8,6 +8,7 @@ import com.side.book.socialing.global.utils.log
 import com.side.book.socialing.presentation.club.dto.ClubPageResponse
 import com.side.book.socialing.presentation.club.dto.CommonClubResponse
 import com.side.book.socialing.presentation.club.dto.CreateClubRequest
+import com.side.book.socialing.presentation.club.dto.SearchClubResponse
 import com.side.book.socialing.presentation.club.dto.UpdateClubRequest
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -214,11 +215,12 @@ class ClubController(
         @RequestParam query: String, // 검색어
         @RequestParam(defaultValue = "10") pageSize: Int,
         @RequestParam(defaultValue = "1") pageNum: Int
-    ): ResponseEntity<ClubPageResponse<CommonClubResponse>> {
+    ): ResponseEntity<ClubPageResponse<SearchClubResponse>> {
+        val userId = userPrincipalResolver.getUserId()
         val offset = (pageNum - 1) * pageSize
 
         return try {
-            val searchResults = clubService.searchClub(query, pageSize, offset)
+            val searchResults = clubService.searchClub(userId, query, pageSize, offset)
             ResponseEntity.ok(searchResults)
         } catch (e: Exception) {
             log.error("Error searching clubs with query: $query", e)
