@@ -3,6 +3,8 @@ export interface User {
   email: string
   nickname: string
   description?: string
+  imageUrl?: string
+  role?: string
 }
 
 export type UserRole = 'HOST' | 'GUEST'
