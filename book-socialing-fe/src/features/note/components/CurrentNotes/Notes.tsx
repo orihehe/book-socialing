@@ -14,11 +14,6 @@ export function Notes() {
           'Content-Type': 'application/json',
         },
       })
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch open notes')
-      }
-
       return response.json()
     },
   })

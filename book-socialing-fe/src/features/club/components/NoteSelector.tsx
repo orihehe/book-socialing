@@ -17,7 +17,6 @@ export default function NoteSelector() {
     queryFn: async () => {
       // TODO: club 조회로 바꾸기
       const res = await apiFetch(`/v1/note/open`)
-      if (!res.ok) throw new Error('클럽 멤버 정보를 불러오지 못했습니다.')
       const result = await res.json()
 
       // undefined 대신 기본값 반환

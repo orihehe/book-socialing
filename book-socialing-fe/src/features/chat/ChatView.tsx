@@ -32,9 +32,6 @@ export default function ChatPage() {
     queryKey: ['note', noteId],
     queryFn: async (): Promise<Note> => {
       const response = await apiFetch(`/v1/note/${noteId}`)
-      if (!response.ok) {
-        throw new Error('Failed to fetch note data')
-      }
       return response.json()
     },
     enabled: !!noteId,
@@ -66,9 +63,6 @@ export default function ChatPage() {
     queryFn: async (): Promise<User[]> => {
       if (!noteId) return []
       const response = await apiFetch(`/v1/note/${noteId}/users`)
-      if (!response.ok) {
-        throw new Error('Failed to fetch note users')
-      }
       return response.json()
     },
     enabled: !!noteId,
@@ -84,9 +78,6 @@ export default function ChatPage() {
         ? `/v1/chat/messages?noteId=${noteId}&messageType=${activeFilter}`
         : `/v1/chat/messages?noteId=${noteId}`
       const response = await apiFetch(url)
-      if (!response.ok) {
-        throw new Error('Failed to fetch chat history')
-      }
       const data = await response.json()
       return data.messages || []
     },

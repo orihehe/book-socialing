@@ -20,9 +20,6 @@ export default function CreateNote() {
       })
 
       const response = await apiFetch('/v1/note/create', { method: 'POST', body: formData })
-      if (!response.ok) {
-        throw new Error('Failed to create note')
-      }
       return response.json()
     },
     onSuccess: () => {

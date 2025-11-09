@@ -28,7 +28,6 @@ export default function EditClub() {
     queryKey: ['club', id],
     queryFn: async (): Promise<Partial<CreateClubCommand>> => {
       const res = await apiFetch(`/v1/club/${id}`)
-      if (!res.ok) throw new Error('클럽 정보를 불러오지 못했습니다.')
       const club = await res.json()
 
       // URL을 File 객체로 변환
@@ -57,9 +56,6 @@ export default function EditClub() {
   const deleteMutation = useMutation({
     mutationFn: async () => {
       const res = await apiFetch(`/v1/club/${id}`, { method: 'DELETE' })
-      if (!res.ok) {
-        throw new Error('클럽 삭제에 실패했습니다.')
-      }
       if (res.status === 204) {
         return null
       }
@@ -84,9 +80,6 @@ export default function EditClub() {
         },
         body: JSON.stringify(clubData),
       })
-      if (!res.ok) {
-        throw new Error('클럽 수정에 실패했습니다.')
-      }
       return res.json()
     },
     onSuccess: () => {
