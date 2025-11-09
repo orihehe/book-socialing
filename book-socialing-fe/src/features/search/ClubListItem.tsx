@@ -21,12 +21,11 @@ export function ClubListItem({ club }: ClubListItemProps) {
     },
     onSuccess: () => {
       toast.success('클럽 신청이 취소되었습니다.')
+      // 검색 결과 캐시를 무효화하여 최신 상태로 갱신
+      queryClient.invalidateQueries({ queryKey: ['club-search'] })
     },
     onError: () => {
       toast.error('클럽 신청 취소에 실패했습니다.')
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['clubMembers', club.id] })
     },
   })
 
@@ -38,12 +37,12 @@ export function ClubListItem({ club }: ClubListItemProps) {
     },
     onSuccess: () => {
       toast.success('클럽 신청이 완료되었습니다.')
+      // 검색 결과 캐시를 무효화하여 최신 상태로 갱신
+      queryClient.invalidateQueries({ queryKey: ['club-search'] })
+      queryClient.invalidateQueries({ queryKey: ['clubs'] })
     },
     onError: () => {
       toast.error('클럽 신청에 실패했습니다.')
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['clubs'] })
     },
   })
 
@@ -71,12 +70,13 @@ export function ClubListItem({ club }: ClubListItemProps) {
         </div>
       </Link>
       {club.role === 'HOST' ? (
-        <Link
-          to={`/club/${club.id}/members`}
-          className="px-4 py-1.5 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 flex-shrink-0"
-        >
-          관리
-        </Link>
+        <BaseButton asChild>
+          <Link to={`/club/${club.id}/members`}>관리</Link>
+        </BaseButton>
+      ) : club.status === 'JOINED' ? (
+        <BaseButton asChild>
+          <Link to={`/club/${club.id}`}>보러가기</Link>
+        </BaseButton>
       ) : club.status === 'PENDING_APPROVAL' ? (
         <BaseButton onClick={() => handleCancelJoinClub()}>신청취소</BaseButton>
       ) : (

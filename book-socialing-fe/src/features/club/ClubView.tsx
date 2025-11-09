@@ -65,7 +65,7 @@ export default function ClubView() {
         <Empty>
           <EmptyHeader>
             <EmptyTitle>아직 가입한 클럽이 없어요</EmptyTitle>
-            <EmptyDescription>마음에 드는 클럽을 찾아 함께 시작해볼까요?</EmptyDescription>
+            <EmptyDescription>마음에 드는 클럽을 찾아 함께 시작해 볼까요?</EmptyDescription>
           </EmptyHeader>
 
           <Button variant="link" asChild className="text-muted-foreground" size="sm">

@@ -14,5 +14,9 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
     return Promise.reject(new Error('Unauthorized - redirect to login'))
   }
 
+  if (!res.ok) {
+    throw new Error(`HTTP error! status: ${res.status}`)
+  }
+
   return res
 }

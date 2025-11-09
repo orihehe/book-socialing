@@ -1,8 +1,9 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
 
+import { BaseButton } from '@/components/common/BaseButton'
 import { apiFetch } from '@/lib/api'
 import { NoteSearchResult } from '@/types/note'
 import { getImageUrl } from '@/util'
@@ -12,6 +13,8 @@ interface NoteListItemProps {
 }
 
 export function NoteListItem({ note }: NoteListItemProps) {
+  const queryClient = useQueryClient()
+
   const calculateDDay = (endAt: string) => {
     const diff = dayjs(endAt).diff(dayjs().startOf('day'), 'day')
     return diff > 0 ? `D-${diff}` : diff === 0 ? 'D-Day' : `D+${Math.abs(diff)}`
@@ -27,6 +30,8 @@ export function NoteListItem({ note }: NoteListItemProps) {
     },
     onSuccess: () => {
       toast.success('노트 신청이 완료되었습니다.')
+      // 검색 결과 캐시를 무효화하여 최신 상태로 갱신
+      queryClient.invalidateQueries({ queryKey: ['note-search'] })
     },
     onError: () => {
       toast.error('노트 신청에 실패했습니다.')
@@ -41,6 +46,8 @@ export function NoteListItem({ note }: NoteListItemProps) {
     },
     onSuccess: () => {
       toast.success('노트 신청이 취소되었습니다.')
+      // 검색 결과 캐시를 무효화하여 최신 상태로 갱신
+      queryClient.invalidateQueries({ queryKey: ['note-search'] })
     },
     onError: () => {
       toast.error('노트 신청 취소에 실패했습니다.')
@@ -62,32 +69,31 @@ export function NoteListItem({ note }: NoteListItemProps) {
       </Link>
       {!isExpired &&
         (note.role === 'HOST' ? (
-          <Link
-            to={`/note/${note.id}/guest`}
-            className="px-4 py-1.5 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 flex-shrink-0"
-          >
-            관리
-          </Link>
+          <BaseButton asChild>
+            <Link to={`/note/${note.id}/guest`}>관리</Link>
+          </BaseButton>
+        ) : note.status === 'JOINED' ? (
+          <BaseButton asChild>
+            <Link to={`/note/${note.id}`}>보러가기</Link>
+          </BaseButton>
         ) : note.status === 'PENDING_APPROVAL' ? (
-          <button
+          <BaseButton
             onClick={e => {
               e.preventDefault()
               cancelJoinNoteMutation.mutate()
             }}
-            className="px-4 py-1.5 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 flex-shrink-0"
           >
             신청취소
-          </button>
+          </BaseButton>
         ) : (
-          <button
+          <BaseButton
             onClick={e => {
               e.preventDefault()
               joinNoteMutation.mutate()
             }}
-            className="px-4 py-1.5 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 flex-shrink-0"
           >
             신청하기
-          </button>
+          </BaseButton>
         ))}
     </div>
   )
