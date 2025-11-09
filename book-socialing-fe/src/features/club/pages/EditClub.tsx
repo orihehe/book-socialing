@@ -17,7 +17,7 @@ import {
 import { LoadingPage } from '@/features/shared/components/LoadingPage'
 import { apiFetch } from '@/lib/api'
 import type { CreateClubCommand } from '@/types/club'
-import { getImageFile } from '@/util'
+import { getImageUrl } from '@/util'
 
 import ClubForm from '../components/ClubForm'
 export default function EditClub() {
@@ -28,14 +28,27 @@ export default function EditClub() {
     queryKey: ['club', id],
     queryFn: async (): Promise<Partial<CreateClubCommand>> => {
       const res = await apiFetch(`/v1/club/${id}`)
-      if (!res.ok) throw new Error('클럽 정보를 불러오지 못했습니다.')
       const club = await res.json()
 
-      const images = (
-        await Promise.all((club.clubImageUrls as string[]).map((url: string) => getImageFile(url)))
-      ).flatMap(image => image)
+      // URL을 File 객체로 변환
+      const imageFiles = await Promise.all(
+        (club.clubImageUrls || []).map(async (url: string) => {
+          try {
+            const response = await fetch(getImageUrl(url))
+            const blob = await response.blob()
+            const fileName = url.split('/').pop() || 'image.jpg'
+            return new File([blob], fileName, { type: blob.type })
+          } catch {
+            return null
+          }
+        })
+      )
 
-      return { ...club, images }
+      return {
+        clubName: club.clubName,
+        description: club.description,
+        images: imageFiles.filter((f): f is File => f !== null),
+      }
     },
     enabled: !!id,
   })
@@ -43,9 +56,6 @@ export default function EditClub() {
   const deleteMutation = useMutation({
     mutationFn: async () => {
       const res = await apiFetch(`/v1/club/${id}`, { method: 'DELETE' })
-      if (!res.ok) {
-        throw new Error('클럽 삭제에 실패했습니다.')
-      }
       if (res.status === 204) {
         return null
       }
@@ -70,9 +80,6 @@ export default function EditClub() {
         },
         body: JSON.stringify(clubData),
       })
-      if (!res.ok) {
-        throw new Error('클럽 수정에 실패했습니다.')
-      }
       return res.json()
     },
     onSuccess: () => {

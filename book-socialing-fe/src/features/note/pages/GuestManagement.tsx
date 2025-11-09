@@ -28,15 +28,7 @@ export default function GuestManagementPage() {
   const { data: guestsData = [] } = useQuery<UserDetail[]>({
     queryKey: ['noteGuests', id],
     queryFn: async () => {
-      const response = await apiFetch(`/v1/note/guests?noteId=${id}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-      if (!response.ok) {
-        throw new Error('Failed to fetch note guests')
-      }
+      const response = await apiFetch(`/v1/note/guests?noteId=${id}`)
       return response.json()
     },
   })
@@ -44,18 +36,9 @@ export default function GuestManagementPage() {
   // 승인 뮤테이션
   const approveMutation = useMutation({
     mutationFn: async ({ noteId, userId }: { noteId: string; userId: number }) => {
-      const response = await apiFetch(`/v1/note/${noteId}/participants/${userId}/approve`, {
+      await apiFetch(`/v1/note/${noteId}/participants/${userId}/approve`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
       })
-
-      if (!response.ok) {
-        throw new Error('Failed to approve participant')
-      }
-
-      return response.json()
     },
     onSuccess: () => {
       // 성공 시 쿼리 무효화하여 데이터 새로고침
@@ -66,18 +49,9 @@ export default function GuestManagementPage() {
   // 거절 뮤테이션
   const rejectMutation = useMutation({
     mutationFn: async ({ noteId, userId }: { noteId: string; userId: number }) => {
-      const response = await apiFetch(`/v1/note/${noteId}/participants/${userId}/reject`, {
+      await apiFetch(`/v1/note/${noteId}/participants/${userId}/reject`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
       })
-
-      if (!response.ok) {
-        throw new Error('Failed to reject participant')
-      }
-
-      return response.json()
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['noteGuests', id] })
@@ -86,18 +60,9 @@ export default function GuestManagementPage() {
 
   const kickMutation = useMutation({
     mutationFn: async ({ noteId, userId }: { noteId: string; userId: number }) => {
-      const response = await apiFetch(`/v1/note/${noteId}/participants/${userId}`, {
+      await apiFetch(`/v1/note/${noteId}/participants/${userId}`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
       })
-
-      if (!response.ok) {
-        throw new Error('Failed to kick participant')
-      }
-
-      return response.json()
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['noteGuests', id] })

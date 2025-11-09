@@ -1,8 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ChevronLeft } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm, FormProvider } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
 import {
@@ -18,6 +19,9 @@ import {
 import { ImageUploadField } from '@/features/shared/components/form/ImageUploadField'
 import { InputField } from '@/features/shared/components/form/InputField'
 import { TextareaField } from '@/features/shared/components/form/TextareaField'
+import { useUser } from '@/hooks/useUser'
+import { apiFetch } from '@/lib/api'
+import { getImageUrl } from '@/util'
 
 const profileSchema = z.object({
   profileImage: z
@@ -38,12 +42,13 @@ export type ProfileFormData = z.infer<typeof profileSchema>
 
 export default function MyEdit() {
   const navigate = useNavigate()
+  const { user, isLoading } = useUser()
   const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false)
 
   const form = useForm<ProfileFormData>({
     defaultValues: {
       profileImage: [],
-      email: 'yayaya@naver.com', // 실제로는 서버에서 가져온 데이터
+      email: '',
       nickname: '',
       bio: '',
     },
@@ -54,28 +59,86 @@ export default function MyEdit() {
   const {
     handleSubmit,
     watch,
+    reset,
     formState: { errors, touchedFields },
   } = form
 
   const bioValue = watch('bio') || ''
   const nicknameValue = watch('nickname') || ''
 
+  // 유저 정보 로드 시 form에 설정
+  useEffect(() => {
+    const loadUserData = async () => {
+      if (user) {
+        let profileImageFile: File[] = []
+
+        // 기존 이미지가 있으면 File로 변환
+        if (user.imageUrl && user.imageUrl !== '/images/default_book_image.jpg') {
+          try {
+            const response = await fetch(getImageUrl(user.imageUrl))
+            const blob = await response.blob()
+            const fileName = user.imageUrl.split('/').pop() || 'profile.jpg'
+            const file = new File([blob], fileName, { type: blob.type })
+            profileImageFile = [file]
+          } catch {
+            toast.error('프로필 이미지를 불러오는데 실패했습니다.')
+          }
+        }
+
+        reset({
+          profileImage: profileImageFile,
+          email: user.email,
+          nickname: user.nickname,
+          bio: user.description || '',
+        })
+      }
+    }
+
+    loadUserData()
+  }, [user, reset])
+
   const onSubmit = async (data: ProfileFormData) => {
-    console.log('Form data:', data)
-    // TODO: API 호출하여 프로필 업데이트
-    // const formData = new FormData()
-    // if (data.profileImage?.[0]) formData.append('profileImage', data.profileImage[0])
-    // formData.append('nickname', data.nickname)
-    // if (data.bio) formData.append('bio', data.bio)
-    // await apiFetch('/v1/user/profile', { method: 'PUT', body: formData })
-    // navigate('/my')
+    try {
+      const formData = new FormData()
+
+      // 새 이미지가 있으면 추가
+      if (data.profileImage?.[0]) {
+        formData.append('profileImage', data.profileImage[0])
+      }
+
+      formData.append('nickname', data.nickname)
+
+      if (data.bio) {
+        formData.append('bio', data.bio)
+      }
+
+      await apiFetch('/v1/user/profile', { method: 'PUT', body: formData })
+      toast.success('프로필이 수정되었습니다.')
+      navigate('/my')
+    } catch {
+      toast.error('프로필 수정에 실패했습니다.')
+    }
   }
 
-  const handleWithdraw = () => {
-    // TODO: 탈퇴 API 호출
-    console.log('회원 탈퇴')
-    setWithdrawDialogOpen(false)
-    // navigate('/sign-in')
+  const handleWithdraw = async () => {
+    try {
+      await apiFetch('/v1/user', { method: 'DELETE' })
+      localStorage.removeItem('accessToken')
+      toast.success('회원 탈퇴가 완료되었습니다.')
+      navigate('/sign-in')
+    } catch {
+      toast.error('회원 탈퇴에 실패했습니다.')
+    } finally {
+      setWithdrawDialogOpen(false)
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-gray-600">로딩 중...</p>
+      </div>
+    )
   }
 
   return (
@@ -94,14 +157,14 @@ export default function MyEdit() {
             {/* Profile Image */}
             <div>
               <h2 className="text-lg font-bold mb-3">프로필 사진</h2>
-              <ImageUploadField name="profileImage" />
+              <ImageUploadField name="profileImage" max={1} />
             </div>
 
             {/* Email (Read-only) */}
             <div>
               <h2 className="text-lg font-bold mb-2">이메일</h2>
               <div className="w-full px-3 py-2 text-sm border border-gray-200 rounded-md bg-gray-50 text-gray-500">
-                yayaya@naver.com
+                {user?.email}
               </div>
             </div>
 

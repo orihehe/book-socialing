@@ -18,7 +18,8 @@ export function ImageUploadField({ name, label = '이미지 업로드', max = 5 
     watch,
     formState: { errors },
   } = useFormContext()
-  const files: File[] = watch(name) ?? []
+  const watchedFiles = watch(name)
+  const files: File[] = useMemo(() => watchedFiles ?? [], [watchedFiles])
   const errMsg = (errors as Record<string, { message: string }>)[name]?.message as
     | string
     | undefined
@@ -49,18 +50,20 @@ export function ImageUploadField({ name, label = '이미지 업로드', max = 5 
       </Label>
 
       <div className="flex gap-4 mt-2 flex-wrap">
-        {/* 업로드 버튼 */}
-        <div className="relative w-24 h-24 rounded-md bg-main/10 flex items-center justify-center border-2 border-main hover:bg-main/20 transition">
-          <Input
-            id={`${name}-input`}
-            type="file"
-            accept="image/*"
-            multiple
-            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-            onChange={e => handleAddFiles(e.target.files)}
-          />
-          <Camera className="w-6 h-6 text-main pointer-events-none" />
-        </div>
+        {/* 업로드 버튼 - max 개수 미만일 때만 표시 */}
+        {files.length < max && (
+          <div className="relative w-24 h-24 rounded-md bg-main/10 flex items-center justify-center border-2 border-main hover:bg-main/20 transition">
+            <Input
+              id={`${name}-input`}
+              type="file"
+              accept="image/*"
+              multiple
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+              onChange={e => handleAddFiles(e.target.files)}
+            />
+            <Camera className="w-6 h-6 text-main pointer-events-none" />
+          </div>
+        )}
 
         {/* 이미지 미리보기 목록 */}
         {previews.map((src, i) => (

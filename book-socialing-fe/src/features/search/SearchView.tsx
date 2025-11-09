@@ -50,7 +50,6 @@ export default function SearchView() {
     queryFn: async () => {
       if (!searchValue) return { totalCount: 0, groups: [] }
       const resp = await apiFetch(`/v1/club/search?query=${encodeURIComponent(searchValue)}`)
-      if (!resp.ok) throw new Error('서버 오류')
       return resp.json()
     },
     enabled: !!searchValue && (searchTarget === 'all' || searchTarget === 'club'),
@@ -62,7 +61,6 @@ export default function SearchView() {
     queryFn: async () => {
       if (!searchValue) return { totalCount: 0, groups: [] }
       const resp = await apiFetch(`/v1/note/search?query=${encodeURIComponent(searchValue)}`)
-      if (!resp.ok) throw new Error('서버 오류')
       return resp.json()
     },
     enabled: !!searchValue && (searchTarget === 'all' || searchTarget === 'note'),

@@ -14,5 +14,10 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
     return Promise.reject(new Error('Unauthorized - redirect to login'))
   }
 
+  // 400 이상이면 에러 (200-399는 성공으로 처리)
+  if (res.status >= 400) {
+    throw new Error(`HTTP error! status: ${res.status}`)
+  }
+
   return res
 }

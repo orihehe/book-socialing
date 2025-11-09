@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button'
 import { CardContent } from '@/components/ui/card'
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/components/ui/carousel'
 import { LoadingPage } from '@/features/shared/components/LoadingPage'
-import { dummy } from '@/features/shared/dummy'
 import { apiFetch } from '@/lib/api'
 import { cn } from '@/lib/utils'
 import type { ClubNotesPageResponse } from '@/types/note'
@@ -31,16 +30,7 @@ export function Summary({ moveToAll }: Props) {
           'Content-Type': 'application/json',
         },
       })
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch open notes')
-      }
-
       const data = await response.json()
-      if (!data || !data.groups || data.groups.length === 0) {
-        // TODO dummy
-        return dummy
-      }
       return data
     },
   })
