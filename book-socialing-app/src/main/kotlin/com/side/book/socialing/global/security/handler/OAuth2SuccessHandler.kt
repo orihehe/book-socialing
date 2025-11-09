@@ -35,7 +35,9 @@ class OAuth2SuccessHandler(
         val accessToken = jwtTokenProvider.createAccessToken(email)
         val refreshToken = jwtTokenProvider.createRefreshToken()
 
-        val redirectUri = "$serverUrl/oauth/callback"
+        // TODO: remove later
+        val refer = request.getHeader("Referer")?.removeSuffix("/") ?: serverUrl
+        val redirectUri = "$refer/oauth/callback"
 
         val targetUrl = UriComponentsBuilder.fromUriString(redirectUri)
             .queryParam("accessToken", accessToken)
