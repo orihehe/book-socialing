@@ -29,7 +29,6 @@ export default function ClubDetail() {
     queryKey: ['club', id],
     queryFn: async () => {
       const res = await apiFetch(`/v1/club/${id}`)
-      if (!res.ok) throw new Error('클럽 정보를 불러오지 못했습니다.')
       return res.json()
     },
     enabled: !!id,
@@ -39,7 +38,6 @@ export default function ClubDetail() {
     queryKey: ['club', id, 'members'],
     queryFn: async () => {
       const res = await apiFetch(`/v1/club/${id}/members`)
-      if (!res.ok) throw new Error('클럽 멤버 정보를 불러오지 못했습니다.')
       return res.json()
     },
     enabled: !!id,

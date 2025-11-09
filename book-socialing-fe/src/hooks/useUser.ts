@@ -10,9 +10,6 @@ export function useUser() {
     queryKey: ['user', 'me'],
     queryFn: async () => {
       const response = await apiFetch('/v1/user/me')
-      if (!response.ok) {
-        throw new Error('Failed to fetch user info')
-      }
       return response.json()
     },
     enabled: hasToken,

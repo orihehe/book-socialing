@@ -19,11 +19,6 @@ export function MyNotes() {
               'Content-Type': 'application/json',
             },
           })
-
-          if (!response.ok) {
-            throw new Error('Failed to fetch created notes')
-          }
-
           return response.json()
         },
       },

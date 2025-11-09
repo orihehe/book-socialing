@@ -58,7 +58,6 @@ export function NoteForm({ mode, note, onSubmit }: Props) {
     queryKey: ['clubs', 'created'],
     queryFn: async () => {
       const res = await apiFetch('/v1/club/created')
-      if (!res.ok) throw new Error('Failed to fetch clubs')
       return res.json()
     },
     staleTime: 5 * 60 * 1000,

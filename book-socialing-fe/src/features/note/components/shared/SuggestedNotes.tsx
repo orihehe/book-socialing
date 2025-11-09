@@ -22,7 +22,6 @@ export function SuggestedNotes() {
     queryKey: ['suggestedNotes'],
     queryFn: async () => {
       const res = await apiFetch('/v1/note/recommend')
-      if (!res.ok) throw new Error('Failed to fetch suggested notes')
       return res.json()
     },
   })
@@ -36,7 +35,6 @@ export function SuggestedNotes() {
       const res = await apiFetch(`/v1/note/${noteId}/join/request`, {
         method: 'POST',
       })
-      if (!res.ok) throw new Error('Failed to join note')
       return res.json()
     },
     onSuccess: () => {

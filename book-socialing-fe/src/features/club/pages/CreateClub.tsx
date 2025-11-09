@@ -23,10 +23,6 @@ export default function CreateClub() {
         method: 'POST',
         body: formData,
       })
-
-      if (!res.ok) {
-        throw new Error('클럽 생성에 실패했습니다')
-      }
       return res.json()
     },
     onSuccess: () => {

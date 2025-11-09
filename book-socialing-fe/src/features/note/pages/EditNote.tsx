@@ -28,11 +28,7 @@ export default function EditNote() {
     queryKey: ['note', id],
     queryFn: async () => {
       const response = await apiFetch(`/v1/note/${id}`)
-      if (!response.ok) {
-        throw new Error('Failed to fetch note data')
-      }
       const note = await response.json()
-
       return { ...note, bookImages: await getImageFile(note.imageUrls?.[0]) }
     },
     enabled: !!id,
@@ -50,9 +46,6 @@ export default function EditNote() {
       })
 
       const response = await apiFetch(`/v1/note/${id}`, { method: 'PUT', body: formData })
-      if (!response.ok) {
-        throw new Error('Failed to update note')
-      }
       return true
     },
     onSuccess: () => {
@@ -66,14 +59,9 @@ export default function EditNote() {
   const deleteMutation = useMutation({
     mutationFn: async () => {
       const response = await apiFetch(`/v1/note/${id}`, { method: 'DELETE' })
-      if (!response.ok) {
-        throw new Error('Failed to delete note')
-      }
-
       if (response.status === 204) {
         return null
       }
-
       return response.json()
     },
     onSuccess: () => {
