@@ -11,14 +11,25 @@ import { UserImage } from '@/features/shared/components/UserImage'
 import { apiFetch } from '@/lib/api'
 import { User, UserDetail } from '@/types/user'
 
-const MemberListItem = ({ user, action }: { user: User; action: React.ReactNode }) => (
+const MemberListItem = ({
+  user,
+  action,
+  isHost = false,
+}: {
+  user: User
+  action: React.ReactNode
+  isHost?: boolean
+}) => (
   <div
     className="flex items-center justify-between px-4 py-4 rounded-xl transition-colors
                hover:bg-black/[0.02]" // 옵션: 호버 배경 살짝
   >
     <div className="flex items-center gap-3">
       <UserImage user={user} />
-      <span className="text-sm font-bold">{user.nickname}</span>
+      <div className="flex flex-col">
+        <span className="text-sm font-bold">{user.nickname}</span>
+        {isHost && <span className="text-xs text-main font-semibold">호스트</span>}
+      </div>
     </div>
     {action}
   </div>
@@ -33,43 +44,33 @@ export default function MemberManagement() {
     queryKey: ['clubMembers', id],
     queryFn: async () => {
       const res = await apiFetch(`/v1/club/${id}/members`)
-      if (!res.ok) throw new Error('Failed to fetch club members')
       return res.json()
     },
   })
 
   const approveMutation = useMutation({
     mutationFn: async ({ clubId, userId }: { clubId: string; userId: number }) => {
-      const response = await apiFetch(`/v1/club/${clubId}/members/${userId}/approve`, {
+      await apiFetch(`/v1/club/${clubId}/members/${userId}/approve`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
       })
-      if (!response.ok) throw new Error('Failed to approve member')
-      return response.json()
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['clubMembers', id] }),
   })
 
   const rejectMutation = useMutation({
     mutationFn: async ({ clubId, userId }: { clubId: string; userId: number }) => {
-      const response = await apiFetch(`/v1/club/${clubId}/members/${userId}/reject`, {
+      await apiFetch(`/v1/club/${clubId}/members/${userId}/reject`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
       })
-      if (!response.ok) throw new Error('Failed to reject member')
-      return response.json()
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['clubMembers', id] }),
   })
 
   const kickMutation = useMutation({
     mutationFn: async ({ clubId, userId }: { clubId: string; userId: number }) => {
-      const response = await apiFetch(`/v1/club/${clubId}/members/${userId}`, {
+      await apiFetch(`/v1/club/${clubId}/members/${userId}`, {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
       })
-      if (!response.ok) throw new Error('Failed to kick member')
-      return response.json()
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['clubMembers', id] }),
   })
@@ -88,6 +89,11 @@ export default function MemberManagement() {
 
   const pendingUsers = clubMembers.filter(user => user.status === 'PENDING_APPROVAL')
   const approvedUsers = clubMembers.filter(user => user.status === 'JOINED')
+
+  // HOST를 맨 위에 표시하기 위해 정렬
+  const hostUsers = approvedUsers.filter(user => user.role === 'HOST')
+  const guestUsers = approvedUsers.filter(user => user.role === 'GUEST')
+  const sortedApprovedUsers = [...hostUsers, ...guestUsers]
 
   return (
     <div className="flex flex-col min-h-screen px-4 pt-4 pb-6 bg-background">
@@ -144,21 +150,25 @@ export default function MemberManagement() {
         {/* Approved Section */}
         <section className="rounded-2xl bg-[#FBFBFB] mt-8">
           <h2 className="text-mx font-bold px-4 pt-4">참가멤버</h2>
-          {approvedUsers.length > 0 ? (
+          {sortedApprovedUsers.length > 0 ? (
             <div className="mt-2 px-2 pb-4 space-y-3">
-              {approvedUsers.map(user => (
+              {sortedApprovedUsers.map(user => (
                 <MemberListItem
                   key={`approved-${user.user.id}`}
                   user={user.user}
                   action={
-                    <div className="flex gap-2">
-                      <BaseButton
-                        onClick={() => handleKick(user.user.id)}
-                        disabled={kickMutation.isPending}
-                      >
-                        강퇴
-                      </BaseButton>
-                    </div>
+                    user.role === 'HOST' ? (
+                      <div className="w-[72px]" /> // 호스트는 강퇴 버튼 없음
+                    ) : (
+                      <div className="flex gap-2">
+                        <BaseButton
+                          onClick={() => handleKick(user.user.id)}
+                          disabled={kickMutation.isPending}
+                        >
+                          강퇴
+                        </BaseButton>
+                      </div>
+                    )
                   }
                 />
               ))}
