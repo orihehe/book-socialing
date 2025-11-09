@@ -28,3 +28,4 @@ file:
   base-dir: ${user.home}/dev/saisai-file
   note-dir: note/
   club-dir: club/
+  user-dir: user/

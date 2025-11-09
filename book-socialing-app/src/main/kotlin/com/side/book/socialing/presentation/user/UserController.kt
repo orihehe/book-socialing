@@ -1,8 +1,10 @@
 package com.side.book.socialing.presentation.user
 
+import com.side.book.socialing.domain.user.command.UpdateUserCommand
 import com.side.book.socialing.domain.user.service.UserService
 import com.side.book.socialing.global.auth.UserPrincipalResolver
 import com.side.book.socialing.global.utils.log
+import com.side.book.socialing.presentation.user.dto.UpdateUserRequest
 import com.side.book.socialing.presentation.user.dto.UserResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -11,8 +13,11 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.multipart.MultipartFile
 
 @Tag(name = "유저 API", description = "유저 관련 API")
 @RestController
@@ -57,5 +62,34 @@ class UserController(
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .build()
         }
+    }
+
+    @Operation(
+        summary = "로그인한 사용자 정보 업데이트",
+        description = "현재 로그인한 사용자의 상세 정보가 업데이트됩니다."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "성공적으로 로그인한 사용자 정보 수정 성공"
+            )
+        ]
+    )
+    @PutMapping("/me")
+    fun updateUser(
+        @RequestPart("request") request: UpdateUserRequest,
+        @RequestPart("image", required = false) imageFile: MultipartFile?
+    ): ResponseEntity<Void> {
+        val userId = userPrincipalResolver.getUserId()
+        val command = UpdateUserCommand(
+            userId = userId,
+            nickname = request.nickname,
+            description = request.description,
+            imageFile = imageFile
+        )
+
+        userService.updateUser(command)
+        return ResponseEntity.ok().build()
     }
 }

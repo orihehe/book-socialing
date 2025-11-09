@@ -20,6 +20,6 @@ data class UserResponse(
     @field:Schema(description = "사용자 역할", example = "ROLE_USER")
     val role: String,
 
-    @field:ArraySchema(arraySchema = Schema(description = "대표 이미지 URL"), schema = Schema(format = "uri", example = "/note/27/cover1.png"))
-    val imageUrl: String
+    @field:Schema(description = "대표 이미지 URL", format = "uri", example = "/note/27/cover1.png")
+    val imageUrl: String?
 )
