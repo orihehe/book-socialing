@@ -607,11 +607,17 @@ class NoteService(
      * @param startDate 날짜 검색 시작일
      * @param endDate 날짜 검색 종료일
      * @return 사용자가 참여 중인 노트 정보가 담긴 `CommonNoteResponse` DTO 리스트.
-     *         만약 참여 중인 노트가 없으면 빈 리스트를 반환합니다.
+     *         만약 참여한 노트가 없으면 빈 리스트를 반환합니다.
      */
     @Transactional(readOnly = true)
     fun getParticipatedNotes(userId: Long, dateType: String, startDate: LocalDateTime?, endDate: LocalDateTime?): List<DateNotesGroupResponse<CommonNoteResponse>> {
 
+        // dateType 유효성 검사
+        if (!StringUtils.equals(dateType, "START") && !StringUtils.equals(dateType, "END")) {
+            // 유효하지 않은 dateType일 경우 예외 발생
+            throw IllegalArgumentException("Invalid dateType parameter. Must be 'START' or 'END'.")
+        }
+        
         val notes = noteRepository.findParticipatedNotesByUserId(userId, dateType, startDate, endDate)
 
         val groupedByDate = notes.groupBy { note ->
