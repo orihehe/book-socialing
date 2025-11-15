@@ -2,6 +2,7 @@ package com.side.book.socialing.presentation.note.dto
 
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Schema(description = "클럽별 노트 페이지 응답(제네릭)")
@@ -23,6 +24,15 @@ data class ClubNotesGroupResponse<T>(
     val clubName: String,
 
     @field:Schema(description = "클럽에 속한 노트 리스트")
+    val notes: List<T>
+)
+
+@Schema(description = "날짜 단위 그룹(제네릭)")
+data class DateNotesGroupResponse<T>(
+    @field:Schema(description = "날짜", example = "2025-04-02")
+    val date: LocalDate,
+
+    @field:Schema(description = "날짜에 속한 노트 리스트")
     val notes: List<T>
 )
 
