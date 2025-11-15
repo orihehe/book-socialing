@@ -607,7 +607,7 @@ class NoteService(
      * @param startDate 날짜 검색 시작일
      * @param endDate 날짜 검색 종료일
      * @return 사용자가 참여 중인 노트 정보가 담긴 `CommonNoteResponse` DTO 리스트.
-     *         만약 참여 중인 노트가 없으면 빈 리스트를 반환합니다.
+     *         만약 참여한 노트가 없으면 빈 리스트를 반환합니다.
      */
     @Transactional(readOnly = true)
     fun getParticipatedNotes(userId: Long, dateType: String, startDate: LocalDateTime?, endDate: LocalDateTime?): List<DateNotesGroupResponse<CommonNoteResponse>> {
