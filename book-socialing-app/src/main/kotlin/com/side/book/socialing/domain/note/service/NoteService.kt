@@ -19,12 +19,14 @@ import com.side.book.socialing.global.file.StoredFile
 import com.side.book.socialing.presentation.note.dto.ClubNotesGroupResponse
 import com.side.book.socialing.presentation.note.dto.ClubNotesPageResponse
 import com.side.book.socialing.presentation.note.dto.CommonNoteResponse
+import com.side.book.socialing.presentation.note.dto.DateNotesGroupResponse
 import com.side.book.socialing.presentation.note.dto.GetNoteResponse
 import com.side.book.socialing.presentation.note.dto.NotesPageResponse
 import com.side.book.socialing.presentation.note.dto.OpenNoteResponse
 import com.side.book.socialing.presentation.note.dto.ParticipantInfoResponse
 import com.side.book.socialing.presentation.note.dto.SearchNoteResponse
 import jakarta.persistence.EntityNotFoundException
+import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.PageRequest
@@ -595,5 +597,44 @@ class NoteService(
     fun getUsers(noteId: Long): List<UserDto> {
         val participants = noteParticipantRepository.findAllByNoteId(noteId)
         return participants.mapNotNull { userService.getUser(it.userId) }
+    }
+
+    /**
+     * 특정 사용자가 참여한 모든 노트 목록을 반환합니다.
+     *
+     * @param userId 정보를 조회할 사용자의 ID.
+     * @param dateType 날짜 검색 조건
+     * @param startDate 날짜 검색 시작일
+     * @param endDate 날짜 검색 종료일
+     * @return 사용자가 참여 중인 노트 정보가 담긴 `CommonNoteResponse` DTO 리스트.
+     *         만약 참여 중인 노트가 없으면 빈 리스트를 반환합니다.
+     */
+    @Transactional(readOnly = true)
+    fun getParticipatedNotes(userId: Long, dateType: String, startDate: LocalDateTime?, endDate: LocalDateTime?): List<DateNotesGroupResponse<CommonNoteResponse>> {
+
+        val notes = noteRepository.findParticipatedNotesByUserId(userId, dateType, startDate, endDate)
+
+        val groupedByDate = notes.groupBy { note ->
+            if (StringUtils.equals(dateType, "START")) {
+                note.startAt.toLocalDate()
+            } else {
+                note.endAt.toLocalDate()
+            }
+        }
+
+        val groups = mutableListOf<DateNotesGroupResponse<CommonNoteResponse>>()
+
+        groupedByDate.filterKeys { it != null }.forEach { (date, list) ->
+            groups.add(
+                DateNotesGroupResponse(
+                    date = date,
+                    notes = list.map(::toCommonNoteResponse)
+                )
+            )
+        }
+
+        groups.sortBy { it.date }
+
+        return groups
     }
 }

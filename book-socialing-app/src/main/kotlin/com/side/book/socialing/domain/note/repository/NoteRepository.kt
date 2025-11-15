@@ -90,4 +90,35 @@ interface NoteRepository : JpaRepository<Note, Long> {
         @Param("keyword") keyword: String?,
         @Param("pageable") pageable: Pageable
     ): List<SearchNoteDto>
+
+    @Query(
+        """
+        SELECT 
+            n
+        FROM Note n 
+        LEFT JOIN n.participants p WITH p.userId = :userId
+        WHERE p.userId = :userId 
+        AND n.deleted = false
+        AND (
+            (:dateType = 'START' AND (:startDate IS NULL OR n.startAt >= :startDate)) OR
+            (:dateType = 'END' AND (:startDate IS NULL OR n.endAt >= :startDate))
+        )
+        AND (
+            (:dateType = 'START' AND (:endDate IS NULL OR n.startAt <= :endDate)) OR
+            (:dateType = 'END' AND (:endDate IS NULL OR n.endAt <= :endDate))
+        )
+        ORDER BY 
+            CASE 
+                WHEN :dateType = 'START' THEN n.startAt
+                WHEN :dateType = 'END' THEN n.endAt
+                ELSE n.createdAt
+            END DESC
+        """
+    )
+    fun findParticipatedNotesByUserId(
+        @Param("userId") userId: Long?,
+        @Param("dateType") dateType: String,
+        @Param("startDate") startDate: LocalDateTime?,
+        @Param("endDate") endDate: LocalDateTime?
+    ): List<Note>
 }

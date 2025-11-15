@@ -9,6 +9,7 @@ import com.side.book.socialing.global.utils.log
 import com.side.book.socialing.presentation.note.dto.ClubNotesPageResponse
 import com.side.book.socialing.presentation.note.dto.CommonNoteResponse
 import com.side.book.socialing.presentation.note.dto.CreateNoteRequest
+import com.side.book.socialing.presentation.note.dto.DateNotesGroupResponse
 import com.side.book.socialing.presentation.note.dto.GetNoteResponse
 import com.side.book.socialing.presentation.note.dto.NotesPageResponse
 import com.side.book.socialing.presentation.note.dto.OpenNoteResponse
@@ -18,6 +19,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -32,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
+import java.time.LocalDate
 
 @Tag(name = "노트 API", description = "노트 조회, 생성, 참여, 퇴고 등 노트 관련 API")
 @RestController
@@ -327,5 +330,36 @@ class NoteController(
     ): ResponseEntity<List<UserDto>> {
         // TODO: auth
         return ResponseEntity.ok(noteService.getUsers(noteId))
+    }
+
+    @Operation(
+        summary = "유저가 참여한 노트 조회",
+        description = "기한동안 유저가 참여한 모든 노트를 검색합니다."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "성공적으로 노트 목록을 조회함"),
+            ApiResponse(responseCode = "500", description = "서버 내부 오류")
+        ]
+    )
+    @GetMapping("/participated")
+    fun getParticipated(
+        @RequestParam dateType: String,
+        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) startDate: LocalDate?, // 여기에 변경
+        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) endDate: LocalDate?,   // 여기에 변경
+    ): ResponseEntity<List<DateNotesGroupResponse<CommonNoteResponse>>> {
+        val userId = userPrincipalResolver.getUserId()
+
+        return try {
+            val upperDateType = dateType.uppercase()
+            val actualStartDate = startDate?.atStartOfDay() // LocalDate -> LocalDateTime
+            val actualEndDate = endDate?.plusDays(1)?.atStartOfDay()?.minusNanos(1) // LocalDate -> LocalDateTime
+            val notes = noteService.getParticipatedNotes(userId, upperDateType, actualStartDate, actualEndDate)
+            ResponseEntity.ok(notes)
+        } catch (e: Exception) {
+            log.error("Error fetching open notes for user $userId", e)
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(emptyList())
+        }
     }
 }
