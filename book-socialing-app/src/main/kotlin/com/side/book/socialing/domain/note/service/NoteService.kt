@@ -7,6 +7,7 @@ import com.side.book.socialing.domain.note.dto.SearchNoteDto
 import com.side.book.socialing.domain.note.entity.Note
 import com.side.book.socialing.domain.note.entity.NoteFile
 import com.side.book.socialing.domain.note.entity.NoteParticipant
+import com.side.book.socialing.domain.note.enum.ParticipantStatus
 import com.side.book.socialing.domain.note.event.NoteCreatedEvent
 import com.side.book.socialing.domain.note.repository.NoteFileRepository
 import com.side.book.socialing.domain.note.repository.NoteParticipantRepository
@@ -58,7 +59,14 @@ class NoteService(
     @Transactional
     fun createNote(cmd: CreateNoteCommand): Long {
         val club = cmd.clubId?.let { id ->
-            clubRepository.findById(id).orElseThrow { IllegalArgumentException("Club not found: $id") }
+            clubRepository.findByIdAndDeletedFalse(id) ?: throw IllegalArgumentException("Club not found: $id")
+        }
+
+        // 클럽 정보가 존재하는 경우 클럽 호스트 권한 확인
+        club?.run {
+            if (!isHost(cmd.userId)) {
+                throw IllegalStateException("User ${cmd.userId} is not a host of club $id")
+            }
         }
 
         // Note.create에 찾아온 club 객체를 전달
@@ -451,14 +459,16 @@ class NoteService(
             .orElseThrow { IllegalArgumentException("Note with ID $noteId not found") }
 
         // 참여자 목록 정제
-        val participants = note.participants.map {
-            ParticipantInfoResponse(
-                participantId = it.id!!,
-                userId = it.userId,
-                role = it.role.name,
-                status = it.status.name
-            )
-        }
+        val participants = note.participants
+            .filter { it.status == ParticipantStatus.JOINED }
+            .map {
+                ParticipantInfoResponse(
+                    participantId = it.id!!,
+                    userId = it.userId,
+                    role = it.role.name,
+                    status = it.status.name
+                )
+            }
 
         // 이미지 URL 목록 정제
         val imageUrls: List<String> = if (note.files.isNotEmpty()) {
@@ -485,14 +495,13 @@ class NoteService(
      * 노트 접근 권한을 확인하는 헬퍼 메소드
      */
     private fun checkNoteAccess(noteId: Long, userId: Long): Boolean {
-        val isParticipant = noteParticipantRepository.findByNoteIdAndUserId(noteId, userId)
-        return isParticipant != null
+        return noteParticipantRepository.existsByNoteIdAndUserIdAndStatus(noteId, userId, ParticipantStatus.JOINED)
     }
 
     @Transactional
     fun deleteNote(noteId: Long, userId: Long) {
-        val note = noteRepository.findById(noteId)
-            .orElseThrow { EntityNotFoundException("Note with ID $noteId not found") }
+        val note = noteRepository.findByIdAndDeletedFalse(noteId)
+            ?: throw EntityNotFoundException("Note with ID $noteId not found")
 
         note.delete(userId)
         note.participants.forEach { it.delete() }
@@ -508,8 +517,8 @@ class NoteService(
      */
     @Transactional
     fun updateNote(cmd: UpdateNoteCommand) {
-        val note = noteRepository.findById(cmd.noteId)
-            .orElseThrow { EntityNotFoundException("Note with ID ${cmd.noteId} not found") }
+        val note = noteRepository.findByIdAndDeletedFalse(cmd.noteId)
+            ?: throw EntityNotFoundException("Note with ID ${cmd.noteId} not found")
 
         note.update(cmd)
 
@@ -617,6 +626,12 @@ class NoteService(
             throw IllegalArgumentException("Invalid dateType parameter. Must be 'START' or 'END'.")
         }
 
+        // dateType 유효성 검사
+        if (!StringUtils.equals(dateType, "START") && !StringUtils.equals(dateType, "END")) {
+            // 유효하지 않은 dateType일 경우 예외 발생
+            throw IllegalArgumentException("Invalid dateType parameter. Must be 'START' or 'END'.")
+        }
+        
         val notes = noteRepository.findParticipatedNotesByUserId(userId, dateType, startDate, endDate)
 
         val groupedByDate = notes.groupBy { note ->

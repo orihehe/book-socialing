@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.nio.file.Paths
-import kotlin.jvm.optionals.getOrNull
 
 @Service
 class UserService(
@@ -21,14 +20,14 @@ class UserService(
     @Value("\${file.user-dir}") private val filePath: String
 ) {
     fun getUserMap(userIds: Set<Long>): Map<Long, UserDto> {
-        val users = userRepository.findAllById(userIds)
+        val users = userRepository.findByIdInAndDeletedFalse(userIds)
         return users.map {
             UserDto.from(it)
         }.associateBy { it.id }
     }
 
     fun getUser(userId: Long): UserDto? {
-        val user = userRepository.findById(userId).getOrNull()
+        val user = userRepository.findByIdAndDeletedFalse(userId)
         if (user == null) {
             log.info("No user found. userId: $userId")
             return null
@@ -44,7 +43,7 @@ class UserService(
      */
     @Transactional(readOnly = true) // 읽기 전용 트랜잭션
     fun getUserProfileResponse(userId: Long): UserResponse? {
-        val user = userRepository.findActiveUserByUserId(userId)
+        val user = userRepository.findByIdAndDeletedFalse(userId)
         if (user == null) {
             log.info("No user found. userId: $userId")
             return null
@@ -68,8 +67,8 @@ class UserService(
      */
     @Transactional // 읽기 전용 트랜잭션
     fun updateUser(cmd: UpdateUserCommand) {
-        val user = userRepository.findById(cmd.userId)
-            .orElseThrow { EntityNotFoundException("User with ID ${cmd.userId} not found") }
+        val user = userRepository.findByIdAndDeletedFalse(cmd.userId)
+            ?: throw EntityNotFoundException("User with ID ${cmd.userId} not found")
 
         user.update(cmd)
 
