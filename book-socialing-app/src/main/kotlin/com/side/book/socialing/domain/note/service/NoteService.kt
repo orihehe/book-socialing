@@ -289,7 +289,7 @@ class NoteService(
     /**
      * 추천 노트 목록을 반환합니다.
      *
-     * @return 추천 노트 정보가 담긴 `RecommendNoteResponse` DTO 리스트.
+     * @return 추천 노트 정보가 담긴 `RecommendNoteResponse` DTO 리스트
      *         만약 추천 노트가 없으면 빈 리스트를 반환합니다.
      */
     @Transactional(readOnly = true)
