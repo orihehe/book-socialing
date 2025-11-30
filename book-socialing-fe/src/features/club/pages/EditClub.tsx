@@ -34,11 +34,19 @@ export default function EditClub() {
       const imageFiles = await Promise.all(
         (club.clubImageUrls || []).map(async (url: string) => {
           try {
-            const response = await fetch(getImageUrl(url))
+            const imageUrl = getImageUrl(url)
+            const response = await fetch(imageUrl)
+
+            if (!response.ok) {
+              console.error(`이미지 로딩 실패: ${imageUrl}, 상태: ${response.status}`)
+              return null
+            }
+
             const blob = await response.blob()
             const fileName = url.split('/').pop() || 'image.jpg'
             return new File([blob], fileName, { type: blob.type })
-          } catch {
+          } catch (error) {
+            console.error(`이미지 로딩 에러: ${url}`, error)
             return null
           }
         })

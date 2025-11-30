@@ -27,6 +27,8 @@ export function NoteListItem({ note }: NoteListItemProps) {
       await apiFetch(`/v1/note/${note.id}/join/request`, {
         method: 'POST',
       })
+
+      return true
     },
     onSuccess: () => {
       toast.success('노트 신청이 완료되었습니다.')

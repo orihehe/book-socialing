@@ -12,7 +12,8 @@ export function getImageUrl(imagePath: string = '') {
     return `${API_URL}/images/default_book_image.jpg`
   }
 
-  return `${API_URL}/api/v1/file?filePath=${imagePath}`
+  // filePath를 URL 인코딩하여 특수문자 처리
+  return `${API_URL}/api/v1/file?filePath=${encodeURIComponent(imagePath)}`
 }
 
 export async function getImageFile(imageUrl?: string) {
