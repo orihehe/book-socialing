@@ -346,7 +346,7 @@ class NoteController(
     fun getParticipated(
         @RequestParam dateType: String,
         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) startDate: LocalDate?, // 여기에 변경
-        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) endDate: LocalDate?,   // 여기에 변경
+        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) endDate: LocalDate? // 여기에 변경
     ): ResponseEntity<List<DateNotesGroupResponse<CommonNoteResponse>>> {
         val userId = userPrincipalResolver.getUserId()
 
