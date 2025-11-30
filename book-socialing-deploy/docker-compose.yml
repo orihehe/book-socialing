@@ -11,7 +11,9 @@ services:
       - ../data:/var/data/saisai-file
 
   nginx:
-    build: ./nginx
+    build:
+      context: ..
+      dockerfile: ./book-socialing-deploy/nginx/Dockerfile
     container_name: nginx
     ports:
       - "80:80"

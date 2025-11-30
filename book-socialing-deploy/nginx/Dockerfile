@@ -5,15 +5,16 @@ FROM node:18-alpine AS builder
 WORKDIR /app
 
 # Copy package.json and package-lock.json (or pnpm-lock.yaml)
-COPY ../book-socialing-fe/package.json ./
-COPY ../book-socialing-fe/pnpm-lock.yaml ./
+COPY book-socialing-fe/package.json ./
+COPY book-socialing-fe/pnpm-lock.yaml ./
 
 # Install dependencies with pnpm
 RUN npm install -g pnpm
+RUN apk add --no-cache git
 RUN pnpm install
 
 # Copy the rest of the frontend source code
-COPY ../book-socialing-fe/ ./
+COPY book-socialing-fe/ ./
 
 # Build the application
 RUN pnpm run build
@@ -25,7 +26,7 @@ FROM nginx:latest
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Copy the custom Nginx configuration
-COPY ./default.conf /etc/nginx/conf.d/default.conf
+COPY book-socialing-deploy/nginx/default.conf /etc/nginx/conf.d/default.conf
 
 # Expose port 80 and 443
 EXPOSE 80 443
