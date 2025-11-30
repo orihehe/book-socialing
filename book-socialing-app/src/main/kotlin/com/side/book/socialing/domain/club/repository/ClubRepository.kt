@@ -38,10 +38,10 @@ interface ClubRepository : JpaRepository<Club, Long> {
         @Param("pageable") pageable: Pageable
     ): List<Club>
 
-    @Query("SELECT count(DISTINCT c.id) FROM Club c JOIN c.participants p WHERE NOT EXISTS ( SELECT 1 FROM c.participants p WHERE p.userId = :userId) AND c.deleted = false")
+    @Query("SELECT count(c) FROM Club c WHERE NOT EXISTS ( SELECT 1 FROM c.participants p WHERE p.userId = :userId) AND c.deleted = false")
     fun countRecommendClubsByUserId(userId: Long): Long
 
-    @Query("SELECT c FROM Club c JOIN c.participants p WHERE NOT EXISTS ( SELECT 1 FROM c.participants p WHERE p.userId = :userId) AND c.deleted = false ORDER BY RAND()")
+    @Query("SELECT c FROM Club c WHERE NOT EXISTS ( SELECT 1 FROM c.participants p WHERE p.userId = :userId) AND c.deleted = false ORDER BY RAND()")
     fun findRecommendClubsByUserId(
         @Param("userId") userId: Long,
         @Param("pageable") pageable: Pageable

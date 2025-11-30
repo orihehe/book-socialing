@@ -41,10 +41,10 @@ interface NoteRepository : JpaRepository<Note, Long> {
         @Param("pageable") pageable: Pageable
     ): List<Note>
 
-    @Query("SELECT count(DISTINCT n.id) FROM Note n JOIN n.participants p WHERE NOT EXISTS ( SELECT 1 FROM n.participants p WHERE p.userId = :userId) AND n.endAt > :currentDateTime AND n.deleted = false")
+    @Query("SELECT count(n) FROM Note n WHERE NOT EXISTS ( SELECT 1 FROM n.participants p WHERE p.userId = :userId) AND n.endAt > :currentDateTime AND n.deleted = false")
     fun countRecommendNotesByUserId(userId: Long, currentDateTime: LocalDateTime): Long
 
-    @Query("SELECT n FROM Note n JOIN n.participants p WHERE NOT EXISTS ( SELECT 1 FROM n.participants p WHERE p.userId = :userId) AND n.endAt > :currentDateTime AND n.deleted = false ORDER BY RAND()")
+    @Query("SELECT n FROM Note n WHERE NOT EXISTS ( SELECT 1 FROM n.participants p WHERE p.userId = :userId) AND n.endAt > :currentDateTime AND n.deleted = false ORDER BY RAND()")
     fun findRecommendNotesByUserId(
         @Param("userId") userId: Long,
         @Param("currentDateTime") currentDateTime: LocalDateTime,
