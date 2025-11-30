@@ -8,6 +8,7 @@ import com.side.book.socialing.domain.chat.entity.MessageType
 import com.side.book.socialing.domain.chat.repository.ChatMessageRepository
 import com.side.book.socialing.domain.chat.repository.ChatRoomParticipantRepository
 import com.side.book.socialing.domain.chat.repository.ChatRoomRepository
+import com.side.book.socialing.global.error.exception.ForbiddenException
 import com.side.book.socialing.global.error.exception.ResourceNotFoundException
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
@@ -54,7 +55,9 @@ class ChatMessageService(
     ): ChatMessagesResponse {
         val chatRoom = chatRoomRepository.findByNoteId(noteId)
             ?: throw ResourceNotFoundException("ChatRoom not found")
-        val roomId = chatRoom.id!!
+        chatRoomParticipantRepository.findByChatRoomIdAndUserId(chatRoom.id!!, userId)
+            ?: throw ForbiddenException("User $userId not participate chat room $noteId")
+        val roomId = chatRoom.id
 
         val cursor = lastMessageId
             ?: chatRoomParticipantRepository.findByChatRoomIdAndUserId(roomId, userId)?.lastReadMessageId
