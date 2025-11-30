@@ -111,9 +111,9 @@ class ClubService(
             CommonClubResponse(
                 id = club.id!!,
                 clubName = club.clubName,
-                clubImageUrls = club.files.map { it.filePath },
+                clubImageUrls = club.files.filter { !it.deleted }.map { it.filePath },
                 description = club.description ?: "",
-                memberCount = club.participants.size
+                memberCount = club.participants.count { it.status == ParticipantStatus.JOINED }
             )
         }
 
@@ -151,9 +151,9 @@ class ClubService(
             CommonClubResponse(
                 id = club.id!!,
                 clubName = club.clubName,
-                clubImageUrls = club.files.map { it.filePath },
+                clubImageUrls = club.files.filter { !it.deleted }.map { it.filePath },
                 description = club.description ?: "",
-                memberCount = club.participants.size
+                memberCount = club.participants.count { it.status == ParticipantStatus.JOINED }
             )
         }
 
@@ -191,9 +191,9 @@ class ClubService(
             CommonClubResponse(
                 id = club.id!!,
                 clubName = club.clubName,
-                clubImageUrls = club.files.map { it.filePath },
+                clubImageUrls = club.files.filter { !it.deleted }.map { it.filePath },
                 description = club.description ?: "",
-                memberCount = club.participants.size
+                memberCount = club.participants.count { it.status == ParticipantStatus.JOINED }
             )
         }
 
@@ -235,9 +235,9 @@ class ClubService(
             CommonClubResponse(
                 id = club.id!!,
                 clubName = club.clubName,
-                clubImageUrls = club.files.map { it.filePath },
+                clubImageUrls = club.files.filter { !it.deleted }.map { it.filePath },
                 description = club.description ?: "",
-                memberCount = club.participants.size
+                memberCount = club.participants.count { it.status == ParticipantStatus.JOINED }
             )
         }
 
@@ -252,7 +252,7 @@ class ClubService(
         return CommonClubResponse(
             id = club.id!!,
             clubName = club.clubName,
-            clubImageUrls = club.files.map { it.filePath },
+            clubImageUrls = club.files.filter { !it.deleted }.map { it.filePath },
             description = club.description ?: "",
             memberCount = club.participants.count { it.status == ParticipantStatus.JOINED }
         )
@@ -265,7 +265,7 @@ class ClubService(
 
         club.delete(userId)
         club.participants.forEach { it.delete() }
-        club.files.forEach { it.delete() }
+        club.files.filter { !it.deleted }.forEach { it.delete() }
         club.reviews.forEach { it.delete() }
     }
 
@@ -350,9 +350,9 @@ class ClubService(
             SearchClubResponse(
                 id = c.id!!,
                 clubName = c.clubName,
-                clubImageUrls = c.files.map { it.filePath },
+                clubImageUrls = c.files.filter { !it.deleted }.map { it.filePath },
                 description = c.description ?: "",
-                memberCount = c.participants.size,
+                memberCount = c.participants.count { it.status == ParticipantStatus.JOINED },
                 status = row.status,
                 role = row.role
             )

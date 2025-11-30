@@ -405,7 +405,7 @@ class NoteService(
     }
 
     private fun toOpenNoteResponse(note: Note): OpenNoteResponse {
-        val participants = note.participants.map {
+        val participants = note.participants.filter { it.status == ParticipantStatus.JOINED }.map {
             ParticipantInfoResponse(
                 participantId = it.id!!,
                 userId = it.userId,
@@ -413,7 +413,8 @@ class NoteService(
                 status = it.status.name
             )
         }
-        val bookImageUrl = note.files.firstOrNull()?.filePath ?: "/images/default_book_image.jpg"
+        val bookImageUrl = note.files.firstOrNull { !it.deleted }?.filePath
+            ?: "/images/default_book_image.jpg"
 
         return OpenNoteResponse(
             id = note.id!!,
@@ -428,7 +429,8 @@ class NoteService(
     }
 
     private fun toCommonNoteResponse(note: Note): CommonNoteResponse {
-        val bookImageUrl = note.files.firstOrNull()?.filePath ?: "/images/default_book_image.jpg"
+        val bookImageUrl = note.files.firstOrNull { !it.deleted }?.filePath
+            ?: "/images/default_book_image.jpg"
 
         return CommonNoteResponse(
             id = note.id!!,
@@ -471,11 +473,12 @@ class NoteService(
             }
 
         // 이미지 URL 목록 정제
-        val imageUrls: List<String> = if (note.files.isNotEmpty()) {
-            note.files.map { it.filePath } // 파일 엔티티의 filePath를 String 리스트로 변환
-        } else {
-            listOf("/images/default_book_image.jpg") // 기본 이미지 1개를 추가하는 예시
-        }
+        val imageUrls: List<String> = note.files
+            .filter { !it.deleted } // 1. 삭제 안 된 파일만 골라내기
+            .map { it.filePath } // 2. 경로(String)로 변환
+            .ifEmpty { // 3. 다 거르고 났는데 비어있다면? (혹은 애초에 없었다면)
+                listOf("/images/default_book_image.jpg") // 기본 이미지 반환
+            }
 
         return GetNoteResponse(
             id = note.id!!,
@@ -505,7 +508,7 @@ class NoteService(
 
         note.delete(userId)
         note.participants.forEach { it.delete() }
-        note.files.forEach { it.delete() }
+        note.files.filter { !it.deleted }.forEach { it.delete() }
     }
 
     /**
@@ -586,7 +589,8 @@ class NoteService(
 
         val groups = rows.map { row ->
             val n = row.note
-            val bookImageUrl = n.files.firstOrNull()?.filePath ?: "/images/default_book_image.jpg"
+            val bookImageUrl = n.files.firstOrNull { !it.deleted }?.filePath
+                ?: "/images/default_book_image.jpg"
 
             SearchNoteResponse(
                 id = n.id!!,
