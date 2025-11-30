@@ -63,7 +63,7 @@ export default function ClubDetail() {
   const joinClubMutation = useMutation({
     mutationFn: async () => {
       await apiFetch(`/v1/club/${id}/join/request`, {
-        method: 'PATCH',
+        method: 'POST',
       })
     },
     onSuccess: () => {
