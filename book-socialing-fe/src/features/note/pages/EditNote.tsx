@@ -46,6 +46,8 @@ export default function EditNote() {
       })
 
       await apiFetch(`/v1/note/${id}`, { method: 'PUT', body: formData })
+
+      return true
     },
     onSuccess: () => {
       toast.success('수정되었습니다.', { position: 'top-center' })
@@ -59,9 +61,9 @@ export default function EditNote() {
     mutationFn: async () => {
       const response = await apiFetch(`/v1/note/${id}`, { method: 'DELETE' })
       if (response.status === 204) {
-        return null
+        return true
       }
-      return response.json()
+      return null
     },
     onSuccess: () => {
       navigate('/note')

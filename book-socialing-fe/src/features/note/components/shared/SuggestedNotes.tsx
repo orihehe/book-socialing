@@ -32,10 +32,10 @@ export function SuggestedNotes() {
 
   const joinNoteMutation = useMutation({
     mutationFn: async (noteId: number) => {
-      const res = await apiFetch(`/v1/note/${noteId}/join/request`, {
+      await apiFetch(`/v1/note/${noteId}/join/request`, {
         method: 'POST',
       })
-      return res.json()
+      return true
     },
     onSuccess: () => {
       toast.success('노트 신청이 완료되었습니다.')

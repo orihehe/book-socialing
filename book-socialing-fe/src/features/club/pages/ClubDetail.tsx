@@ -65,6 +65,8 @@ export default function ClubDetail() {
       await apiFetch(`/v1/club/${id}/join/request`, {
         method: 'POST',
       })
+
+      return true
     },
     onSuccess: () => {
       toast.success('클럽 신청이 완료되었습니다.')
