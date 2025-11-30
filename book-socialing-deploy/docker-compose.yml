@@ -31,4 +31,5 @@ services:
     volumes:
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
-    command: [ "sh", "-c", "while :; do certbot renew --quiet; sleep 12h & wait $${!}; done" ]
+    entrypoint: /bin/sh -c
+    command: 'while :; do certbot renew --quiet; sleep 12h & wait $${!}; done'
