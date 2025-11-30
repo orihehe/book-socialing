@@ -8,7 +8,6 @@ import jakarta.persistence.EntityNotFoundException
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import kotlin.jvm.optionals.getOrNull
 
 // TODO: move logics to Note entity
 @Service
@@ -20,7 +19,7 @@ class NoteJoinService(
 
     @Transactional
     fun joinRequest(userId: Long, noteId: Long) {
-        val note = noteRepository.findById(noteId).getOrNull()
+        val note = noteRepository.findByIdAndDeletedFalse(noteId)
             ?: throw EntityNotFoundException("Note $noteId doesn't exist")
 
         noteParticipantRepository.findByNoteIdAndUserId(noteId, userId)?.let {
@@ -46,7 +45,7 @@ class NoteJoinService(
 
     @Transactional
     fun approve(userId: Long, noteId: Long, approvedUserId: Long) {
-        val note = noteRepository.findById(noteId).getOrNull()
+        val note = noteRepository.findByIdAndDeletedFalse(noteId)
             ?: throw EntityNotFoundException("Note $noteId doesn't exist")
 
         if (!note.isHost(userId)) {
@@ -68,7 +67,7 @@ class NoteJoinService(
 
     @Transactional
     fun reject(userId: Long, noteId: Long, rejectedUserId: Long) {
-        val note = noteRepository.findById(noteId).getOrNull()
+        val note = noteRepository.findByIdAndDeletedFalse(noteId)
             ?: throw EntityNotFoundException("Note $noteId doesn't exist")
 
         if (!note.isHost(userId)) {
@@ -83,7 +82,7 @@ class NoteJoinService(
 
     @Transactional
     fun kick(userId: Long, noteId: Long, kickedUserId: Long) {
-        val note = noteRepository.findById(noteId).getOrNull()
+        val note = noteRepository.findByIdAndDeletedFalse(noteId)
             ?: throw EntityNotFoundException("Note $noteId doesn't exist")
 
         if (!note.isHost(userId)) {

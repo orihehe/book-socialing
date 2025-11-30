@@ -6,34 +6,33 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
-import java.util.Optional
 
 interface ClubRepository : JpaRepository<Club, Long> {
 
-    fun findById(clubId: Long?): Optional<Club>
+    fun findByIdAndDeletedFalse(clubId: Long?): Club?
 
-    @Query("SELECT count(DISTINCT c.id) FROM Club c JOIN c.participants p WHERE p.userId = :userId AND p.status = 'JOINED'")
+    @Query("SELECT count(DISTINCT c.id) FROM Club c JOIN c.participants p WHERE c.deleted = false AND p.userId = :userId AND p.status = 'JOINED'")
     fun countJoinedClubByUserId(userId: Long): Long
 
-    @Query("SELECT c FROM Club c JOIN c.participants p WHERE p.userId = :userId AND p.status = 'JOINED'")
+    @Query("SELECT c FROM Club c JOIN c.participants p WHERE c.deleted = false AND p.userId = :userId AND p.status = 'JOINED'")
     fun findJoinedClubByUserId(
         @Param("userId") userId: Long,
         @Param("pageable") pageable: Pageable
     ): List<Club>
 
-    @Query("SELECT count(DISTINCT c.id) FROM Club c JOIN c.participants p WHERE p.userId = :userId AND p.status = 'JOINED' AND p.role = 'HOST'")
+    @Query("SELECT count(DISTINCT c.id) FROM Club c JOIN c.participants p WHERE c.deleted = false AND p.userId = :userId AND p.status = 'JOINED' AND p.role = 'HOST'")
     fun countCreatedClubsByUserId(userId: Long): Long
 
-    @Query("SELECT c FROM Club c JOIN c.participants p WHERE p.userId = :userId AND p.status = 'JOINED' AND p.role = 'HOST'")
+    @Query("SELECT c FROM Club c JOIN c.participants p WHERE c.deleted = false AND p.userId = :userId AND p.status = 'JOINED' AND p.role = 'HOST'")
     fun findCreatedClubsByUserId(
         @Param("userId") userId: Long,
         @Param("pageable") pageable: Pageable
     ): List<Club>
 
-    @Query("SELECT count(DISTINCT c.id) FROM Club c JOIN c.participants p WHERE p.userId = :userId AND p.status = 'PENDING_APPROVAL'")
+    @Query("SELECT count(DISTINCT c.id) FROM Club c JOIN c.participants p WHERE c.deleted = false AND p.userId = :userId AND p.status = 'PENDING_APPROVAL'")
     fun countPendingClubsByUserId(userId: Long): Long
 
-    @Query("SELECT c FROM Club c JOIN c.participants p WHERE p.userId = :userId AND p.status = 'PENDING_APPROVAL'")
+    @Query("SELECT c FROM Club c JOIN c.participants p WHERE c.deleted = false AND p.userId = :userId AND p.status = 'PENDING_APPROVAL'")
     fun findPendingClubsByUserId(
         @Param("userId") userId: Long,
         @Param("pageable") pageable: Pageable
@@ -51,7 +50,8 @@ interface ClubRepository : JpaRepository<Club, Long> {
     @Query(
         """
         SELECT COUNT(DISTINCT c.id) FROM Club c 
-        WHERE (c.clubName LIKE %:keyword% OR c.description LIKE %:keyword% OR :keyword IS NULL)
+        WHERE (c.clubName LIKE %:keyword% OR c.description LIKE %:keyword%) OR (:keyword IS NULL)
+        AND c.deleted = false
     """
     )
     fun countSearchClubByClubName(

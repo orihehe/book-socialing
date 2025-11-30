@@ -1,6 +1,7 @@
 package com.side.book.socialing.domain.note.service
 
 import com.side.book.socialing.domain.club.service.ClubService
+import com.side.book.socialing.domain.note.enum.ParticipantStatus
 import com.side.book.socialing.domain.note.repository.NoteParticipantRepository
 import com.side.book.socialing.domain.note.repository.NoteRepository
 import com.side.book.socialing.domain.user.service.UserService
@@ -20,7 +21,7 @@ class NoteHostService(
 
     @Transactional(readOnly = true)
     fun getGuests(userId: Long, noteId: Long): List<NoteGuestResponse> {
-        val note = noteRepository.findById(noteId).orElseThrow { throw EntityNotFoundException("Note $noteId not found") }
+        val note = noteRepository.findByIdAndDeletedFalse(noteId) ?: throw EntityNotFoundException("Note $noteId not found")
 
         if (!note.isHost(userId)) {
             throw PermissionDeniedException("User is not the host of the note")
@@ -28,7 +29,7 @@ class NoteHostService(
 
         val noteParticipants = noteParticipantRepository.findAllByNoteId(noteId)
 
-        val club = note.club ?: return noteParticipants.filter { !it.isHost() }.map {
+        val club = note.club ?: return noteParticipants.filter { !it.isHost() && it.status == ParticipantStatus.JOINED }.map {
             val user = userService.getUser(it.userId)
                 ?: throw EntityNotFoundException("User $userId not found")
             NoteGuestResponse(
