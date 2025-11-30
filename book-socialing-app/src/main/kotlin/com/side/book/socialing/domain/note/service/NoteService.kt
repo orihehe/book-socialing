@@ -631,7 +631,7 @@ class NoteService(
             // 유효하지 않은 dateType일 경우 예외 발생
             throw IllegalArgumentException("Invalid dateType parameter. Must be 'START' or 'END'.")
         }
-        
+
         val notes = noteRepository.findParticipatedNotesByUserId(userId, dateType, startDate, endDate)
 
         val groupedByDate = notes.groupBy { note ->

@@ -261,7 +261,7 @@ class ClubService(
     @Transactional
     fun deleteClub(clubId: Long, userId: Long) {
         val club = clubRepository.findByIdAndDeletedFalse(clubId)
-            ?: throw EntityNotFoundException("Club with ID ${clubId} not found")
+            ?: throw EntityNotFoundException("Club with ID $clubId not found")
 
         club.delete(userId)
         club.participants.forEach { it.delete() }
