@@ -45,8 +45,7 @@ export default function EditNote() {
         formData.append('images', file, file.name)
       })
 
-      const response = await apiFetch(`/v1/note/${id}`, { method: 'PUT', body: formData })
-      return true
+      await apiFetch(`/v1/note/${id}`, { method: 'PUT', body: formData })
     },
     onSuccess: () => {
       toast.success('수정되었습니다.', { position: 'top-center' })
