@@ -10,7 +10,6 @@ import com.side.book.socialing.presentation.club.ClubMemberResponse
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import kotlin.jvm.optionals.getOrNull
 
 @Service
 class ClubJoinService(
@@ -21,7 +20,7 @@ class ClubJoinService(
 
     @Transactional
     fun joinRequest(userId: Long, clubId: Long) {
-        val club = clubRepository.findById(clubId).getOrNull()
+        val club = clubRepository.findByIdAndDeletedFalse(clubId)
             ?: throw EntityNotFoundException("Club $clubId doesn't exist")
 
         clubParticipantRepository.findByClubIdAndUserId(clubId, userId)?.let {
@@ -49,7 +48,7 @@ class ClubJoinService(
 
     @Transactional
     fun approve(userId: Long, clubId: Long, approvedUserId: Long) {
-        val club = clubRepository.findById(clubId).getOrNull()
+        val club = clubRepository.findByIdAndDeletedFalse(clubId)
             ?: throw EntityNotFoundException("Club $clubId doesn't exist")
 
         if (!club.isHost(userId)) {
@@ -64,7 +63,7 @@ class ClubJoinService(
 
     @Transactional
     fun reject(userId: Long, clubId: Long, rejectedUserId: Long) {
-        val club = clubRepository.findById(clubId).getOrNull()
+        val club = clubRepository.findByIdAndDeletedFalse(clubId)
             ?: throw EntityNotFoundException("Club $clubId doesn't exist")
 
         if (!club.isHost(userId)) {
@@ -79,7 +78,7 @@ class ClubJoinService(
 
     @Transactional
     fun kick(userId: Long, clubId: Long, kickedUserId: Long) {
-        val club = clubRepository.findById(clubId).getOrNull()
+        val club = clubRepository.findByIdAndDeletedFalse(clubId)
             ?: throw EntityNotFoundException("Club $clubId doesn't exist")
 
         if (!club.isHost(userId)) {
@@ -98,7 +97,7 @@ class ClubJoinService(
 
     @Transactional(readOnly = true)
     fun getClubMembers(clubId: Long): List<ClubMemberResponse> {
-        clubRepository.findById(clubId).getOrNull()
+        clubRepository.findByIdAndDeletedFalse(clubId)
             ?: throw EntityNotFoundException("Club $clubId doesn't exist")
 
         val participantMap = clubParticipantRepository.findAllByClubIdAndStatus(clubId, ParticipantStatus.JOINED)

@@ -254,14 +254,14 @@ class ClubService(
             clubName = club.clubName,
             clubImageUrls = club.files.map { it.filePath },
             description = club.description ?: "",
-            memberCount = club.participants.size
+            memberCount = club.participants.count { it.status == ParticipantStatus.JOINED }
         )
     }
 
     @Transactional
     fun deleteClub(clubId: Long, userId: Long) {
-        val club = clubRepository.findById(clubId)
-            .orElseThrow { EntityNotFoundException("Club with ID $clubId not found") }
+        val club = clubRepository.findByIdAndDeletedFalse(clubId)
+            ?: throw EntityNotFoundException("Club with ID $clubId not found")
 
         club.delete(userId)
         club.participants.forEach { it.delete() }
@@ -278,8 +278,8 @@ class ClubService(
      */
     @Transactional
     fun updateClub(cmd: UpdateClubCommand) {
-        val club = clubRepository.findById(cmd.clubId)
-            .orElseThrow { EntityNotFoundException("Club with ID ${cmd.clubId} not found") }
+        val club = clubRepository.findByIdAndDeletedFalse(cmd.clubId)
+            ?: throw EntityNotFoundException("Club with ID ${cmd.clubId} not found")
 
         club.update(cmd)
 
