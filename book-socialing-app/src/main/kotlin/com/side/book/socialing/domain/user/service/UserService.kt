@@ -7,6 +7,7 @@ import com.side.book.socialing.domain.user.repository.UserRepository
 import com.side.book.socialing.global.file.FileUploader
 import com.side.book.socialing.global.file.StoredFile
 import com.side.book.socialing.global.utils.log
+import com.side.book.socialing.infrastructure.oauth.OAuthClientManager
 import com.side.book.socialing.presentation.user.dto.UserResponse
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.beans.factory.annotation.Value
@@ -19,6 +20,7 @@ import java.nio.file.Paths
 @Service
 class UserService(
     private val userRepository: UserRepository,
+    private val oAuthClientManager: OAuthClientManager,
     private val fileUploader: FileUploader,
     private val eventPublisher: ApplicationEventPublisher,
     @Value("\${file.user-dir}") private val filePath: String
@@ -95,9 +97,16 @@ class UserService(
     }
 
     @Transactional
-    fun withdrawUser(userId: Long) {
+    suspend fun withdrawUser(userId: Long) {
         val user = userRepository.findByIdOrNull(userId)
             ?: throw EntityNotFoundException("User with ID $userId not found")
+
+        try {
+            oAuthClientManager.unlink(user.provider, user.providerId)
+        } catch (e: Exception) {
+            log.error("Failed to process unlink for user: $userId", e)
+            throw IllegalStateException("Failed to withdraw user due to unlink failure.", e)
+        }
 
         user.withdraw()
         eventPublisher.publishEvent(UserWithdrawnEvent(userId))
