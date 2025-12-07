@@ -180,7 +180,7 @@ class ClubController(
     @PutMapping("/{clubId}", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     @Operation(
         summary = "클럽 수정",
-        description = "클럽 ID를 통해 특정 클럽을 수정합니다. 호스트만 수정할 수 있습니다"
+        description = "클럽 ID를 통해 특정 클럽을 수정합니다. 호스트만 수정할 수 있습니다."
     )
     @ApiResponses(
         value = [
