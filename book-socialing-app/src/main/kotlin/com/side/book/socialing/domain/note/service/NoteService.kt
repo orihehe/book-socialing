@@ -605,7 +605,10 @@ class NoteService(
     }
 
     fun getUsers(noteId: Long): List<UserDto> {
-        val participants = noteParticipantRepository.findAllByNoteId(noteId)
+        val participants = noteParticipantRepository.findAllByNoteIdAndStatusIn(
+            noteId,
+            setOf(ParticipantStatus.JOINED)
+        )
         return participants.mapNotNull { userService.getUser(it.userId) }
     }
 
