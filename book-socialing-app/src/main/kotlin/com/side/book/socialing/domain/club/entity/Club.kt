@@ -4,7 +4,6 @@ import com.side.book.socialing.domain.club.command.CreateClubCommand
 import com.side.book.socialing.domain.club.command.UpdateClubCommand
 import com.side.book.socialing.domain.common.BaseEntity
 import com.side.book.socialing.domain.note.entity.ClubReview
-import com.side.book.socialing.domain.note.entity.NoteFile
 import com.side.book.socialing.global.error.exception.ForbiddenException
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -36,7 +35,7 @@ class Club(
 
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "club")
-    var files: MutableList<NoteFile> = ArrayList(),
+    var files: MutableList<ClubFile> = ArrayList(),
 
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "club")
