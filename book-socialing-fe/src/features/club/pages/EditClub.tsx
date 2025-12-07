@@ -81,13 +81,17 @@ export default function EditClub() {
 
   const updateMutation = useMutation({
     mutationFn: async (clubData: CreateClubCommand) => {
-      const res = await apiFetch(`/v1/club/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(clubData),
+      const { images, ...request } = clubData
+      const formData = new FormData()
+      const requestBlob = new Blob([JSON.stringify(request)], { type: 'application/json' })
+
+      formData.append('request', requestBlob)
+      images.forEach(file => {
+        formData.append('images', file, file.name)
       })
+
+      const res = await apiFetch(`/v1/club/${id}`, { method: 'PUT', body: formData })
+
       return res.json()
     },
     onSuccess: () => {
