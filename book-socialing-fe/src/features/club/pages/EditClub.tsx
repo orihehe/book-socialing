@@ -92,7 +92,7 @@ export default function EditClub() {
 
       const res = await apiFetch(`/v1/club/${id}`, { method: 'PUT', body: formData })
 
-      return res.json()
+      return res.ok
     },
     onSuccess: () => {
       toast.success('클럽 정보가 수정되었습니다.')
