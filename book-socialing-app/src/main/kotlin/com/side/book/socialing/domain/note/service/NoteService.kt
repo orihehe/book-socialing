@@ -630,12 +630,6 @@ class NoteService(
             throw IllegalArgumentException("Invalid dateType parameter. Must be 'START' or 'END'.")
         }
 
-        // dateType 유효성 검사
-        if (!StringUtils.equals(dateType, "START") && !StringUtils.equals(dateType, "END")) {
-            // 유효하지 않은 dateType일 경우 예외 발생
-            throw IllegalArgumentException("Invalid dateType parameter. Must be 'START' or 'END'.")
-        }
-
         val notes = noteRepository.findParticipatedNotesByUserId(userId, dateType, startDate, endDate)
 
         val groupedByDate = notes.groupBy { note ->
