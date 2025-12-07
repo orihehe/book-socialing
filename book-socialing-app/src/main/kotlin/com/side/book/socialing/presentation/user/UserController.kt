@@ -111,9 +111,9 @@ class UserController(
         ]
     )
     @DeleteMapping
-    fun deleteUser(): ResponseEntity<Void> {
+    fun withdrawUser(): ResponseEntity<Void> {
         val userId = userPrincipalResolver.getUserId()
-        userService.deleteUser(userId)
+        userService.withdrawUser(userId)
         return ResponseEntity.ok().build()
     }
 }

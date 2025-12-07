@@ -11,6 +11,7 @@ import com.side.book.socialing.presentation.user.dto.UserResponse
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationEventPublisher
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.nio.file.Paths
@@ -23,14 +24,14 @@ class UserService(
     @Value("\${file.user-dir}") private val filePath: String
 ) {
     fun getUserMap(userIds: Set<Long>): Map<Long, UserDto> {
-        val users = userRepository.findByIdInAndDeletedFalse(userIds)
+        val users = userRepository.findAllById(userIds)
         return users.map {
             UserDto.from(it)
         }.associateBy { it.id }
     }
 
     fun getUser(userId: Long): UserDto? {
-        val user = userRepository.findByIdAndDeletedFalse(userId)
+        val user = userRepository.findByIdOrNull(userId)
         if (user == null) {
             log.info("No user found. userId: $userId")
             return null
@@ -46,7 +47,7 @@ class UserService(
      */
     @Transactional(readOnly = true) // 읽기 전용 트랜잭션
     fun getUserProfileResponse(userId: Long): UserResponse? {
-        val user = userRepository.findByIdAndDeletedFalse(userId)
+        val user = userRepository.findByIdOrNull(userId)
         if (user == null) {
             log.info("No user found. userId: $userId")
             return null
@@ -70,7 +71,7 @@ class UserService(
      */
     @Transactional // 읽기 전용 트랜잭션
     fun updateUser(cmd: UpdateUserCommand) {
-        val user = userRepository.findByIdAndDeletedFalse(cmd.userId)
+        val user = userRepository.findByIdOrNull(cmd.userId)
             ?: throw EntityNotFoundException("User with ID ${cmd.userId} not found")
 
         user.update(cmd)
@@ -94,11 +95,11 @@ class UserService(
     }
 
     @Transactional
-    fun deleteUser(userId: Long) {
-        val user = userRepository.findByIdAndDeletedFalse(userId)
+    fun withdrawUser(userId: Long) {
+        val user = userRepository.findByIdOrNull(userId)
             ?: throw EntityNotFoundException("User with ID $userId not found")
 
-        user.delete()
+        user.withdraw()
         eventPublisher.publishEvent(UserWithdrawnEvent(userId))
     }
 }
