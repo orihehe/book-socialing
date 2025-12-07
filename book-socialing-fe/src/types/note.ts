@@ -21,7 +21,7 @@ export interface Club {
 }
 
 export interface ClubNotesGroup {
-  clubId: number
+  id: number
   clubName: string
   notes: Note[]
 }

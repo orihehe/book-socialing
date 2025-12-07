@@ -9,7 +9,7 @@ export function CreatedNote({ notes, ...club }: ClubNotesGroup) {
   const navigate = useNavigate()
   return (
     <div>
-      {club.clubId && <div>{club.clubName}</div>}
+      {club.id && <div>{club.clubName}</div>}
       {notes.map(note => (
         <DefaultNote key={note.id} {...note}>
           <BaseButton className="flex-shrink-0" onClick={() => navigate(`/note/${note.id}/edit`)}>

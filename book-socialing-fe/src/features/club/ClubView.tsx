@@ -1,8 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
-import { ArrowUpRightIcon } from 'lucide-react'
+import { ArrowUp, ArrowUpRightIcon, Plus } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 
-import { BottomButton } from '@/components/common/BottomButton'
 import { Button } from '@/components/ui/button'
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty'
 import { apiFetch } from '@/lib/api'
@@ -80,7 +79,23 @@ export default function ClubView() {
         </div>
       )}
 
-      <BottomButton onClick={() => navigate('/club/create')} children="클럽 생성하러가기" />
+      <div className="fixed bottom-13 right-2 flex flex-col gap-1">
+        <Button
+          className="rounded-full w-13 h-13 shadow-lg opacity-80"
+          size="icon"
+          onClick={() => navigate('/club/create')}
+        >
+          <Plus />
+        </Button>
+        <Button
+          variant="secondary"
+          className="rounded-full w-13 h-13 shadow-lg opacity-80"
+          size="icon"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        >
+          <ArrowUp />
+        </Button>
+      </div>
     </MainLayout>
   )
 }

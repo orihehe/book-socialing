@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { ChevronLeft, Search } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { useWebSocket } from '@/hooks/useWebSocket'
@@ -36,6 +36,10 @@ export default function ChatPage() {
     },
     enabled: !!noteId,
   })
+
+  const isNoteEnded = useMemo(() => {
+    return noteData?.endAt ? !dayjs().isBefore(noteData.endAt, 'day') : false
+  }, [noteData?.endAt])
 
   // JWT 토큰을 localStorage에서 가져오기
   const token = localStorage.getItem('accessToken') || localStorage.getItem('token') || ''
@@ -172,7 +176,7 @@ export default function ChatPage() {
       </main>
 
       <footer className="p-2">
-        <ChatInput onSendMessage={handleSendMessage} disabled={!isConnected} />
+        <ChatInput onSendMessage={handleSendMessage} disabled={!isConnected || isNoteEnded} />
         {!isConnected && (
           <div className="text-center text-sm text-gray-500 px-4">
             {isConnecting ? '연결 중...' : '연결되지 않음'}

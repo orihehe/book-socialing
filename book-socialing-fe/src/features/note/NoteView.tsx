@@ -1,4 +1,4 @@
-import { ArrowUp, Pencil } from 'lucide-react'
+import { ArrowUp, Plus } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
@@ -37,17 +37,17 @@ export default function NoteView() {
           {activeChildIndex === 2 && <RevisedNotes />}
         </div>
       </MainLayout>
-      <div className="fixed bottom-10 right-2 flex flex-col gap-1">
+      <div className="fixed bottom-13 right-2 flex flex-col gap-1">
         <Button
-          className="rounded-full w-10 h-10 shadow-lg opacity-80"
+          className="rounded-full w-13 h-13 shadow-lg opacity-80"
           size="icon"
           onClick={() => navigate('/note/create')}
         >
-          <Pencil />
+          <Plus />
         </Button>
         <Button
           variant="secondary"
-          className="rounded-full w-10 h-10 shadow-lg opacity-80"
+          className="rounded-full w-13 h-13 shadow-lg opacity-80"
           size="icon"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         >

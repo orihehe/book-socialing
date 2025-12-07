@@ -20,7 +20,7 @@ export default function NoteSelector() {
       const result = await res.json()
 
       // undefined 대신 기본값 반환
-      return (result?.groups?.[1] || { clubId: 0, clubName: '', notes: [] }) as ClubNotesGroup
+      return (result?.groups?.[1] || { id: 0, clubName: '', notes: [] }) as ClubNotesGroup
     },
     enabled: !!id,
   })

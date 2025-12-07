@@ -53,7 +53,7 @@ export function SuggestedNotes() {
     <BaseCard
       title={
         <div className="flex items-center justify-between">
-          <span>{`추천 노트 (${suggestedNotes.totalCount})`}</span>
+          <span>추천 노트</span>
           <Button
             variant="ghost"
             size="icon"
