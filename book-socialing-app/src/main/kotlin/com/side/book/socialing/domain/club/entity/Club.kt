@@ -61,6 +61,10 @@ class Club(
         deleted = true
     }
 
+    fun systemDelete() {
+        deleted = true
+    }
+
     fun isHost(userId: Long): Boolean {
         return this.participants.any { it.userId == userId && it.isHost() }
     }

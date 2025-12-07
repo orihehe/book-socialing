@@ -59,7 +59,7 @@ class User(
         }
     }
 
-    fun delete(userId: Long) {
+    fun delete() {
         deleted = true
     }
 
