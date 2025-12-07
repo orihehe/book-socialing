@@ -28,7 +28,7 @@ export default function NoteSelector() {
   return (
     <div className="mb-10">
       <div className="space-y-2 my-7">
-        <Label className="text-base font-bold">클럽 내역</Label>
+        <Label className="text-base font-bold">클럽 내 노트</Label>
         {noteQuery.data?.notes && noteQuery.data.notes.length > 0 ? (
           <div
             className="overflow-x-auto mt-2"
@@ -55,11 +55,11 @@ export default function NoteSelector() {
           </div>
         )}
       </div>
-
       {selectedNote && (
-        <div>
+        <div className="cursor-pointer" onClick={() => navigate(`/note/${selectedNote.id}`)}>
           <h2 className="text-2xl font-bold mb-2 text-center w-full">{selectedNote.bookName}</h2>
-          <div className="flex gap-4 bg-white rounded-xl border-none w-100">
+
+          <div className="flex gap-4 bg-white rounded-xl border-none w-100 p-4 hover:bg-gray-50 transition">
             {/* 책 표지 */}
             <div className="w-[140px] h-[220px] bg-gray-100 rounded-md overflow-hidden flex-shrink-0">
               {selectedNote.bookImageUrl ? (
@@ -82,7 +82,6 @@ export default function NoteSelector() {
                 </div>
               </div>
 
-              {/* 책 설명 */}
               <div>
                 <p>책정보</p>
                 <div className="text-sm text-gray-700 leading-snug line-clamp-5">

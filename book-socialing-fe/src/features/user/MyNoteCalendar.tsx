@@ -7,10 +7,11 @@ import { useNavigate } from 'react-router-dom'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { apiFetch } from '@/lib/api'
 import { Note } from '@/types/note'
+import { getImageUrl } from '@/util'
 
 export default function NoteScheduleCalendar() {
   const navigate = useNavigate()
-  const [month, setMonth] = React.useState(dayjs('2025-07-01'))
+  const [month, setMonth] = React.useState(dayjs().startOf('month'))
   const [open, setOpen] = useState(false)
   const [selectedNotes, setSelectedNotes] = useState<Note[]>([])
   const [dateType] = useState<'START' | 'END'>('END')
@@ -54,7 +55,7 @@ export default function NoteScheduleCalendar() {
         <h2 className="text-lg font-bold text-gray-900">노트 일정 관리</h2>
       </header>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
+        <DialogContent className="bg-white w-[80%] max-w-[80%] p-6 rounded-xl">
           <DialogHeader>
             <DialogTitle>노트 선택</DialogTitle>
           </DialogHeader>
@@ -69,7 +70,10 @@ export default function NoteScheduleCalendar() {
                   navigate(`/note/${note.id}`)
                 }}
               >
-                <img src={note.bookImageUrl} className="w-10 h-14 object-cover rounded-sm" />
+                <img
+                  src={getImageUrl(note.bookImageUrl)}
+                  className="w-10 h-14 object-cover rounded-sm"
+                />
                 <div className="text-sm font-medium truncate">{note.bookName || '제목 없음'}</div>
               </button>
             ))}
@@ -128,7 +132,7 @@ export default function NoteScheduleCalendar() {
                     {notes.slice(0, 3).map((n, i) => (
                       <img
                         key={n.id}
-                        src={n.bookImageUrl}
+                        src={getImageUrl(n.bookImageUrl)}
                         alt=""
                         className="absolute w-full h-full object-cover rounded-md"
                         style={{

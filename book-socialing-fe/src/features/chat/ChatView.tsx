@@ -4,6 +4,7 @@ import { ChevronLeft, Search } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
+import { useUser } from '@/hooks/useUser'
 import { useWebSocket } from '@/hooks/useWebSocket'
 import { apiFetch } from '@/lib/api'
 import { ChatMessageResponse, MessageType } from '@/types/chat'
@@ -26,6 +27,7 @@ export default function ChatPage() {
   const navigate = useNavigate()
   const { id: noteId } = useParams<{ id: string }>()
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const { user } = useUser()
 
   // 노트 데이터 가져오기
   const { data: noteData } = useQuery({
@@ -168,6 +170,7 @@ export default function ChatPage() {
             key={message.messageId}
             onUserClick={handleUserClick}
             user={userMap.get(message.userId)}
+            isMine={message.userId === user?.id}
             {...message}
           />
         ))}
@@ -176,7 +179,7 @@ export default function ChatPage() {
       </main>
 
       <footer className="p-2">
-        <ChatInput onSendMessage={handleSendMessage} disabled={!isConnected || isNoteEnded} />
+        {!isNoteEnded && <ChatInput onSendMessage={handleSendMessage} disabled={!isConnected} />}
         {!isConnected && (
           <div className="text-center text-sm text-gray-500 px-4">
             {isConnecting ? '연결 중...' : '연결되지 않음'}
