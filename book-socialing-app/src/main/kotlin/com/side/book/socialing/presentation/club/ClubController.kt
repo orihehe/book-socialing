@@ -9,7 +9,6 @@ import com.side.book.socialing.presentation.club.dto.ClubPageResponse
 import com.side.book.socialing.presentation.club.dto.CommonClubResponse
 import com.side.book.socialing.presentation.club.dto.CreateClubRequest
 import com.side.book.socialing.presentation.club.dto.SearchClubResponse
-import com.side.book.socialing.presentation.club.dto.SingleClubResponse
 import com.side.book.socialing.presentation.club.dto.UpdateClubRequest
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -68,7 +67,7 @@ class ClubController(
         ]
     )
     @GetMapping("/{clubId}")
-    fun getClubById(@PathVariable clubId: Long): ResponseEntity<SingleClubResponse> {
+    fun getClubById(@PathVariable clubId: Long): ResponseEntity<CommonClubResponse> {
         val club = clubService.getClubById(clubId)
         return ResponseEntity.ok(club)
     }
@@ -190,8 +189,7 @@ class ClubController(
     fun updateClub(
         @PathVariable clubId: Long,
         @RequestPart("request") request: UpdateClubRequest,
-        @RequestPart("images", required = false) imageFiles: List<MultipartFile>?,
-        @RequestPart("deletedImageIds", required = false) deletedFileIds: List<Long>?
+        @RequestPart("images") imageFiles: List<MultipartFile>
     ): ResponseEntity<Void> {
         val userId = userPrincipalResolver.getUserId()
         val command = UpdateClubCommand(
@@ -199,8 +197,7 @@ class ClubController(
             userId = userId,
             clubName = request.clubName,
             description = request.description,
-            imageFiles = imageFiles ?: emptyList(),
-            deletedFileIds = deletedFileIds ?: emptyList()
+            imageFiles = imageFiles
         )
 
         clubService.updateClub(command)

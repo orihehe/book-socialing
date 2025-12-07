@@ -35,7 +35,7 @@ class Club(
 
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "club")
-    var files: MutableList<ClubFile> = ArrayList(),
+    var files: List<ClubFile> = listOf(),
 
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "club")
