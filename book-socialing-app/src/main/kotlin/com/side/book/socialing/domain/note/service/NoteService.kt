@@ -22,7 +22,6 @@ import com.side.book.socialing.presentation.note.dto.ClubNotesPageResponse
 import com.side.book.socialing.presentation.note.dto.CommonNoteResponse
 import com.side.book.socialing.presentation.note.dto.DateNotesGroupResponse
 import com.side.book.socialing.presentation.note.dto.GetNoteResponse
-import com.side.book.socialing.presentation.note.dto.NoteImageDto
 import com.side.book.socialing.presentation.note.dto.NotesPageResponse
 import com.side.book.socialing.presentation.note.dto.OpenNoteResponse
 import com.side.book.socialing.presentation.note.dto.ParticipantInfoResponse
@@ -473,11 +472,8 @@ class NoteService(
                 )
             }
 
-        val noteImages = note.files.filter { !it.deleted }.map {
-            NoteImageDto(
-                fileId = it.id!!,    // ID 포함
-                filePath = it.filePath // 경로(URL) 포함
-            )
+        val noteImageUrls = note.files.filter { !it.deleted }.map {
+            it.filePath
         }
 
         return GetNoteResponse(
@@ -487,7 +483,7 @@ class NoteService(
             bookName = note.bookName,
             bookAuthor = note.bookAuthor,
             description = note.description,
-            images = noteImages,
+            imageUrls = noteImageUrls,
             participants = participants,
             startAt = note.startAt,
             endAt = note.endAt
@@ -525,20 +521,12 @@ class NoteService(
 
         note.update(cmd)
 
-        // 파일 논리 삭제
-        val filesToDeletePath = mutableListOf<String>()
-        if (cmd.deletedFileIds.isNotEmpty()) {
-            val targetsToDelete = note.files.filter { cmd.deletedFileIds.contains(it.id) }
-
-            targetsToDelete.forEach { noteFile ->
-                filesToDeletePath.add(noteFile.filePath) // 경로만 저장
-                noteFile.delete() // DB: 삭제 처리 (Soft Delete)
-                note.files.remove(noteFile) // 객체: 리스트에서 제거
-            }
+        val noteFilePath = Paths.get(filePath, note.id!!.toString()).toString()
+        note.files.forEach {
+            it.delete()
         }
 
         // 신규 파일 저장
-        val noteFilePath = Paths.get(filePath, note.id!!.toString()).toString()
         val uploadedFiles = mutableListOf<StoredFile>()
         try {
             for (file in cmd.imageFiles) {
@@ -559,11 +547,6 @@ class NoteService(
                 fileUploader.delete(file.filePath)
             }
             throw e
-        }
-
-        // 파일 물리 삭제
-        filesToDeletePath.forEach { path ->
-            fileUploader.delete(path)
         }
     }
 

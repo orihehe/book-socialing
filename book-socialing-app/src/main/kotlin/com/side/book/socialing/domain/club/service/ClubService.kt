@@ -14,11 +14,9 @@ import com.side.book.socialing.domain.club.repository.ClubRepository
 import com.side.book.socialing.global.error.exception.ForbiddenException
 import com.side.book.socialing.global.file.FileUploader
 import com.side.book.socialing.global.file.StoredFile
-import com.side.book.socialing.presentation.club.dto.ClubImageDto
 import com.side.book.socialing.presentation.club.dto.ClubPageResponse
 import com.side.book.socialing.presentation.club.dto.CommonClubResponse
 import com.side.book.socialing.presentation.club.dto.SearchClubResponse
-import com.side.book.socialing.presentation.club.dto.SingleClubResponse
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.PageRequest
@@ -248,18 +246,15 @@ class ClubService(
     }
 
     @Transactional(readOnly = true)
-    fun getClubById(clubId: Long): SingleClubResponse {
+    fun getClubById(clubId: Long): CommonClubResponse {
         val club = clubRepository.findById(clubId)
             .orElseThrow { EntityNotFoundException("Club not found with ID: $clubId") }
 
-        return SingleClubResponse(
+        return CommonClubResponse(
             id = club.id!!,
             clubName = club.clubName,
-            clubImages = club.files.filter { !it.deleted }.map {
-                ClubImageDto(
-                    fileId = it.id!!,    // ID 포함
-                    filePath = it.filePath // 경로(URL) 포함
-                )
+            clubImageUrls = club.files.filter { !it.deleted }.map {
+                it.filePath
             },
             description = club.description ?: "",
             memberCount = club.participants.count { it.status == ParticipantStatus.JOINED }
@@ -291,19 +286,10 @@ class ClubService(
 
         club.update(cmd)
 
-        // 파일 논리 삭제
-        val filesToDeletePath = mutableListOf<String>()
-        if (cmd.deletedFileIds.isNotEmpty()) {
-            val targetsToDelete = club.files.filter { cmd.deletedFileIds.contains(it.id) }
-
-            targetsToDelete.forEach { clubFile ->
-                filesToDeletePath.add(clubFile.filePath) // 경로만 저장
-                clubFile.delete() // DB: 삭제 처리 (Soft Delete)
-                club.files.remove(clubFile) // 객체: 리스트에서 제거
-            }
-        }
-
         val clubFilePath = Paths.get(filePath, club.id!!.toString()).toString()
+        club.files.forEach {
+            it.delete()
+        }
 
         val uploadedFiles = mutableListOf<StoredFile>()
         try {
@@ -325,11 +311,6 @@ class ClubService(
                 fileUploader.delete(file.filePath)
             }
             throw e
-        }
-
-        // 파일 물리 삭제
-        filesToDeletePath.forEach { path ->
-            fileUploader.delete(path)
         }
     }
 

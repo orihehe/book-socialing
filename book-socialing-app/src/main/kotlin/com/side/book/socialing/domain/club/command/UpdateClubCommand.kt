@@ -8,8 +8,7 @@ data class UpdateClubCommand(
     val userId: Long,
     val clubName: String,
     val description: String?,
-    val imageFiles: List<MultipartFile> = emptyList(),
-    val deletedFileIds: List<Long> = emptyList()
+    val imageFiles: List<MultipartFile>
 ) {
     init {
         if (imageFiles.size !in 1..3) {

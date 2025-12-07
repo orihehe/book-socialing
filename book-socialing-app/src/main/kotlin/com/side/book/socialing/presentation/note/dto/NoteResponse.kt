@@ -95,12 +95,6 @@ data class OpenNoteResponse(
     val endAt: LocalDateTime
 )
 
-@Schema(description = "개별 노트 이미지 DTO")
-data class NoteImageDto(
-    val fileId: Long,
-    val filePath: String
-)
-
 @Schema(description = "개별 노트 조회 DTO")
 data class GetNoteResponse(
     @field:Schema(description = "노트 ID", example = "27")
@@ -121,8 +115,8 @@ data class GetNoteResponse(
     @field:Schema(description = "노트 소개", example = "이것이 자바다 다음으로 볼 책", nullable = true)
     val description: String?,
 
-    @field:ArraySchema(arraySchema = Schema(description = "이미지 목록"), schema = Schema(example = "{fileId: 1, filePath: '/note/27/cover1.png'"))
-    val images: List<NoteImageDto>,
+    @field:ArraySchema(arraySchema = Schema(description = "이미지 url"), schema = Schema(example = "/note/27/cover1.png"))
+    val imageUrls: List<String>,
 
     @field:ArraySchema(schema = Schema(implementation = ParticipantInfoResponse::class))
     @field:Schema(description = "참여자 목록")
