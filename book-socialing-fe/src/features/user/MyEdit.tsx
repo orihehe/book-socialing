@@ -24,11 +24,7 @@ import { apiFetch } from '@/lib/api'
 import { getImageUrl } from '@/util'
 
 const profileSchema = z.object({
-  profileImage: z
-    .array(z.instanceof(File))
-    .min(0)
-    .max(1, '최대 1장까지만 등록할 수 있어요')
-    .optional(),
+  image: z.array(z.instanceof(File)).min(0).max(1, '최대 1장까지만 등록할 수 있어요').optional(),
   email: z.string().email('올바른 이메일을 입력해 주세요'),
   nickname: z
     .string()
@@ -47,7 +43,7 @@ export default function MyEdit() {
 
   const form = useForm<ProfileFormData>({
     defaultValues: {
-      profileImage: [],
+      image: [],
       email: '',
       nickname: '',
       bio: '',
@@ -86,7 +82,7 @@ export default function MyEdit() {
         }
 
         reset({
-          profileImage: profileImageFile,
+          image: profileImageFile,
           email: user.email,
           nickname: user.nickname,
           bio: user.description || '',
@@ -102,8 +98,8 @@ export default function MyEdit() {
       const formData = new FormData()
 
       // 새 이미지가 있으면 추가
-      if (data.profileImage?.[0]) {
-        formData.append('profileImage', data.profileImage[0])
+      if (data.image?.[0]) {
+        formData.append('image', data.image[0])
       }
 
       formData.append('nickname', data.nickname)
