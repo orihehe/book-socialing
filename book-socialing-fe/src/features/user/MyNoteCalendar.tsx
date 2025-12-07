@@ -1,26 +1,44 @@
+import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import * as React from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { apiFetch } from '@/lib/api'
 import { Note } from '@/types/note'
-
-const mockNotes: Partial<Note>[] = [
-  { id: 1, endAt: '2025-07-12', bookImageUrl: '/covers/book1.jpg' },
-  { id: 2, endAt: '2025-07-25', bookImageUrl: '/covers/book2.jpg' },
-]
 
 export default function NoteScheduleCalendar() {
   const navigate = useNavigate()
   const [month, setMonth] = React.useState(dayjs('2025-07-01'))
+  const [open, setOpen] = useState(false)
+  const [selectedNotes, setSelectedNotes] = useState<Note[]>([])
+  const [dateType] = useState<'START' | 'END'>('END')
 
-  const notesByDate = React.useMemo(() => {
-    const map: Record<string, Partial<Note>> = {}
-    mockNotes.forEach(note => {
-      map[dayjs(note.endAt).format('YYYY-MM-DD')] = note
-    })
-    return map
-  }, [])
+  const startDate = month.format('YYYY-MM-DD')
+  const endDate = month.endOf('month').format('YYYY-MM-DD')
+
+  const { data: notesByDate } = useQuery({
+    queryKey: ['myNotes', dateType, startDate, endDate],
+    queryFn: async () => {
+      const params = new URLSearchParams({
+        dateType,
+        startDate,
+        endDate,
+      })
+
+      const res = await apiFetch(`/v1/note/participated?${params.toString()}`)
+
+      const map: Record<string, Note[]> = {}
+      const dateNotes: { date: string; notes: Note[] }[] = await res.json()
+
+      dateNotes.forEach(({ date, notes }) => {
+        map[date] = notes
+      })
+
+      return map
+    },
+  })
 
   const daysInMonth = month.daysInMonth()
   const firstDayOfWeek = month.startOf('month').day()
@@ -35,6 +53,29 @@ export default function NoteScheduleCalendar() {
       <header className="w-full flex items-center justify-between mb-4">
         <h2 className="text-lg font-bold text-gray-900">노트 일정 관리</h2>
       </header>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>노트 선택</DialogTitle>
+          </DialogHeader>
+
+          <div className="flex flex-col gap-2 mt-2">
+            {selectedNotes.map(note => (
+              <button
+                key={note.id}
+                className="flex items-center gap-3 p-2 rounded-md border hover:bg-gray-100"
+                onClick={() => {
+                  setOpen(false)
+                  navigate(`/note/${note.id}`)
+                }}
+              >
+                <img src={note.bookImageUrl} className="w-10 h-14 object-cover rounded-sm" />
+                <div className="text-sm font-medium truncate">{note.bookName || '제목 없음'}</div>
+              </button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* 월 네비게이션 */}
       <div className="flex items-center justify-between w-full my-4">
@@ -65,24 +106,44 @@ export default function NoteScheduleCalendar() {
         {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(day => {
           const currentDate = month.date(day)
           const dateKey = currentDate.format('YYYY-MM-DD')
-          const { id, bookImageUrl } = notesByDate[dateKey] ?? {}
+          const notes = notesByDate?.[dateKey] ?? []
 
           return (
             <button
               key={day}
-              className={`flex flex-col items-center gap-1${id ? ' cursor-pointer' : ''}`}
-              disabled={!id}
+              className={`flex flex-col items-center gap-1${notes.length > 0 ? ' cursor-pointer' : ''}`}
+              disabled={!dateKey}
               onClick={() => {
-                if (id) navigate(`/note/${id}`)
+                if (notes.length === 1) {
+                  navigate(`/note/${notes[0].id}`)
+                } else if (notes.length > 1) {
+                  setSelectedNotes(notes)
+                  setOpen(true)
+                }
               }}
             >
               <div className="relative w-12 h-18 rounded-md overflow-hidden">
-                {bookImageUrl ? (
-                  <img
-                    src={bookImageUrl}
-                    alt=""
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
+                {notes.length > 0 ? (
+                  <div className="relative w-full h-full">
+                    {notes.slice(0, 3).map((n, i) => (
+                      <img
+                        key={n.id}
+                        src={n.bookImageUrl}
+                        alt=""
+                        className="absolute w-full h-full object-cover rounded-md"
+                        style={{
+                          transform: `translate(${i * 3}px, ${i * 3}px)`,
+                          zIndex: i,
+                        }}
+                      />
+                    ))}
+
+                    {notes.length > 3 && (
+                      <div className="absolute bottom-0 right-0 bg-black/50 text-white text-[9px] px-1 rounded">
+                        +{notes.length - 3}
+                      </div>
+                    )}
+                  </div>
                 ) : (
                   <div className="absolute inset-0 bg-gray-200" />
                 )}

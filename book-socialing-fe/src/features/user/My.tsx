@@ -1,7 +1,9 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 import { BaseCard } from '@/components/common/BaseCard'
+import { BottomButton } from '@/components/common/BottomButton'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -12,6 +14,7 @@ import MyCalendar from './MyNoteCalendar'
 export default function My() {
   const { user, isLoading, hasToken } = useUser()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const profileUrl = ''
 
   useEffect(() => {
@@ -82,6 +85,15 @@ export default function My() {
       </BaseCard>
 
       <MyCalendar />
+
+      <BottomButton
+        onClick={() => {
+          localStorage.removeItem('accessToken')
+          queryClient.removeQueries({ queryKey: ['user', 'me'] })
+        }}
+      >
+        로그아웃
+      </BottomButton>
     </>
   )
 }

@@ -81,6 +81,10 @@ class Note(
         deleted = true
     }
 
+    fun systemDelete() {
+        deleted = true
+    }
+
     fun update(cmd: UpdateNoteCommand) {
         if (!isHost(cmd.userId)) {
             throw ForbiddenException("User ${cmd.userId} is not the host of note $id.")

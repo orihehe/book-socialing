@@ -1,4 +1,3 @@
-import { useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
@@ -7,20 +6,19 @@ import { useUser } from '@/hooks/useUser'
 
 export default function KakaoCallback() {
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
   const params = new URLSearchParams(window.location.search)
   const accessToken = params.get('accessToken')
   // 유저 정보 가져오기
-  const { user, isError } = useUser()
+  const { user, isError, refetch } = useUser()
 
   // accessToken 저장 및 user 쿼리 활성화
   useEffect(() => {
     if (accessToken) {
       localStorage.setItem('accessToken', accessToken)
       // 토큰 저장 후 user 쿼리를 즉시 활성화
-      queryClient.invalidateQueries({ queryKey: ['user', 'me'] })
+      refetch()
     }
-  }, [accessToken, queryClient])
+  }, [accessToken, refetch])
 
   // 유저 정보 로드 성공 시 홈으로 이동
   useEffect(() => {
