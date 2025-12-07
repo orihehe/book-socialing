@@ -99,6 +99,7 @@ interface NoteRepository : JpaRepository<Note, Long> {
         FROM Note n 
         LEFT JOIN n.participants p WITH p.userId = :userId
         WHERE p.userId = :userId 
+        AND p.status = 'JOINED'
         AND n.deleted = false
         AND (
             (:dateType = 'START' AND (:startDate IS NULL OR n.startAt >= :startDate)) OR
