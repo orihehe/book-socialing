@@ -14,9 +14,11 @@ import com.side.book.socialing.domain.club.repository.ClubRepository
 import com.side.book.socialing.global.error.exception.ForbiddenException
 import com.side.book.socialing.global.file.FileUploader
 import com.side.book.socialing.global.file.StoredFile
+import com.side.book.socialing.presentation.club.dto.ClubImageDto
 import com.side.book.socialing.presentation.club.dto.ClubPageResponse
 import com.side.book.socialing.presentation.club.dto.CommonClubResponse
 import com.side.book.socialing.presentation.club.dto.SearchClubResponse
+import com.side.book.socialing.presentation.club.dto.SingleClubResponse
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.PageRequest
@@ -246,14 +248,19 @@ class ClubService(
     }
 
     @Transactional(readOnly = true)
-    fun getClubById(clubId: Long): CommonClubResponse {
+    fun getClubById(clubId: Long): SingleClubResponse {
         val club = clubRepository.findById(clubId)
             .orElseThrow { EntityNotFoundException("Club not found with ID: $clubId") }
 
-        return CommonClubResponse(
+        return SingleClubResponse(
             id = club.id!!,
             clubName = club.clubName,
-            clubImageUrls = club.files.filter { !it.deleted }.map { it.filePath },
+            clubImages = club.files.filter { !it.deleted }.map {
+                ClubImageDto(
+                    fileId = it.id!!,    // ID 포함
+                    filePath = it.filePath // 경로(URL) 포함
+                )
+            },
             description = club.description ?: "",
             memberCount = club.participants.count { it.status == ParticipantStatus.JOINED }
         )

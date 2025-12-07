@@ -12,7 +12,7 @@ data class UpdateNoteCommand(
     val description: String,
     val startAt: LocalDateTime,
     val endAt: LocalDateTime,
-    val imageFiles: List<MultipartFile>,
+    val imageFiles: List<MultipartFile> = emptyList(),
     val deletedFileIds: List<Long> = emptyList()
 ) {
     init {

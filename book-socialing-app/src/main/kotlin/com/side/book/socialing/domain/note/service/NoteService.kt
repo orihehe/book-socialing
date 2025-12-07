@@ -22,6 +22,7 @@ import com.side.book.socialing.presentation.note.dto.ClubNotesPageResponse
 import com.side.book.socialing.presentation.note.dto.CommonNoteResponse
 import com.side.book.socialing.presentation.note.dto.DateNotesGroupResponse
 import com.side.book.socialing.presentation.note.dto.GetNoteResponse
+import com.side.book.socialing.presentation.note.dto.NoteImageDto
 import com.side.book.socialing.presentation.note.dto.NotesPageResponse
 import com.side.book.socialing.presentation.note.dto.OpenNoteResponse
 import com.side.book.socialing.presentation.note.dto.ParticipantInfoResponse
@@ -472,13 +473,12 @@ class NoteService(
                 )
             }
 
-        // 이미지 URL 목록 정제
-        val imageUrls: List<String> = note.files
-            .filter { !it.deleted } // 1. 삭제 안 된 파일만 골라내기
-            .map { it.filePath } // 2. 경로(String)로 변환
-            .ifEmpty { // 3. 다 거르고 났는데 비어있다면? (혹은 애초에 없었다면)
-                listOf("/images/default_book_image.jpg") // 기본 이미지 반환
-            }
+        val noteImages = note.files.filter { !it.deleted }.map {
+            NoteImageDto(
+                fileId = it.id!!,    // ID 포함
+                filePath = it.filePath // 경로(URL) 포함
+            )
+        }
 
         return GetNoteResponse(
             id = note.id!!,
@@ -487,7 +487,7 @@ class NoteService(
             bookName = note.bookName,
             bookAuthor = note.bookAuthor,
             description = note.description,
-            imageUrls = imageUrls,
+            images = noteImages,
             participants = participants,
             startAt = note.startAt,
             endAt = note.endAt
