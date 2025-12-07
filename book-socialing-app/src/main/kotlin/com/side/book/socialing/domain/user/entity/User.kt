@@ -5,6 +5,8 @@ import com.side.book.socialing.domain.user.command.CreateUserCommand
 import com.side.book.socialing.domain.user.command.UpdateUserCommand
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
@@ -14,7 +16,7 @@ import org.hibernate.annotations.SQLRestriction
 
 @Entity
 @Table(name = "users", uniqueConstraints = [UniqueConstraint(columnNames = ["provider", "provider_id"])])
-@SQLRestriction("deleted = false")
+@SQLRestriction("status = 'ACTIVE'")
 class User(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,10 +26,10 @@ class User(
     val provider: String,
 
     @Column(name = "provider_id", nullable = false)
-    val providerId: String,
+    var providerId: String,
 
-    @Column(nullable = false)
-    val email: String,
+    @Column(nullable = true)
+    var email: String?,
 
     @Column(nullable = false)
     var nickname: String,
@@ -41,13 +43,13 @@ class User(
     @Column(name = "profile_image_url", length = 500)
     var profileImageUrl: String? = null,
 
-    @Column(name = "deleted", nullable = false)
-    var deleted: Boolean = false
-
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    var status: UserStatus = UserStatus.ACTIVE
 ) : BaseEntity() {
 
     companion object {
-        fun create(cmd: CreateUserCommand, id: Long? = null): User {
+        fun create(cmd: CreateUserCommand): User {
             return User(
                 provider = cmd.provider,
                 providerId = cmd.providerId,
@@ -59,8 +61,12 @@ class User(
         }
     }
 
-    fun delete() {
-        deleted = true
+    fun withdraw() {
+        this.status = UserStatus.WITHDRAWN
+        this.nickname = "탈퇴한 사용자"
+        this.email = null
+        this.profileImageUrl = null // or a default image
+        this.providerId = "${this.providerId}_${System.currentTimeMillis()}"
     }
 
     fun update(cmd: UpdateUserCommand) {
