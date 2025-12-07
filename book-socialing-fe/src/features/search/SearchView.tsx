@@ -71,12 +71,7 @@ export default function SearchView() {
     setSearchValue(value)
   }
 
-  const totalCount =
-    (searchTarget === 'all'
-      ? (clubSearchData?.totalCount || 0) + (noteSearchData?.totalCount || 0)
-      : searchTarget === 'club'
-        ? clubSearchData?.totalCount || 0
-        : noteSearchData?.totalCount || 0) || 0
+  const totalCount = (clubSearchData?.totalCount || 0) + (noteSearchData?.totalCount || 0)
 
   const showClubSection = searchTarget === 'all' || searchTarget === 'club'
   const showNoteSection = searchTarget === 'all' || searchTarget === 'note'
@@ -147,7 +142,9 @@ export default function SearchView() {
       ) : (
         <div className="px-6 pt-4 pb-6">
           {/* Total Count */}
-          <div className="mb-4 text-sm text-gray-700">{totalCount}개</div>
+          {searchTarget === 'all' && (
+            <div className="mb-4 text-sm text-gray-700">{totalCount}개</div>
+          )}
 
           {/* Club Section */}
           {showClubSection && (
