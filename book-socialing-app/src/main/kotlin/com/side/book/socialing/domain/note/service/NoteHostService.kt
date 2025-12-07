@@ -27,9 +27,12 @@ class NoteHostService(
             throw PermissionDeniedException("User is not the host of the note")
         }
 
-        val noteParticipants = noteParticipantRepository.findAllByNoteId(noteId)
+        val noteParticipants = noteParticipantRepository.findAllByNoteIdAndStatusIn(
+            noteId,
+            setOf(ParticipantStatus.PENDING_APPROVAL)
+        )
 
-        val club = note.club ?: return noteParticipants.filter { !it.isHost() && it.status == ParticipantStatus.JOINED }.map {
+        val club = note.club ?: return noteParticipants.filter { !it.isHost() }.map {
             val user = userService.getUser(it.userId)
                 ?: throw EntityNotFoundException("User $userId not found")
             NoteGuestResponse(

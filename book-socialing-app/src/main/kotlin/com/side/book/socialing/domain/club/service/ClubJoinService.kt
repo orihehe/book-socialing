@@ -100,8 +100,11 @@ class ClubJoinService(
         clubRepository.findByIdAndDeletedFalse(clubId)
             ?: throw EntityNotFoundException("Club $clubId doesn't exist")
 
-        val participantMap = clubParticipantRepository.findAllByClubIdAndStatus(clubId, ParticipantStatus.JOINED)
-            .associateBy { it.userId }
+        val participantMap = clubParticipantRepository.findAllByClubIdAndStatusIn(
+            clubId,
+            setOf(ParticipantStatus.JOINED, ParticipantStatus.PENDING_APPROVAL)
+        ).associateBy { it.userId }
+
         if (participantMap.isEmpty()) {
             throw EntityNotFoundException("No participants found for club $clubId")
         }

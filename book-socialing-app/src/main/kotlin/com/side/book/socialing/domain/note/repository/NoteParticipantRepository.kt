@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface NoteParticipantRepository : JpaRepository<NoteParticipant, Long> {
     fun findByNoteIdAndUserId(noteId: Long, userId: Long): NoteParticipant?
-    fun findAllByNoteId(noteId: Long): List<NoteParticipant>
+    fun findAllByNoteIdAndStatusIn(noteId: Long, statuses: Set<ParticipantStatus>): List<NoteParticipant>
+    fun findAllByUserId(userId: Long): List<NoteParticipant>
     fun existsByNoteIdAndUserIdAndStatus(noteId: Long, userId: Long, status: ParticipantStatus): Boolean
 }
