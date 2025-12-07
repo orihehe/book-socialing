@@ -153,7 +153,7 @@ export default function MyEdit() {
             {/* Profile Image */}
             <div>
               <h2 className="text-lg font-bold mb-3">프로필 사진</h2>
-              <ImageUploadField name="profileImage" max={1} />
+              <ImageUploadField name="image" max={1} />
             </div>
 
             {/* Email (Read-only) */}

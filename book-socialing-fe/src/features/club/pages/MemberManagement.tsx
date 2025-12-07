@@ -50,7 +50,7 @@ export default function MemberManagement() {
 
   const approveMutation = useMutation({
     mutationFn: async ({ clubId, userId }: { clubId: string; userId: number }) => {
-      await apiFetch(`/v1/club/${clubId}/members/${userId}/approve`, {
+      await apiFetch(`/v1/club/${clubId}/participants/${userId}/approve`, {
         method: 'PATCH',
       })
     },
@@ -59,7 +59,7 @@ export default function MemberManagement() {
 
   const rejectMutation = useMutation({
     mutationFn: async ({ clubId, userId }: { clubId: string; userId: number }) => {
-      await apiFetch(`/v1/club/${clubId}/members/${userId}/reject`, {
+      await apiFetch(`/v1/club/${clubId}/participants/${userId}/reject`, {
         method: 'PATCH',
       })
     },
@@ -68,7 +68,7 @@ export default function MemberManagement() {
 
   const kickMutation = useMutation({
     mutationFn: async ({ clubId, userId }: { clubId: string; userId: number }) => {
-      await apiFetch(`/v1/club/${clubId}/members/${userId}`, {
+      await apiFetch(`/v1/club/${clubId}/participants/${userId}`, {
         method: 'DELETE',
       })
     },

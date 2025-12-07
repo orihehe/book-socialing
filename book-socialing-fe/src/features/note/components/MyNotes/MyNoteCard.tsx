@@ -27,7 +27,7 @@ export function CreatedNote({ notes, ...club }: ClubNotesGroup) {
 export function AppliedNote({ notes, ...club }: ClubNotesGroup) {
   return (
     <div className="">
-      <div>{club.clubName}</div>
+      {club.clubName && <div>{club.clubName}</div>}
       {notes.map(note => (
         <DefaultNote key={note.id} {...note}>
           <BaseButton className="flex-shrink-0">신청취소</BaseButton>
