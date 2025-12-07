@@ -189,7 +189,8 @@ class ClubController(
     fun updateClub(
         @PathVariable clubId: Long,
         @RequestPart("request") request: UpdateClubRequest,
-        @RequestPart("images") imageFiles: List<MultipartFile>
+        @RequestPart("images") imageFiles: List<MultipartFile>,
+        @RequestPart("deletedImageIds") deletedFileIds: List<Long>
     ): ResponseEntity<Void> {
         val userId = userPrincipalResolver.getUserId()
         val command = UpdateClubCommand(
@@ -197,7 +198,8 @@ class ClubController(
             userId = userId,
             clubName = request.clubName,
             description = request.description,
-            imageFiles = imageFiles
+            imageFiles = imageFiles,
+            deletedFileIds = deletedFileIds
         )
 
         clubService.updateClub(command)

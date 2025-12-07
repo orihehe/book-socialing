@@ -525,11 +525,20 @@ class NoteService(
 
         note.update(cmd)
 
-        val noteFilePath = Paths.get(filePath, note.id!!.toString()).toString()
-        note.files.forEach {
-            it.delete()
+        // 파일 논리 삭제
+        val filesToDeletePath = mutableListOf<String>()
+        if (cmd.deletedFileIds.isNotEmpty()) {
+            val targetsToDelete = note.files.filter { cmd.deletedFileIds.contains(it.id) }
+
+            targetsToDelete.forEach { noteFile ->
+                filesToDeletePath.add(noteFile.filePath) // 경로만 저장
+                noteFile.delete() // DB: 삭제 처리 (Soft Delete)
+                note.files.remove(noteFile) // 객체: 리스트에서 제거
+            }
         }
 
+        // 신규 파일 저장
+        val noteFilePath = Paths.get(filePath, note.id!!.toString()).toString()
         val uploadedFiles = mutableListOf<StoredFile>()
         try {
             for (file in cmd.imageFiles) {
@@ -550,6 +559,11 @@ class NoteService(
                 fileUploader.delete(file.filePath)
             }
             throw e
+        }
+
+        // 파일 물리 삭제
+        filesToDeletePath.forEach { path ->
+            fileUploader.delete(path)
         }
     }
 

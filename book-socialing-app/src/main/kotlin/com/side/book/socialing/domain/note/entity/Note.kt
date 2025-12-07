@@ -55,7 +55,7 @@ class Note(
 
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "note")
-    var files: List<NoteFile> = listOf()
+    var files: MutableList<NoteFile> = ArrayList()
 ) : BaseEntity() {
     companion object {
         fun create(cmd: CreateNoteCommand, club: Club?): Note {
