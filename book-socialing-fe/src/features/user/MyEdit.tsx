@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
 import { ChevronLeft } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm, FormProvider } from 'react-hook-form'
@@ -22,7 +23,6 @@ import { TextareaField } from '@/features/shared/components/form/TextareaField'
 import { useUser } from '@/hooks/useUser'
 import { apiFetch } from '@/lib/api'
 import { getImageUrl } from '@/util'
-
 const profileSchema = z.object({
   image: z.array(z.instanceof(File)).min(0).max(1, '최대 1장까지만 등록할 수 있어요').optional(),
   email: z.string().email('올바른 이메일을 입력해 주세요'),
@@ -31,13 +31,14 @@ const profileSchema = z.object({
     .min(2, '2-8자 이하')
     .max(8, '2-8자 이하')
     .regex(/^[a-zA-Z0-9가-힣]+$/, '공백불가'),
-  bio: z.string().max(30, '30자 이하로 입력해 주세요').optional(),
+  description: z.string().max(30, '30자 이하로 입력해 주세요').optional(),
 })
 
 export type ProfileFormData = z.infer<typeof profileSchema>
 
 export default function MyEdit() {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const { user, isLoading } = useUser()
   const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false)
 
@@ -46,7 +47,7 @@ export default function MyEdit() {
       image: [],
       email: '',
       nickname: '',
-      bio: '',
+      description: '',
     },
     resolver: zodResolver(profileSchema),
     mode: 'onChange',
@@ -59,7 +60,7 @@ export default function MyEdit() {
     formState: { errors, touchedFields },
   } = form
 
-  const bioValue = watch('bio') || ''
+  const descriptionValue = watch('description') || ''
   const nicknameValue = watch('nickname') || ''
 
   // 유저 정보 로드 시 form에 설정
@@ -85,7 +86,7 @@ export default function MyEdit() {
           image: profileImageFile,
           email: user.email,
           nickname: user.nickname,
-          bio: user.description || '',
+          description: user.description || '',
         })
       }
     }
@@ -102,11 +103,14 @@ export default function MyEdit() {
         formData.append('image', data.image[0])
       }
 
-      formData.append('nickname', data.nickname)
-
-      if (data.bio) {
-        formData.append('bio', data.bio)
-      }
+      formData.append(
+        'request',
+        JSON.stringify({
+          userId: user?.id,
+          nickname: data.nickname,
+          description: data.description,
+        })
+      )
 
       await apiFetch('/v1/user/me', { method: 'PUT', body: formData })
       toast.success('프로필이 수정되었습니다.')
@@ -120,6 +124,7 @@ export default function MyEdit() {
     try {
       await apiFetch('/v1/user', { method: 'DELETE' })
       localStorage.removeItem('accessToken')
+      queryClient.removeQueries({ queryKey: ['user', 'me'] })
       toast.success('회원 탈퇴가 완료되었습니다.')
       navigate('/sign-in')
     } catch {
@@ -211,7 +216,9 @@ export default function MyEdit() {
             <div>
               <h2 className="text-lg font-bold mb-2">소개</h2>
               <TextareaField name="bio" label="" placeholder="자기소개를 입력하세요" />
-              <div className="text-right text-xs text-gray-400 mt-1">{bioValue.length}/30 자</div>
+              <div className="text-right text-xs text-gray-400 mt-1">
+                {descriptionValue.length}/30 자
+              </div>
             </div>
           </div>
 
