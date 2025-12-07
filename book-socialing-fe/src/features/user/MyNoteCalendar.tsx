@@ -70,7 +70,10 @@ export default function NoteScheduleCalendar() {
                   navigate(`/note/${note.id}`)
                 }}
               >
-                <img src={note.bookImageUrl} className="w-10 h-14 object-cover rounded-sm" />
+                <img
+                  src={getImageUrl(note.bookImageUrl)}
+                  className="w-10 h-14 object-cover rounded-sm"
+                />
                 <div className="text-sm font-medium truncate">{note.bookName || '제목 없음'}</div>
               </button>
             ))}
