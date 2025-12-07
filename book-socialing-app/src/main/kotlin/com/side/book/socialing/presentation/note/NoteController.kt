@@ -268,8 +268,8 @@ class NoteController(
     fun updateNote(
         @PathVariable noteId: Long,
         @RequestPart("request") request: UpdateNoteRequest,
-        @RequestPart("images") imageFiles: List<MultipartFile>,
-        @RequestPart("deletedImageIds") deletedFileIds: List<Long>
+        @RequestPart("images", required = false) imageFiles: List<MultipartFile>,
+        @RequestPart("deletedImageIds", required = false) deletedFileIds: List<Long>
     ): ResponseEntity<Void> {
         val userId = userPrincipalResolver.getUserId()
         val command = UpdateNoteCommand(
