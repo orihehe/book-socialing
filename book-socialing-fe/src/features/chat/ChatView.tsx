@@ -176,7 +176,7 @@ export default function ChatPage() {
       </main>
 
       <footer className="p-2">
-        <ChatInput onSendMessage={handleSendMessage} disabled={!isConnected || isNoteEnded} />
+        {!isNoteEnded && <ChatInput onSendMessage={handleSendMessage} disabled={!isConnected} />}
         {!isConnected && (
           <div className="text-center text-sm text-gray-500 px-4">
             {isConnecting ? '연결 중...' : '연결되지 않음'}
