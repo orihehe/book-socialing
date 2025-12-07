@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
 import { ChevronLeft } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm, FormProvider } from 'react-hook-form'
@@ -22,7 +23,6 @@ import { TextareaField } from '@/features/shared/components/form/TextareaField'
 import { useUser } from '@/hooks/useUser'
 import { apiFetch } from '@/lib/api'
 import { getImageUrl } from '@/util'
-
 const profileSchema = z.object({
   image: z.array(z.instanceof(File)).min(0).max(1, '최대 1장까지만 등록할 수 있어요').optional(),
   email: z.string().email('올바른 이메일을 입력해 주세요'),
@@ -38,6 +38,7 @@ export type ProfileFormData = z.infer<typeof profileSchema>
 
 export default function MyEdit() {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const { user, isLoading } = useUser()
   const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false)
 
@@ -123,6 +124,7 @@ export default function MyEdit() {
     try {
       await apiFetch('/v1/user', { method: 'DELETE' })
       localStorage.removeItem('accessToken')
+      queryClient.removeQueries({ queryKey: ['user', 'me'] })
       toast.success('회원 탈퇴가 완료되었습니다.')
       navigate('/sign-in')
     } catch {
