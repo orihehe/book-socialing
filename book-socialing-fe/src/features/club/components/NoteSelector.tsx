@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import { Label } from '@/components/ui/label'
 import { apiFetch } from '@/lib/api'
@@ -11,6 +11,7 @@ import { getImageUrl } from '@/util'
 export default function NoteSelector() {
   const { id } = useParams<{ id: string }>()
   const [selectedNote, setSelectedNote] = useState<Note>()
+  const navigate = useNavigate()
 
   const noteQuery = useQuery({
     queryKey: ['club', id, 'notes'],
