@@ -22,30 +22,27 @@ export function MyNotes() {
           return response.json()
         },
       },
-      // {
-      //   queryKey: ['pendingNotes'],
-      //   queryFn: async (): Promise<ClubNotesPageResponse> => {
-      //     const response = await apiFetch('/v1/note/pending', {
-      //       method: 'GET',
-      //       headers: {
-      //         'Content-Type': 'application/json',
-      //       },
-      //     })
+      {
+        queryKey: ['pendingNotes'],
+        queryFn: async (): Promise<ClubNotesPageResponse> => {
+          const response = await apiFetch('/v1/note/pending', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          })
 
-      //     if (!response.ok) {
-      //       throw new Error('Failed to fetch pending notes')
-      //     }
+          if (!response.ok) {
+            throw new Error('Failed to fetch pending notes')
+          }
 
-      //     return response.json()
-      //   },
-      // },
+          return response.json()
+        },
+      },
     ],
   })
 
-  const pendingResult = { data: { groups: [], totalCount: 0 }, error: false, isLoading: false }
-
-  // const [createdResult, pendingResult] = results
-  const [createdResult] = results
+  const [createdResult, pendingResult] = results
   const isLoading = createdResult.isLoading || pendingResult.isLoading
 
   if (isLoading) return <LoadingPage className="h-30" />

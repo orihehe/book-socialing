@@ -22,6 +22,7 @@ export function useUser() {
     user: query.data,
     isLoading: query.isLoading,
     isError: query.isError,
+    refetch: query.refetch,
     hasToken,
   }
 }

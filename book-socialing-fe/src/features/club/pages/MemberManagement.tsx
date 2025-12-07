@@ -114,7 +114,7 @@ export default function MemberManagement() {
         {/* Pending Section */}
         <section className="rounded-2xl bg-[#FBFBFB]">
           <h2 className="text-mx font-bold px-4 pt-4">신청멤버</h2>
-          {pendingUsers.length > 0 ? (
+          {pendingUsers?.length > 0 ? (
             <div className="mt-2 px-2 pb-4 space-y-3">
               {pendingUsers.map(user => (
                 <MemberListItem
@@ -150,7 +150,7 @@ export default function MemberManagement() {
         {/* Approved Section */}
         <section className="rounded-2xl bg-[#FBFBFB] mt-8">
           <h2 className="text-mx font-bold px-4 pt-4">참가멤버</h2>
-          {sortedApprovedUsers.length > 0 ? (
+          {sortedApprovedUsers?.length > 0 ? (
             <div className="mt-2 px-2 pb-4 space-y-3">
               {sortedApprovedUsers.map(user => (
                 <MemberListItem
