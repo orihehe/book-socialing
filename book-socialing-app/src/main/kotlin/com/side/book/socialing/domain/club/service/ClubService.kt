@@ -24,6 +24,7 @@ import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.nio.file.Paths
+import kotlin.collections.contains
 
 @Service
 class ClubService(
@@ -283,10 +284,19 @@ class ClubService(
 
         club.update(cmd)
 
-        val clubFilePath = Paths.get(filePath, club.id!!.toString()).toString()
-        club.files.forEach {
-            it.delete()
+        // 파일 논리 삭제
+        val filesToDeletePath = mutableListOf<String>()
+        if (cmd.deletedFileIds.isNotEmpty()) {
+            val targetsToDelete = club.files.filter { cmd.deletedFileIds.contains(it.id) }
+
+            targetsToDelete.forEach { clubFile ->
+                filesToDeletePath.add(clubFile.filePath) // 경로만 저장
+                clubFile.delete() // DB: 삭제 처리 (Soft Delete)
+                club.files.remove(clubFile) // 객체: 리스트에서 제거
+            }
         }
+
+        val clubFilePath = Paths.get(filePath, club.id!!.toString()).toString()
 
         val uploadedFiles = mutableListOf<StoredFile>()
         try {
@@ -308,6 +318,11 @@ class ClubService(
                 fileUploader.delete(file.filePath)
             }
             throw e
+        }
+
+        // 파일 물리 삭제
+        filesToDeletePath.forEach { path ->
+            fileUploader.delete(path)
         }
     }
 
