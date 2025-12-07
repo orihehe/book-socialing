@@ -55,7 +55,7 @@ export default function NoteScheduleCalendar() {
         <h2 className="text-lg font-bold text-gray-900">노트 일정 관리</h2>
       </header>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
+        <DialogContent className="bg-white w-[80%] max-w-[80%] p-6 rounded-xl">
           <DialogHeader>
             <DialogTitle>노트 선택</DialogTitle>
           </DialogHeader>
