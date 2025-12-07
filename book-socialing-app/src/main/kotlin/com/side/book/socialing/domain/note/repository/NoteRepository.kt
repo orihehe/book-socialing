@@ -97,7 +97,7 @@ interface NoteRepository : JpaRepository<Note, Long> {
         SELECT 
             n
         FROM Note n 
-        LEFT JOIN n.participants p WITH p.userId = :userId
+        JOIN n.participants p WITH p.userId = :userId
         WHERE p.userId = :userId 
         AND p.status = 'JOINED'
         AND n.deleted = false
