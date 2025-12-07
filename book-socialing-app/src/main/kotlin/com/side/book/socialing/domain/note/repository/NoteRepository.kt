@@ -31,7 +31,7 @@ interface NoteRepository : JpaRepository<Note, Long> {
         @Param("pageable") pageable: Pageable
     ): List<Note>
 
-    @Query("SELECT count(DISTINCT n.id) FROM Note n JOIN n.participants p WHERE p.userId = :userId AND p.status = 'PENDING_APPROVAL' AND n.deleted = false")
+    @Query("SELECT count(DISTINCT n.id) FROM Note n JOIN n.participants p WHERE p.userId = :userId AND p.status = 'PENDING_APPROVAL' AND n.endAt > NOW() AND n.deleted = false")
     fun countPendingNotesByUserId(userId: Long, currentDateTime: LocalDateTime): Long
 
     @Query("SELECT n FROM Note n JOIN n.participants p WHERE p.userId = :userId AND p.status = 'PENDING_APPROVAL' AND n.endAt > :currentDateTime AND n.deleted = false ORDER BY p.createdAt")
