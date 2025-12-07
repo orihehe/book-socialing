@@ -35,7 +35,7 @@ export function ToggleNotes({ title, result, NoteComponent }: MyNotesProps) {
             >
               <div className="flex flex-col gap-2 mt-2">
                 {groups.map(group => (
-                  <NoteComponent key={group.clubId} {...group} />
+                  <NoteComponent key={group.id} {...group} />
                 ))}
               </div>
             </motion.div>
