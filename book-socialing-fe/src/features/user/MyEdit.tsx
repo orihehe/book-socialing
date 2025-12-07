@@ -112,7 +112,7 @@ export default function MyEdit() {
         formData.append('bio', data.bio)
       }
 
-      await apiFetch('/v1/user/profile', { method: 'PUT', body: formData })
+      await apiFetch('/v1/user/me', { method: 'PUT', body: formData })
       toast.success('프로필이 수정되었습니다.')
       navigate('/my')
     } catch {

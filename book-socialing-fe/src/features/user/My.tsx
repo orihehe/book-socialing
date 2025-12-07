@@ -70,7 +70,9 @@ export default function My() {
               </div>
               <div className="flex items-start">
                 <span className="w-16 font-medium text-gray-500">소개</span>
-                <span className="text-gray-800 whitespace-pre-line">
+                <span
+                  className={`text-gray-800 whitespace-pre-line ${user.description ? '' : 'text-gray-400'}`}
+                >
                   {user.description ?? '나를 소개하는 글을 써보세요!'}
                 </span>
               </div>

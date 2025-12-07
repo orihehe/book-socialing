@@ -17,7 +17,7 @@ import { InputField } from '@/features/shared/components/form/InputField'
 import { SelectField } from '@/features/shared/components/form/SelectField'
 import { TextareaField } from '@/features/shared/components/form/TextareaField'
 import { apiFetch } from '@/lib/api'
-import type { Club, Note } from '@/types/note'
+import type { ClubNotesPageResponse, Note } from '@/types/note'
 
 const noteSchema = z.object({
   bookName: z
@@ -54,7 +54,7 @@ export function NoteForm({ mode, note, onSubmit }: Props) {
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
 
-  const { data: clubs } = useQuery<Club[], Error>({
+  const { data: clubNotesGroups } = useQuery<ClubNotesPageResponse, Error>({
     queryKey: ['clubs', 'created'],
     queryFn: async () => {
       const res = await apiFetch('/v1/club/created')
@@ -123,13 +123,13 @@ export function NoteForm({ mode, note, onSubmit }: Props) {
             <InputField name="bookAuthor" label="작가이름" placeholder="작가이름" />
 
             {/* Club Selection */}
-            {!!clubs?.length && (
+            {!!clubNotesGroups?.groups?.length && (
               <SelectField
                 name="clubId"
                 label="클럽"
                 options={[
                   { value: undefined, label: '미선택' },
-                  ...clubs.map(club => ({
+                  ...clubNotesGroups.groups.map(club => ({
                     value: club.id.toString(),
                     label: club.clubName,
                   })),
