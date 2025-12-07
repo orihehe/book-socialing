@@ -7,10 +7,11 @@ import { useNavigate } from 'react-router-dom'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { apiFetch } from '@/lib/api'
 import { Note } from '@/types/note'
+import { getImageUrl } from '@/util'
 
 export default function NoteScheduleCalendar() {
   const navigate = useNavigate()
-  const [month, setMonth] = React.useState(dayjs('2025-07-01'))
+  const [month, setMonth] = React.useState(dayjs().startOf('month'))
   const [open, setOpen] = useState(false)
   const [selectedNotes, setSelectedNotes] = useState<Note[]>([])
   const [dateType] = useState<'START' | 'END'>('END')
@@ -128,7 +129,7 @@ export default function NoteScheduleCalendar() {
                     {notes.slice(0, 3).map((n, i) => (
                       <img
                         key={n.id}
-                        src={n.bookImageUrl}
+                        src={getImageUrl(n.bookImageUrl)}
                         alt=""
                         className="absolute w-full h-full object-cover rounded-md"
                         style={{
