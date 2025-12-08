@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ChevronLeft } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm, FormProvider } from 'react-hook-form'
@@ -94,31 +94,29 @@ export default function MyEdit() {
     loadUserData()
   }, [user, reset])
 
-  const onSubmit = async (data: ProfileFormData) => {
-    try {
+  const updateMutation = useMutation({
+    mutationFn: async (userData: ProfileFormData) => {
+      const { image, ...request } = userData
       const formData = new FormData()
+      const requestBlob = new Blob([JSON.stringify(request)], { type: 'application/json' })
 
-      // 새 이미지가 있으면 추가
-      if (data.image?.[0]) {
-        formData.append('image', data.image[0])
+      formData.append('request', requestBlob)
+
+      if (image?.[0]) {
+        formData.append('image', image[0])
       }
+      const res = await apiFetch('/v1/user/me', { method: 'PUT', body: formData })
 
-      formData.append(
-        'request',
-        JSON.stringify({
-          userId: user?.id,
-          nickname: data.nickname,
-          description: data.description,
-        })
-      )
-
-      await apiFetch('/v1/user/me', { method: 'PUT', body: formData })
+      return res.ok
+    },
+    onSuccess: () => {
       toast.success('프로필이 수정되었습니다.')
-      navigate('/my')
-    } catch {
+      navigate('/club')
+    },
+    onError: () => {
       toast.error('프로필 수정에 실패했습니다.')
-    }
-  }
+    },
+  })
 
   const handleWithdraw = async () => {
     try {
@@ -153,7 +151,7 @@ export default function MyEdit() {
       </div>
 
       <FormProvider {...form}>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(data => updateMutation.mutate(data))}>
           <div className="p-4 space-y-6">
             {/* Profile Image */}
             <div>

@@ -8,6 +8,7 @@ import type { User, UserDetail } from '@/types/user'
 export default function UserScroll({ clubMembers }: { clubMembers: UserDetail[] }) {
   const [open, setOpen] = useState(false)
   const [selectedUser, setSelectedUser] = useState<User>()
+  const joinedUsers = clubMembers.filter(member => member.status === 'JOINED')
 
   function handleUserClick(user: User) {
     setOpen(true)
@@ -17,13 +18,13 @@ export default function UserScroll({ clubMembers }: { clubMembers: UserDetail[] 
   return (
     <>
       <div className="space-y-2 my-7">
-        <Label className="text-base font-bold">멤버 {clubMembers.length}</Label>
+        <Label className="text-base font-bold">멤버 {joinedUsers.length}</Label>
         <div
           className="overflow-x-auto mt-2"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           <div className="flex gap-3 w-max overflow-x-auto !scrollbar-hide touch-auto">
-            {clubMembers.map(member => (
+            {joinedUsers.map(member => (
               <UserImage
                 key={member.user.id}
                 user={member.user}
