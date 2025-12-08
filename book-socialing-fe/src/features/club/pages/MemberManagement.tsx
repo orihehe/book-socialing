@@ -92,7 +92,7 @@ export default function MemberManagement() {
 
   // HOST를 맨 위에 표시하기 위해 정렬
   const hostUsers = approvedUsers.filter(user => user.role === 'HOST')
-  const guestUsers = approvedUsers.filter(user => user.role === 'GUEST')
+  const guestUsers = approvedUsers.filter(user => user.role === 'MEMBER')
   const sortedApprovedUsers = [...hostUsers, ...guestUsers]
 
   return (
