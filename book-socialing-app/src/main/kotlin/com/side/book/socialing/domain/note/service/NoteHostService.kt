@@ -16,7 +16,7 @@ class NoteHostService(
     private val noteRepository: NoteRepository,
     private val noteParticipantRepository: NoteParticipantRepository,
     private val clubParticipantRepository: ClubParticipantRepository,
-    private val userService: UserService,
+    private val userService: UserService
 ) {
 
     @Transactional(readOnly = true)
