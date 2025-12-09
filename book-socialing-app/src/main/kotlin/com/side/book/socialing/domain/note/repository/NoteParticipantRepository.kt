@@ -11,7 +11,8 @@ interface NoteParticipantRepository : JpaRepository<NoteParticipant, Long> {
     fun findAllByNoteIdAndStatusIn(noteId: Long, statuses: Set<ParticipantStatus>): List<NoteParticipant>
     fun findAllByUserId(userId: Long): List<NoteParticipant>
 
-    @Query("""
+    @Query(
+        """
         SELECT DISTINCT 
             CASE 
                 WHEN np.userId IS NOT NULL THEN np.userId 
@@ -24,7 +25,7 @@ interface NoteParticipantRepository : JpaRepository<NoteParticipant, Long> {
         WHERE n.id = :noteId
           AND n.deleted = false
           AND (np.userId IS NOT NULL OR cp.userId IS NOT NULL)
-    """)
+    """
+    )
     fun findAllJoinedUserIdsByNoteId(@Param("noteId") noteId: Long): Set<Long>
-
 }

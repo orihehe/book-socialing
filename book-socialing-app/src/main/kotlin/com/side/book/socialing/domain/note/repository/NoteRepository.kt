@@ -11,7 +11,8 @@ import java.time.LocalDateTime
 interface NoteRepository : JpaRepository<Note, Long> {
     fun findByIdAndDeletedFalse(noteId: Long?): Note?
 
-    @Query("""
+    @Query(
+        """
         SELECT count(DISTINCT n.id) 
         FROM Note n 
         LEFT JOIN n.participants np
@@ -24,10 +25,12 @@ interface NoteRepository : JpaRepository<Note, Long> {
               OR 
               (cp.userId = :userId AND cp.status = 'JOINED' AND cp.deleted = false)
           )
-    """)
+    """
+    )
     fun countActiveNotesByUserId(userId: Long, currentDateTime: LocalDateTime): Long
 
-    @Query("""
+    @Query(
+        """
         SELECT DISTINCT n
         FROM Note n 
         LEFT JOIN n.participants np
@@ -41,7 +44,8 @@ interface NoteRepository : JpaRepository<Note, Long> {
               (cp.userId = :userId AND cp.status = 'JOINED' AND cp.deleted = false)
           )
         ORDER BY n.startAt ASC
-    """)
+    """
+    )
     fun findActiveNotesByUserId(
         @Param("userId") userId: Long,
         @Param("currentDateTime") currentDateTime: LocalDateTime,
@@ -68,7 +72,8 @@ interface NoteRepository : JpaRepository<Note, Long> {
         @Param("pageable") pageable: Pageable
     ): List<Note>
 
-    @Query("""
+    @Query(
+        """
         SELECT count(n) 
         FROM Note n 
         WHERE n.club IS NULL        
@@ -79,10 +84,12 @@ interface NoteRepository : JpaRepository<Note, Long> {
               FROM n.participants p 
               WHERE p.userId = :userId
           )
-    """)
+    """
+    )
     fun countRecommendNotesByUserId(userId: Long, currentDateTime: LocalDateTime): Long
 
-    @Query("""
+    @Query(
+        """
         SELECT n 
         FROM Note n 
         WHERE n.club IS NULL     
@@ -94,14 +101,16 @@ interface NoteRepository : JpaRepository<Note, Long> {
               WHERE p.userId = :userId
           )
         ORDER BY RAND()        
-    """)
+    """
+    )
     fun findRecommendNotesByUserId(
         @Param("userId") userId: Long,
         @Param("currentDateTime") currentDateTime: LocalDateTime,
         @Param("pageable") pageable: Pageable
     ): List<Note>
 
-    @Query("""
+    @Query(
+        """
         SELECT count(DISTINCT n.id) 
         FROM Note n 
         LEFT JOIN n.participants np 
@@ -114,10 +123,12 @@ interface NoteRepository : JpaRepository<Note, Long> {
               OR 
               (cp.userId = :userId AND cp.status = 'JOINED' AND cp.deleted = false)
           )
-    """)
+    """
+    )
     fun countRevisedNotesByUserId(userId: Long, currentDateTime: LocalDateTime): Long
 
-    @Query("""
+    @Query(
+        """
         SELECT DISTINCT n
         FROM Note n 
         LEFT JOIN n.participants np 
@@ -131,7 +142,8 @@ interface NoteRepository : JpaRepository<Note, Long> {
               (cp.userId = :userId AND cp.status = 'JOINED' AND cp.deleted = false)
           )
         ORDER BY n.endAt DESC
-    """)
+    """
+    )
     fun findRevisedNotesByUserId(
         @Param("userId") userId: Long,
         @Param("currentDateTime") currentDateTime: LocalDateTime,
@@ -149,7 +161,8 @@ interface NoteRepository : JpaRepository<Note, Long> {
         @Param("keyword") keyword: String?
     ): Long
 
-    @Query("""
+    @Query(
+        """
     SELECT 
         new com.side.book.socialing.domain.note.dto.SearchNoteDto(
             n,
@@ -172,7 +185,8 @@ interface NoteRepository : JpaRepository<Note, Long> {
         WHERE (n.bookName LIKE %:keyword% OR :keyword IS NULL)
         AND n.deleted = false
         ORDER BY n.createdAt DESC
-    """)
+    """
+    )
     fun findNoteByBookName(
         @Param("userId") userId: Long?,
         @Param("keyword") keyword: String?,
@@ -215,7 +229,8 @@ interface NoteRepository : JpaRepository<Note, Long> {
         @Param("endDate") endDate: LocalDateTime?
     ): List<Note>
 
-    @Query("""
+    @Query(
+        """
         SELECT COUNT(n) > 0 
         FROM Note n 
         LEFT JOIN n.participants np 
@@ -228,7 +243,8 @@ interface NoteRepository : JpaRepository<Note, Long> {
               OR 
               (cp.userId = :userId AND cp.status = 'JOINED' AND cp.deleted = false)
           )
-    """)
+    """
+    )
     fun existsByNoteIdAndUserAccess(
         @Param("noteId") noteId: Long,
         @Param("userId") userId: Long
