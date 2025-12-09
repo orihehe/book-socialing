@@ -48,6 +48,7 @@ class NoteHostService(
         val responseList = mutableListOf<NoteGuestResponse>()
 
         explicitParticipants
+            .filter { !it.isHost() }
             .forEach { part ->
                 userMap[part.userId]?.let { user ->
                     responseList.add(
@@ -60,17 +61,19 @@ class NoteHostService(
                 }
             }
 
-        implicitClubMembers.forEach { part ->
-            userMap[part.userId]?.let { user ->
-                responseList.add(
-                    NoteGuestResponse(
-                        user = user,
-                        role = "MEMBER",
-                        status = "JOINED"
+        implicitClubMembers
+            .filter { !it.isHost() }
+            .forEach { part ->
+                userMap[part.userId]?.let { user ->
+                    responseList.add(
+                        NoteGuestResponse(
+                            user = user,
+                            role = "MEMBER",
+                            status = "JOINED"
+                        )
                     )
-                )
+                }
             }
-        }
 
         return responseList
     }
