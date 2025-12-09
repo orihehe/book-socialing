@@ -494,7 +494,7 @@ class NoteService(
      * 노트 접근 권한을 확인하는 헬퍼 메소드
      */
     private fun checkNoteAccess(noteId: Long, userId: Long): Boolean {
-        return noteParticipantRepository.existsByNoteIdAndUserIdAndStatus(noteId, userId, ParticipantStatus.JOINED)
+        return noteRepository.existsByNoteIdAndUserAccess(noteId, userId)
     }
 
     @Transactional
@@ -605,11 +605,11 @@ class NoteService(
     }
 
     fun getUsers(noteId: Long): List<UserDto> {
-        val participants = noteParticipantRepository.findAllByNoteIdAndStatusIn(
-            noteId,
-            setOf(ParticipantStatus.JOINED)
-        )
-        return participants.mapNotNull { userService.getUser(it.userId) }
+        val userIds: Set<Long> = noteParticipantRepository.findAllJoinedUserIdsByNoteId(noteId)
+
+        return userIds.mapNotNull { userId ->
+            userService.getUser(userId)
+        }
     }
 
     /**
