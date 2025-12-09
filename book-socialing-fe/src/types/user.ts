@@ -11,7 +11,7 @@ export interface ChatUser extends Omit<User, 'imageUrl' | 'role'> {
   profileImageUrl?: string
 }
 
-export type UserRole = 'HOST' | 'GUEST'
+export type UserRole = 'HOST' | 'MEMBER'
 export type UserStatus = 'JOINED' | 'PENDING_APPROVAL' | 'CANCEL' | 'REJECTED' | 'LEFT' | 'KICKED'
 
 export interface UserDetail {
