@@ -76,13 +76,17 @@ interface NoteRepository : JpaRepository<Note, Long> {
         """
         SELECT count(n) 
         FROM Note n 
-        WHERE n.club IS NULL        
-          AND n.endAt > :currentDateTime 
+        WHERE n.endAt > :currentDateTime 
           AND n.deleted = false
-          AND NOT EXISTS (          
-              SELECT 1 
-              FROM n.participants p 
-              WHERE p.userId = :userId
+          AND NOT EXISTS (       
+              SELECT 1 FROM n.participants np WHERE np.userId = :userId
+          )
+          AND (
+              n.club IS NULL 
+              OR NOT EXISTS (
+                  SELECT 1 FROM n.club.participants cp 
+                  WHERE cp.userId = :userId AND cp.status = 'JOINED' AND cp.deleted = false
+              )
           )
     """
     )
@@ -92,13 +96,23 @@ interface NoteRepository : JpaRepository<Note, Long> {
         """
         SELECT n 
         FROM Note n 
-        WHERE n.club IS NULL     
-          AND n.endAt > :currentDateTime 
+        WHERE n.endAt > :currentDateTime 
           AND n.deleted = false
           AND NOT EXISTS (       
               SELECT 1 
-              FROM n.participants p 
-              WHERE p.userId = :userId
+              FROM n.participants np 
+              WHERE np.userId = :userId
+          )
+          AND (
+              n.club IS NULL 
+              OR 
+              NOT EXISTS (
+                  SELECT 1 
+                  FROM n.club.participants cp 
+                  WHERE cp.userId = :userId 
+                    AND cp.status = 'JOINED'
+                    AND cp.deleted = false
+              )
           )
         ORDER BY RAND()        
     """

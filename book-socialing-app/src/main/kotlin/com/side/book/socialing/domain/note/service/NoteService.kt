@@ -311,7 +311,6 @@ class NoteService(
             return ClubNotesPageResponse(totalCount = 0L, groups = emptyList())
         }
 
-        // 사용자가 참여하고 있는 모든 참여 정보를 찾는다.
         val notes = noteRepository.findRecommendNotesByUserId(userId, now, pageable)
 
         val groupedByClub = notes.groupBy { it.club?.id }
