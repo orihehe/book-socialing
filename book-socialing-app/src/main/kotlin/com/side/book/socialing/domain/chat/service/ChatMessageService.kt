@@ -51,7 +51,7 @@ class ChatMessageService(
         )
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     fun findMessages(
         noteId: Long,
         userId: Long,
